@@ -8,6 +8,7 @@ import * as THREE from 'three'
 import Instrument from './Instrument'
 import { I } from '../lib/pointer'
 import { useFrame } from '@react-three/fiber'
+import { useRef } from 'react'
 
 class ViewportObserver {
   private els = new Set<Element>()
@@ -61,13 +62,23 @@ function Studio() {
   )
 }
 
+/** Fires once the renderer has genuinely put frames on screen, so the drawing
+ *  is only removed when there is something real behind it. */
+function Ready({ onReady }: { onReady: () => void }) {
+  const seen = useRef(0)
+  useFrame(() => {
+    if (seen.current < 3 && ++seen.current === 3) onReady()
+  })
+  return null
+}
+
 /** Resolves the image out of black rather than cutting to it. */
 function Exposure() {
   useFrame(({ gl }) => { gl.toneMappingExposure = I.v * 1.15 })
   return null
 }
 
-export default function Scene() {
+export default function Scene({ onReady }: { onReady: () => void }) {
   return (
     <Canvas
       // inline, not a class: styles.css is injected after mount and R3F would
@@ -89,6 +100,7 @@ export default function Scene() {
 
       <Instrument />
       <Exposure />
+      <Ready onReady={onReady} />
 
       <ContactShadows position={[0, -1.55, 0]} opacity={0.5} scale={14} blur={3} far={5} />
 

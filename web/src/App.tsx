@@ -2,6 +2,7 @@ import { useEffect, useState, lazy, Suspense } from 'react'
 import { initScroll } from './lib/scroll'
 import ExperienceBoundary from './lib/ExperienceBoundary'
 import { nudge } from './lib/nudge'
+import Resolving from './Resolving'
 import './styles.css'
 
 const Scene = lazy(() => import('./scene/Scene'))
@@ -29,6 +30,14 @@ const RAIL = ['Resolve', 'carabiner', 'recur', 'LabLedger', 'QuizNest', 'Recipe'
 
 export default function App() {
   const allowed = useExperienceAllowed()
+  const [ready, setReady] = useState(false)
+
+  // The drawing must never outlive its purpose. If the scene errors out or the
+  // context is lost, onReady never fires — so retire it on a timer regardless.
+  useEffect(() => {
+    const id = setTimeout(() => setReady(true), 9000)
+    return () => clearTimeout(id)
+  }, [])
   useEffect(() => initScroll(), [])
 
   return (
@@ -38,14 +47,23 @@ export default function App() {
       {allowed && (
         <ExperienceBoundary>
           <Suspense fallback={null}>
-            <Scene />
+            <Scene onReady={() => setReady(true)} />
           </Suspense>
         </ExperienceBoundary>
       )}
 
+      {allowed && <Resolving done={ready} />}
+
       <header className="hud top">
-        <span className="brand"><i className="pip" />Ritish Saini</span>
-        <span className="role">Backend engineer · Postgres · Security</span>
+        <span className="brand">
+          <svg className="mark" viewBox="-50 -50 100 100" aria-hidden="true">
+            <path d="M 33 0 L 40.6 14.8 L 31 11.3 L 33.1 27.8 L 25.3 21.2 L 21.6 37.4 L 16.5 28.6 L 7.5 42.6 L 5.7 32.5 L -7.5 42.6 L -5.7 32.5 L -21.6 37.4 L -16.5 28.6 L -33.1 27.8 L -25.3 21.2 L -40.6 14.8 L -31 11.3 L -43.2 0 L -33 0 L -40.6 -14.8 L -31 -11.3 L -33.1 -27.8 L -25.3 -21.2 L -21.6 -37.4 L -16.5 -28.6 L -7.5 -42.6 L -5.7 -32.5 L 7.5 -42.6 L 5.7 -32.5 L 21.6 -37.4 L 16.5 -28.6 L 33.1 -27.8 L 25.3 -21.2 L 40.6 -14.8 L 31 -11.3 L 43.2 0 Z" />
+            <circle r="13" fill="var(--void)" />
+            <circle r="5" fill="var(--beam)" />
+          </svg>
+          Ritish Saini
+        </span>
+        <span className="role">Python · FastAPI · PostgreSQL · Security</span>
       </header>
 
       <nav className="hud rail" aria-label="Sections">
