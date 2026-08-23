@@ -6,7 +6,6 @@ import {
 import { BlendFunction } from 'postprocessing'
 import * as THREE from 'three'
 import Instrument from './Instrument'
-import { useThree, useFrame } from '@react-three/fiber'
 
 class ViewportObserver {
   private els = new Set<Element>()
@@ -52,7 +51,6 @@ export default function Scene() {
       <directionalLight position={[3.5, 4, 2.5]} intensity={0.6} />
 
       <Instrument />
-      <Probe />
 
       <ContactShadows position={[0, -1.55, 0]} opacity={0.5} scale={14} blur={3} far={5} />
 
