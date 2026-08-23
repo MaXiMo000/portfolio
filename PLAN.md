@@ -50,20 +50,63 @@ three unless there is a specific reason:
 
 ### The direction to take instead
 
-**Instrument panel.** Ritish's work is measurement: query plans, LOINC codes,
-tenant isolation proofs, 60-repo corpora, entropy thresholds. The visual
-language should be the language of instruments — precise, legible, quietly
-confident, numbers treated as first-class content.
+**The drawing sheet.** Ritish's work is measurement: query plans, LOINC codes,
+tenant isolation proofs, 60-repo corpora, entropy thresholds. And the 3D hero
+(§5) is a *machined part*. A machined part ships with a document — dimensioned
+views, a title block, tolerance callouts, a material spec, a revision row.
 
-- **Palette** — a near-neutral technical ground (graphite / bone), one
-  signal colour used *only* for live data and interactive state, one warning
-  colour used almost never. Four to six tokens, all named. No gradient meshes.
-- **Type** — a characteristic display face with real width contrast, a
-  workhorse body face, and a genuine mono for every number and identifier.
-  Numbers are the content here; set them properly, tabular figures on.
-- **Structure** — numbers and units carry meaning: `2,441 KB`, `31 → 2`,
-  `0.02s`, `57 tests`. Let real figures do the decorating instead of ornament.
-- **Signature** — one memorable element, executed well. Not five effects.
+So the site is not a dark tech portfolio with a 3D object dropped in it. The
+site **is the drawing**, and the ratchet is the part it documents.
+
+This also settles the ground value, which is the decision most portfolios get
+backwards. **Pale sheet, not near-black.** Machined metal under an HDRI reads
+far better against bone than against black, dark-with-one-accent is the most
+worn AI-portfolio default there is, and a light ground is the harder thing to
+execute — which is the point.
+
+**Palette** — six tokens, all named. No gradient meshes, no glassmorphism.
+
+| Token | Value | Used for |
+|---|---|---|
+| `--sheet` | `#E6E4DE` | page ground — drafting vellum, grey-green, *not* cream `#F4F1EA` |
+| `--ink` | `#191B1E` | all type, all rules at full weight |
+| `--rule` | `#B4B1A9` | hairlines, dimension lines, arrowheads, grid |
+| `--anodize` | `#1B45D8` | **signal.** Live data and interactive state only. Nothing else. |
+| `--witness` | `#C8340C` | warning. Used ~three times on the whole site. |
+| `--bed` | `#111316` | the canvas well the 3D sits in, and nowhere else |
+
+`--anodize` and `--witness` are climbing-hardware anodizing colours, which is
+where a carabiner's own colour vocabulary comes from. They are not decoration
+and they are not applied by area — they are applied by *meaning*.
+
+**Type** — two variable faces, two `woff2` files, both self-hosted and subset.
+
+- **Archivo Variable** — display and body. It carries a real width axis
+  (62–125), so the identity comes from *width contrast within one family*:
+  the name set extremely expanded, section labels set condensed and small.
+  That is a typographic idea, not a font pairing.
+- **Commit Mono** — every number, every identifier, every unit. Tabular
+  figures on, always. Numbers are the content here.
+
+**Structure** — the drafting vernacular, used only where it states something
+true:
+
+- **Dimension lines** with real arrowheads that measure the actual layout, and
+  annotate the real value: `↕ 640`, `⟷ 72ch`. Pure CSS. Never a fake number.
+- **Title block** — see Signature.
+- **Part numbering on projects only**, because the projects genuinely are a
+  parts list. No `01 / 02 / 03` on anything that is not a sequence.
+
+**Signature — the live title block.** Bottom-right of the viewport, fixed, the
+way a title block sits on a real drawing sheet. It holds sheet name, revision,
+and a **live readout of the page's own telemetry**: bytes actually transferred
+so far, LCP once it fires, current scroll depth as a dimension. Real
+`PerformanceObserver` numbers, never hardcoded.
+
+That single element is the whole thesis in one component — the site measures
+itself, in public, while you read it. It also means §7 Phase 3 stops being a
+section you scroll to and becomes ambient. Everything else on the page stays
+quiet so this is the thing that gets remembered.
 
 ### Motion
 
@@ -71,14 +114,26 @@ Motion must serve comprehension. A scroll-triggered reveal that shows a plan
 changing, or a ratchet that turns one way, teaches something. A parallax card
 tilt teaches nothing and costs a repaint.
 
+The scroll choreography is one idea, applied consistently: **scroll is the
+ratchet's input shaft.** Scrolling advances the wheel; each section boundary is
+one tooth passing the pawl. It cannot run backwards — scroll up and the camera
+returns, but the mechanism holds. That is carabiner's central idea (a baseline
+that only tightens) made physical, and it gives every section boundary a real
+mechanical event instead of a fade-in.
+
 Every animation respects `prefers-reduced-motion: reduce` — completely, not by
 shortening durations.
 
 ---
 
-## 4. Performance budget — the hard part, and the differentiator
+## 4. Performance budget — two tiers, and only one of them is capped
 
-These are pass/fail, checked in CI. Not aspirations.
+The budget is split. **The document is capped hard; the 3D layer is not.** This
+is the resolution of the whole brief, and it costs nothing: Lighthouse and LCP
+are measured on the critical path, and the 3D is not on the critical path. You
+keep the score *and* the spectacle. Nothing is traded.
+
+### Tier 1 — the document. Pass/fail, checked in CI.
 
 | Metric | Budget | Reference site for contrast |
 |---|---|---|
@@ -89,6 +144,17 @@ These are pass/fail, checked in CI. Not aspirations.
 | Cumulative Layout Shift | **0** | — |
 | Lighthouse performance (mobile) | **≥ 95** | — |
 | Time to interactive without any JS | **immediate** | never |
+
+### Tier 2 — the 3D layer. Deliberately uncapped.
+
+Loaded after the document is complete, idle, and interactive. **~2–3 MB is
+fine.** Spend it on the HDRI and on render quality; that is where the look
+lives. The one hard rule is the load *order*, not the size:
+
+- it never blocks first paint, never blocks interaction, never blocks fonts
+- it must be cancellable — navigate away mid-download and nothing is stuck
+- CI asserts Tier 1 with the 3D layer *excluded from the graph entirely*; if
+  the 3D can affect the Tier 1 number, the load order is wrong, not the budget
 
 **No preloader. Ever.** A loading screen is an admission that the page cannot
 show anything useful yet. Text and layout are HTML; they arrive with the
@@ -111,59 +177,95 @@ document.
 
 ---
 
-## 5. The 3D — additive, never load-bearing
+## 5. The 3D — the headline, still not load-bearing
+
+This is where the quality bar is set. It should be genuinely excellent, and it
+is allowed to be expensive (§4 Tier 2). What it is *not* allowed to do is hold
+up the document.
+
+### Scene — settled: the ratchet
+
+A ratchet wheel and pawl. Asymmetric teeth, machined metal, one direction only.
+Chosen over the query-plan structure for three reasons:
+
+1. **Scroll maps to it directly.** Scroll → rotation is a one-to-one physical
+   mapping, not an invented one. A camera flying along a node graph is a
+   metaphor; a wheel turning under your thumb is the thing itself.
+2. **It is the most reliably beautiful thing in three.js.** Machined metal
+   under a good HDRI is a solved, gorgeous look. A floating node graph is one
+   bad decision away from generic-tech-blob.
+3. **It carries carabiner's actual idea** — a baseline that only ratchets
+   tighter, never loosens.
+
+One scene, done extremely well, reused down the whole page. Not a toy per
+section. The query-plan visualisation survives as a cheap 2D scroll-driven
+piece later — it teaches something and costs almost nothing.
 
 ### Technology
 
-**three.js with a real modelled asset.** Not hand-rolled WebGL signed distance
-fields. This is settled: a previous attempt at a hand-rolled SDF raymarcher for
-the carabiner site failed over six rounds — the geometry never resolved, and
-three genuine bugs (a non-uniformly scaled distance field, a material id
-destroyed by `smin`, a camera closer than the object's own radius) still left it
-looking wrong. three.js with a proper GLTF and HDRI lighting is the well-trodden
-route that reliably produces the intended look.
+**three.js — settled.** Not hand-rolled WebGL signed distance fields. A
+previous attempt at a hand-rolled SDF raymarcher for the carabiner site failed
+over six rounds: the geometry never resolved, and three genuine bugs (a
+non-uniformly scaled distance field, a material id destroyed by `smin`, a
+camera closer than the object's own radius) still left it looking wrong.
+
+**Generate the geometry in code. Do not ship a `.glb`.** A ratchet is a
+parametric part: the teeth are one `Shape` extruded around a circle, the hub is
+a lathe, the pawl is a second extrusion. This is not a cost-saving compromise —
+it is the *better* result, because procedural teeth are perfect and adjustable
+where a modelled mesh is fixed. Three consequences:
+
+- geometry costs **zero bytes** and no Blender round-trip
+- no Draco/meshopt decoder, therefore **no `wasm-unsafe-eval` in `script-src`**
+  — the §6 CSP stays `default-src 'none'`
+- the largest 3D asset becomes the **HDRI environment map**, which is correct,
+  because on metal the environment *is* the material. Spend the budget there:
+  a real studio HDRI, not a three-light rig.
+
+Mesh detail is not what makes this look expensive. Environment, roughness map,
+anisotropy on the machined faces, and a correct tone map are.
 
 ### The rule that keeps it honest
 
-> The 3D is loaded **after** the page is complete and usable, and never at all
-> when the visitor's connection or device says no.
+> The 3D loads **after** the page is complete and usable. It never blocks, and
+> it degrades to something deliberate rather than something missing.
 
-Skip the 3D entirely when any of these hold:
+**Phones get the real scene, not a poster.** They are most of the audience;
+handing them a JPEG of the good version is the wrong trade now that quality is
+the priority. Instead, one scene with two quality profiles:
+
+| | Desktop | Phone / low-power |
+|---|---|---|
+| `devicePixelRatio` cap | 2.0 | 1.25 |
+| Environment | full HDRI | pre-filtered, half resolution |
+| Postprocessing | on | off |
+| Shadows | contact shadows | baked into the ground texture |
+
+Skip the 3D **entirely** only when the visitor or the hardware says no:
 
 - `navigator.connection.saveData` is true
 - `prefers-reduced-motion: reduce`
-- `navigator.hardwareConcurrency <= 4`
-- viewport width below the tablet breakpoint (phones get the static poster)
 - WebGL context creation fails
+- (`hardwareConcurrency` and viewport width no longer gate it — they select the
+  low-power profile instead)
 
-In every skip case the visitor sees a **static poster image** — an AVIF render
-of the same scene, under 40 KB. It should look deliberate, not degraded. Most
-visitors on phones will only ever see this, and it must be good.
+In those three cases the visitor sees a **static poster** — an AVIF render of
+the same scene, under 40 KB, composed to look deliberate. It is now a genuine
+fallback rather than the default mobile experience.
 
-### Scene concept
+### Engineering rules for the 3D layer
 
-Tie it to the work, not to fashion. Candidates, in order of preference:
-
-1. **A query plan as a physical structure** — nodes and edges in space, the
-   camera moving along the plan as the page scrolls, a Seq Scan visibly heavier
-   than an Index Scan. It is Ritish's actual expertise made visible.
-2. **A ratchet mechanism** — asymmetric teeth and a pawl, turning one way only.
-   Carries carabiner's central idea and is mechanically satisfying.
-3. **An instrument being calibrated** — a dial that settles to a reading.
-
-Whichever is chosen: one scene, done extremely well, reused across the page —
-not a different toy per section.
-
-### Budget for the 3D layer
-
-- Model: **≤ 300 KB** as compressed `.glb` (Draco or meshopt), loaded lazily
-- three.js: import only the modules used; tree-shaken build, target ≤ 120 KB gz
-- Cap the renderer at `devicePixelRatio ≤ 1.5`; a retina buffer triples the
-  fill cost for a difference nobody sees on soft materials
+- three.js tree-shaken; import only the modules used
+- **Damp the scroll inside the canvas, never on the page.** Page scroll stays
+  native and instant; the camera and wheel lerp toward the scroll value. That
+  is where the "butter" actually comes from, and it costs nothing in scroll
+  integrity. No smooth-scroll library. (See §8 — this is the one amendment.)
 - **Stop rendering** when the canvas leaves the viewport or the tab is hidden —
   but always paint the first frame, or a page opened in a background tab shows
   an empty canvas when it is finally focused
-- Target 60fps on a mid-range phone, measured, not assumed
+- Render only on scroll change plus a short settle, not a permanent rAF loop.
+  A static wheel should cost 0% CPU.
+- 60fps on a mid-range phone, measured on a real device, not assumed
 
 ---
 
@@ -225,26 +327,37 @@ the same choice.
 Each phase ends with a deployed, working site. The 3D is never a prerequisite
 for anything.
 
-### Phase 0 — the whole site, no JavaScript *(first)*
-Static HTML and CSS. Every section, all real copy, all project cards, responsive
-from 320px up, keyboard navigable, semantic landmarks. Deployed with headers.
+**The 3D moved earlier.** It used to come after the motion work. That was
+wrong: the scroll choreography is *driven by* the mechanism, so building all the
+reveals first means rebuilding them around the canvas. The scene now lands
+second, and the page's motion is choreographed to it once it exists.
+
+### Phase 0 — the whole site, no JavaScript *(still first, non-negotiable)*
+Static HTML and CSS. Every section, all real copy, all project cards, the
+drafting-sheet type and palette from §3, responsive from 320px up, keyboard
+navigable, semantic landmarks. Deployed with headers.
 **Exit:** complete and good with JS disabled. Lighthouse ≥ 98. Under 150 KB.
 
-### Phase 1 — motion and polish
-Scroll-reveals, hover states, the type animation, view transitions. All CSS or
-tiny JS islands. Reduced-motion honoured completely.
-**Exit:** budgets in §4 still met. CLS still 0.
+### Phase 1 — the 3D *(moved up)*
+three.js, procedural ratchet geometry, the HDRI and material work, both quality
+profiles, the poster fallback, every skip condition from §5. Get the object
+looking genuinely excellent standing still before anything animates it.
+**Exit:** it looks expensive in a screenshot. 60fps on a real mid-range phone.
+Tier 1 budgets unchanged, because none of it is on the critical path.
 
-### Phase 2 — the 3D
-three.js, the chosen scene, the static poster fallback, every skip condition
-from §5 implemented.
-**Exit:** 60fps mid-range phone; identical Lighthouse score to Phase 1 because
-none of it is on the critical path.
+### Phase 2 — scroll choreography
+Scroll drives the wheel; section boundaries are teeth. The DOM reveals, hover
+states and view transitions are choreographed to the same scroll value, so the
+page and the mechanism move as one system. Native CSS scroll-driven animations
+where they reach; damping inside the canvas only.
+**Exit:** Tier 1 budgets still met. CLS still 0. Reduced-motion path is a
+complete, composed static page — not the same page with the motion switched off.
 
 ### Phase 3 — proof
-A visible, honest performance section on the site itself: the budgets, the real
-measured numbers, and the reference comparison. Turn the constraint into the
-argument — this is the part that separates it from every other portfolio.
+The live title block from §3 goes real: actual `PerformanceObserver` numbers,
+bytes transferred, LCP. Plus the honest performance section — the budgets, the
+measured numbers, the reference comparison. Turn the constraint into the
+argument. This is the part no other portfolio has.
 
 ### Phase 4 — the details
 Custom domain, OG images, `sitemap.xml`, RSS if writing happens, a 404 with
@@ -255,7 +368,9 @@ personality.
 ## 8. Explicitly not doing this
 
 - No preloader, no "enter site" gate, no fake progress bar
-- No hijacked scrolling, no smooth-scroll library that fights the OS
+- No hijacked scrolling, no smooth-scroll library that fights the OS.
+  *Amended:* damping is allowed, but only inside the WebGL canvas (§5). The
+  page's own scroll stays native, instant and OS-native. Always.
 - No auto-playing sound, no cursor that replaces the real one on touch devices
 - No React/Next for what is a static document
 - No CDN for fonts, scripts or styles
