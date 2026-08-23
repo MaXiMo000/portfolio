@@ -70,6 +70,9 @@ function Ratchet({ index }: { index: number }) {
   const flash = useRef<THREE.PointLight>(null!)
   const angle = useRef(0)
   const settled = useRef(0)
+  const lastT = useRef(0)
+  const armed = useRef(false)
+  const advanced = useRef(0)
   const alloy = useAlloy()
   const brass = useMemo(
     () => new THREE.MeshStandardMaterial({
@@ -88,13 +91,24 @@ function Ratchet({ index }: { index: number }) {
 
     // Quantised: scroll advances exactly one tooth at a time.
     if (S.i === index) {
-      const target = Math.floor(S.t * TEETH * 0.6) * STEP
-      // The wheel NEVER reverses. Scroll back and the camera returns; the
-      // mechanism holds. That is the entire argument of carabiner.
+      // Re-entering must not replay old travel, so re-arm against the current
+      // position rather than the one we left at.
+      if (!armed.current) { lastT.current = S.t; armed.current = true }
+      const delta = S.t - lastT.current
+      lastT.current = S.t
+      // Accumulate *travel* rather than reading absolute progress. Reading S.t
+      // directly meant the wheel maxed out on the first scroll through and
+      // never moved again on any later pass.
+      if (delta > 0) advanced.current += delta
+      const target = Math.floor(advanced.current * TEETH * 0.6) * STEP
+      // It still never reverses: scroll back and the camera returns, the
+      // mechanism holds. That is the whole argument of carabiner.
       if (target > settled.current) {
         settled.current = target
         if (flash.current) flash.current.intensity = 14
       }
+    } else {
+      armed.current = false
     }
     angle.current = damp(angle.current, settled.current, 11, d)
     wheel.current.rotation.z = angle.current
