@@ -1,4 +1,4 @@
-/* Art direction: see ART-DIRECTION.md. Fonts are CDN in dev only — self-host at ship. */
+/* Design system and rules: see README.md. Fonts are self-hosted (src/fonts.css). */
 :root{
   --void:#08090C; --chalk:#EDECE8; --alloy:#98A3B1;
   --beam:#86E9DE; --escalate:#E8873B; --hair:rgba(255,255,255,.07);

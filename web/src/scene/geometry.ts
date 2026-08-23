@@ -2,7 +2,7 @@ import * as THREE from 'three'
 
 /** Asymmetric ratchet: a long ramp up to each tip, then a radial face back.
  *  Generated, not modelled — the teeth are exact and tunable, and it ships
- *  zero bytes of mesh (see ART-DIRECTION.md §4). */
+ *  zero bytes of mesh. */
 export function ratchetGeometry(teeth = 24, rTip = 1, rRoot = 0.86) {
   const s = new THREE.Shape()
   for (let i = 0; i < teeth; i++) {

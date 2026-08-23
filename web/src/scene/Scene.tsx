@@ -7,8 +7,8 @@ import { BlendFunction } from 'postprocessing'
 import * as THREE from 'three'
 import Instrument from './Instrument'
 import { I } from '../lib/pointer'
-import { useFrame } from '@react-three/fiber'
-import { useRef } from 'react'
+import { useFrame, useThree } from '@react-three/fiber'
+import { useEffect, useRef } from 'react'
 
 class ViewportObserver {
   private els = new Set<Element>()
@@ -62,6 +62,41 @@ function Studio() {
   )
 }
 
+/**
+ * Stops the render loop while the tab is hidden. A fixed full-screen canvas
+ * never leaves the viewport, so visibility is the only real trigger — and
+ * without this a 60fps WebGL scene keeps burning battery in a background tab
+ * for as long as it stays open.
+ *
+ * It never pauses before a frame has been painted: a page opened straight into
+ * a background tab would otherwise show an empty canvas when finally focused.
+ */
+function Frameloop() {
+  const setFrameloop = useThree((s) => s.setFrameloop)
+  const invalidate = useThree((s) => s.invalidate)
+  const painted = useRef(0)
+
+  useFrame(() => {
+    painted.current++
+    if (painted.current === 2 && document.hidden) setFrameloop('never')
+  })
+
+  useEffect(() => {
+    const onVisibility = () => {
+      if (document.hidden) {
+        if (painted.current > 0) setFrameloop('never')
+      } else {
+        setFrameloop('always')
+        invalidate()
+      }
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => document.removeEventListener('visibilitychange', onVisibility)
+  }, [setFrameloop, invalidate])
+
+  return null
+}
+
 /** Fires once the renderer has genuinely put frames on screen, so the drawing
  *  is only removed when there is something real behind it. */
 function Ready({ onReady }: { onReady: () => void }) {
@@ -101,6 +136,7 @@ export default function Scene({ onReady }: { onReady: () => void }) {
       <Instrument />
       <Exposure />
       <Ready onReady={onReady} />
+      <Frameloop />
 
       <ContactShadows position={[0, -1.55, 0]} opacity={0.5} scale={14} blur={3} far={5} />
 
