@@ -1,7 +1,7 @@
 import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
-import { S, damp } from '../lib/scroll'
+import { S, VIEW, damp } from '../lib/scroll'
 import { P, I } from '../lib/pointer'
 import { NUDGE } from '../lib/nudge'
 import { ratchetGeometry, housingGeometry, pawlGeometry, tumblerGeometry } from './geometry'
@@ -616,11 +616,22 @@ export default function Instrument() {
     state.camera.position.z = damp(state.camera.position.z, z + intro, 3, d)
     rig.current.rotation.y = damp(rig.current.rotation.y, S.t * 0.3 + P.x * 0.16, 2.5, d)
     rig.current.rotation.x = damp(rig.current.rotation.x, -P.y * 0.1, 2.5, d)
-    state.camera.lookAt(0.55, 0, 0)
+
+    const m = VIEW.mobile
+    // At fov 38 and z~3.3 the half-height is ~1.14 world units, so y 0.78 with
+    // scale 0.52 lands the instrument in the top quarter — clear of the copy,
+    // and clear of the vignette at the frame edge.
+    rig.current.position.x = damp(rig.current.position.x, m ? 0.14 : 1.15, 4, d)
+    rig.current.position.y = damp(rig.current.position.y, m ? 0.78 : 0.05, 4, d)
+    const s = damp(rig.current.scale.x, m ? 0.52 : 0.78, 4, d)
+    rig.current.scale.setScalar(s)
+    state.camera.lookAt(m ? 0.1 : 0.55, m ? 0.05 : 0, 0)
   })
 
   return (
-    // right of centre, cropped: the copy owns the left third
+    // Desktop: right of centre, cropped — the copy owns the left third.
+    // Narrow: there is no side to move to, so it lifts into the upper third
+    // and shrinks, leaving the lower two thirds to the text (see useFrame).
     <group ref={rig} position={[1.15, 0.05, 0]} scale={0.78}>
       <Housing index={0} opensWith={1} />
       <Ratchet index={1} />

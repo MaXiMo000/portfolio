@@ -11,6 +11,7 @@ gsap.registerPlugin(ScrollTrigger)
  *  i = active section index, t = 0..1 progress *through* that section.
  */
 export const S = { i: 0, t: 0, p: 0 }
+export const VIEW = { mobile: false }
 
 // dev only: lets the scene be driven without scrolling, so a transition can be
 // parked at any point and inspected
@@ -43,6 +44,7 @@ export function initScroll() {
    * still on screen, and S.t jumped instead of sweeping.
    */
   const update = () => {
+    VIEW.mobile = window.innerWidth <= 820
     const mid = window.scrollY + window.innerHeight / 2
     let best = 0
     let bestDist = Infinity

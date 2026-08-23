@@ -150,7 +150,23 @@ colour is **light inside the scene**, not decoration on the UI.
 4. **~60% of every frame stays empty.** Negative space is the luxury signal.
    Everything above fails if the frame is crowded.
 
-## 8. Accessibility floor — non-negotiable
+## 8. Contrast, and why the palette is not the lever
+
+Measured against the ground, the palette is sound. Measured against the
+*instrument*, nothing survives — white type is **2.39:1** over bright metal.
+No hue choice fixes that, so contrast is bought with **separation, not colour**:
+
+- **Desktop** — the instrument is cropped right of centre and the copy owns the
+  left third. They never overlap, so nothing is needed.
+- **Narrow** — there is no side to move to. The instrument lifts into the top
+  quarter (`y 0.78`, `scale 0.52`) and a ground scrim reasserts `--void` under
+  the text from ~34% down. The object stays visible; the copy sits on black.
+
+Every text token clears WCAG AA (4.5:1) against the ground on its own:
+`dt` 5.48 · HUD greys 6.25 · `.num em` 5.05 · body 7.78 · headline 16.84.
+Nothing below 4.5 ships, however decorative it looks.
+
+## 9. Accessibility floor — non-negotiable
 
 - `prefers-reduced-motion`: a complete, composed **static** composition per
   section with real content. Not the same page with motion switched off.
@@ -158,7 +174,7 @@ colour is **light inside the scene**, not decoration on the UI.
 - Skip link; every section keyboard reachable; visible focus.
 - **No autoplay audio.** The reference sites do it; we are not going to.
 
-## 9. Stack and budget
+## 10. Stack and budget
 
 React · React Three Fiber · drei · Three.js · GSAP ScrollTrigger · Lenis ·
 `@react-three/postprocessing`, built with Vite.
@@ -174,7 +190,7 @@ An earlier revision capped total JS at 40 KB. This stack is ~400 KB gzipped
 before a line of our own code, so that number is void. The floor is what
 survived, and the floor is the part that actually mattered.
 
-## 10. Hosting and headers
+## 11. Hosting and headers
 
 **Netlify, not GitHub Pages.** Pages cannot set HTTP response headers, which
 rules out a real CSP, HSTS and `frame-ancestors`. That single limitation
