@@ -55,11 +55,13 @@ export function housingGeometry() {
 
 /** The pawl: a tapered arm that only lets the wheel go one way. */
 export function pawlGeometry() {
+  // The arm runs along -X, back toward the wheel it holds. It used to run +X,
+  // which pointed it away from the teeth and left it floating in space.
   const s = new THREE.Shape()
   s.moveTo(0, 0.075)
-  s.lineTo(0.78, 0.03)
-  s.lineTo(0.84, 0)
-  s.lineTo(0.78, -0.03)
+  s.lineTo(-0.78, 0.035)
+  s.lineTo(-0.86, 0)
+  s.lineTo(-0.78, -0.035)
   s.lineTo(0, -0.075)
   s.closePath()
   const g = new THREE.ExtrudeGeometry(s, {

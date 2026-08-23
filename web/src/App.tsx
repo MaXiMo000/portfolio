@@ -1,6 +1,7 @@
 import { useEffect, useState, lazy, Suspense } from 'react'
 import { initScroll } from './lib/scroll'
 import ExperienceBoundary from './lib/ExperienceBoundary'
+import { nudge } from './lib/nudge'
 import './styles.css'
 
 const Scene = lazy(() => import('./scene/Scene'))
@@ -79,7 +80,12 @@ export default function App() {
               <dt>Hard</dt><dd>A ratchet that never loosens — not by accident, not by a well-meaning PR.</dd>
               <dt>Cost</dt><dd><b>60</b> repos calibrated · <b>57</b> tests · SARIF · PyPI, GHCR, Marketplace</dd>
             </dl>
-            <a className="go" href="https://github.com/MaXiMo000/carabiner">Open the repo →</a>
+            <a
+              className="go" href="https://github.com/MaXiMo000/carabiner"
+              onPointerEnter={() => nudge(1)} onFocus={() => nudge(1)}
+            >
+              Open the repo →
+            </a>
           </div>
         </section>
 

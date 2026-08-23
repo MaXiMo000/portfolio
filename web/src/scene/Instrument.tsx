@@ -3,12 +3,18 @@ import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { S, damp } from '../lib/scroll'
 import { P, I } from '../lib/pointer'
+import { NUDGE } from '../lib/nudge'
 import { ratchetGeometry, housingGeometry, pawlGeometry, tumblerGeometry } from './geometry'
 
 const BEAM = '#86E9DE'
 const ESCALATE = '#E8873B'
 const TEETH = 24
 const STEP = (Math.PI * 2) / TEETH
+const SPARKS = 40
+// pawl pivot sits outside the wheel; the arm reaches back to r ~0.94, just
+// inside the tooth tips, so it actually rides the flank
+const PIVOT = { x: 1.6, y: 0.55, z: 0.05 }
+const CONTACT = new THREE.Vector3(0.76, 0.55, 0.05)
 
 /** One alloy for the whole page. The metal is read from the environment,
  *  not from lights — that is why the HDRI is the expensive asset. */
@@ -68,12 +74,13 @@ function Ratchet({ index }: { index: number }) {
   const g = useRef<THREE.Group>(null!)
   const wheel = useRef<THREE.Mesh>(null!)
   const pawl = useRef<THREE.Group>(null!)
-  const flash = useRef<THREE.PointLight>(null!)
+  const sparks = useRef<THREE.InstancedMesh>(null!)
   const angle = useRef(0)
   const settled = useRef(0)
   const lastT = useRef(0)
   const armed = useRef(false)
   const advanced = useRef(0)
+  const seenNudge = useRef(0)
   const alloy = useAlloy()
   const brass = useMemo(
     () => new THREE.MeshStandardMaterial({
@@ -83,6 +90,29 @@ function Ratchet({ index }: { index: number }) {
   const geo = useMemo(() => ratchetGeometry(TEETH), [])
   const pawlGeo = useMemo(pawlGeometry, [])
   const w = useWeight(index)
+
+  // Struck metal throws sparks. Warm white, not the cyan measurement light —
+  // this is a mechanical event, not a reading.
+  const dummy = useMemo(() => new THREE.Object3D(), [])
+  const sparkState = useMemo(
+    () => Array.from({ length: SPARKS }, () => ({
+      life: 0, p: new THREE.Vector3(), v: new THREE.Vector3(),
+    })),
+    [],
+  )
+  const emit = () => {
+    let spawned = 0
+    for (const sp of sparkState) {
+      if (sp.life > 0) continue
+      sp.life = 1
+      sp.p.set(CONTACT.x, CONTACT.y, CONTACT.z + (Math.random() - 0.5) * 0.12)
+      // thrown along the tooth's direction of travel, with scatter
+      const a = -1.15 + (Math.random() - 0.5) * 1.5
+      const sp0 = 1.1 + Math.random() * 2.2
+      sp.v.set(Math.cos(a) * sp0, Math.sin(a) * sp0, (Math.random() - 0.5) * 0.9)
+      if (++spawned >= 9) break
+    }
+  }
 
   useFrame((_, dt) => {
     const d = Math.min(dt, 0.05)
@@ -106,33 +136,65 @@ function Ratchet({ index }: { index: number }) {
       // mechanism holds. That is the whole argument of carabiner.
       if (target > settled.current) {
         settled.current = target
-        if (flash.current) flash.current.intensity = 14
+        emit()
       }
     } else {
       armed.current = false
     }
+
+    // hovering "Open the repo" clicks it one tooth
+    if (NUDGE.section === index && NUDGE.count !== seenNudge.current) {
+      seenNudge.current = NUDGE.count
+      settled.current += STEP
+      emit()
+    }
     angle.current = damp(angle.current, settled.current, 11, d)
     wheel.current.rotation.z = angle.current
 
-    // pawl rides the tooth it is holding, then snaps back against the spring
+    // pawl rides up the tooth flank, then drops back against its spring
     const phase = (angle.current % STEP) / STEP
-    pawl.current.rotation.z = -0.34 + Math.sin(phase * Math.PI) * 0.13
-    if (flash.current) flash.current.intensity = damp(flash.current.intensity, 0, 9, d)
+    pawl.current.rotation.z = -0.04 + Math.sin(phase * Math.PI) * 0.11
+
+    // sparks: ballistic, short-lived, stretched along their own velocity
+    for (let i = 0; i < SPARKS; i++) {
+      const sp = sparkState[i]
+      if (sp.life <= 0) { dummy.scale.setScalar(0.0001) }
+      else {
+        sp.life -= d / 0.34
+        sp.v.y -= 5.2 * d
+        sp.v.multiplyScalar(1 - 1.6 * d)
+        sp.p.addScaledVector(sp.v, d)
+        dummy.position.copy(sp.p)
+        dummy.lookAt(sp.p.clone().add(sp.v))
+        const l = Math.max(sp.life, 0)
+        dummy.scale.set(0.012 * l, 0.012 * l, 0.05 + sp.v.length() * 0.035 * l)
+      }
+      dummy.updateMatrix()
+      sparks.current.setMatrixAt(i, dummy.matrix)
+    }
+    sparks.current.instanceMatrix.needsUpdate = true
   })
 
   return (
     <group ref={g}>
       <mesh ref={wheel} geometry={geo} material={alloy} castShadow receiveShadow />
-      <group position={[1.28, 0.34, 0.04]}>
+      <group position={[PIVOT.x, PIVOT.y, PIVOT.z]}>
         <group ref={pawl}>
           <mesh geometry={pawlGeo} material={brass} castShadow />
         </group>
-        <mesh>
-          <cylinderGeometry args={[0.085, 0.085, 0.16, 24]} />
+        <mesh rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[0.085, 0.085, 0.17, 24]} />
           <primitive object={brass} attach="material" />
         </mesh>
       </group>
-      <pointLight ref={flash} color={BEAM} distance={2.4} position={[0.9, 0.2, 0.4]} />
+
+      <instancedMesh ref={sparks} args={[undefined, undefined, SPARKS]} frustumCulled={false}>
+        <boxGeometry args={[1, 1, 1]} />
+        <meshBasicMaterial
+          color="#FFE3B4" toneMapped={false}
+          blending={THREE.AdditiveBlending} transparent depthWrite={false}
+        />
+      </instancedMesh>
     </group>
   )
 }
@@ -428,7 +490,7 @@ export default function Instrument() {
   // camera keyframes, one per section — eased, never linear
   const KEYS: [number, number, number][] = [
     [0, 0, 3.3],      // 00 housing, close
-    [0.35, 0.1, 4.4], // 01 ratchet
+    [0.95, 0.8, 4.3], // 01 ratchet — raked, so the teeth and pawl read
     [0, 0.9, 5.4],    // 02 rotor, from above
     [0.2, 0, 4.8],    // 03 spectrometer, side on
     [0, 0.15, 4.3],   // 04 tumbler, down the barrel
