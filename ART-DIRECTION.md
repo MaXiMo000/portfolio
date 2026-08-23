@@ -207,9 +207,11 @@ Permissions-Policy: geolocation=(), camera=(), microphone=(), payment=(), usb=()
 
 `default-src 'none'` is reachable precisely *because* nothing is loaded from a
 third party. The performance choice and the security choice are the same
-choice. The one outstanding exception is the fonts — still on Google's CDN, and
-named explicitly in `style-src`/`font-src` until they are self-hosted as subset
-`woff2`, at which point the whole policy collapses to `'self'`.
+choice. Fonts are self-hosted (`npm run fonts` regenerates them), so **the policy is
+now entirely same-origin** — the page cannot contact a third party at all.
+They are Google's own woff2 files, unmodified and deliberately un-subsetted: a
+dropped glyph is a worse failure than a few kB, and `unicode-range` already
+means a browser fetches only the subsets it needs.
 
 No third-party JS. No analytics that phone home. Contact is a `mailto:`, so
 `form-action` stays `'none'`.

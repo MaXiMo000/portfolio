@@ -3,6 +3,7 @@ import { initScroll } from './lib/scroll'
 import ExperienceBoundary from './lib/ExperienceBoundary'
 import { nudge } from './lib/nudge'
 import Resolving from './Resolving'
+import './fonts.css'
 import './styles.css'
 
 const Scene = lazy(() => import('./scene/Scene'))
