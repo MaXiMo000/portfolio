@@ -2,6 +2,7 @@ import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { S, damp } from '../lib/scroll'
+import { P, I } from '../lib/pointer'
 import { ratchetGeometry, housingGeometry, pawlGeometry, tumblerGeometry } from './geometry'
 
 const BEAM = '#86E9DE'
@@ -224,7 +225,7 @@ function Spectrometer({ index }: { index: number }) {
     [],
   )
 
-  useFrame((state, dt) => {
+  useFrame((state) => {
     const k = w.current
     g.current.visible = k > 0.01
     g.current.scale.setScalar(k * 1.15)
@@ -443,10 +444,16 @@ export default function Instrument() {
     const x = THREE.MathUtils.lerp(a[0], b[0], e * 0.35)
     const y = THREE.MathUtils.lerp(a[1], b[1], e * 0.35)
     const z = THREE.MathUtils.lerp(a[2], b[2], e * 0.35)
-    state.camera.position.x = damp(state.camera.position.x, x, 3, d)
-    state.camera.position.y = damp(state.camera.position.y, y, 3, d)
-    state.camera.position.z = damp(state.camera.position.z, z, 3, d)
-    rig.current.rotation.y = damp(rig.current.rotation.y, S.t * 0.3, 2.5, d)
+    // the entrance dollies in; afterwards I.v is 1 and contributes nothing
+    const intro = (1 - I.v) * 1.5
+    // Pointer parallax. Turning the object against a fixed environment is what
+    // rakes the specular across the machined faces — the light appears to move
+    // because the reflection does.
+    state.camera.position.x = damp(state.camera.position.x, x + P.x * 0.22, 3, d)
+    state.camera.position.y = damp(state.camera.position.y, y - P.y * 0.14, 3, d)
+    state.camera.position.z = damp(state.camera.position.z, z + intro, 3, d)
+    rig.current.rotation.y = damp(rig.current.rotation.y, S.t * 0.3 + P.x * 0.16, 2.5, d)
+    rig.current.rotation.x = damp(rig.current.rotation.x, -P.y * 0.1, 2.5, d)
     state.camera.lookAt(0.55, 0, 0)
   })
 

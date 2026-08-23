@@ -6,10 +6,14 @@ import {
 import { BlendFunction } from 'postprocessing'
 import * as THREE from 'three'
 import Instrument from './Instrument'
+import { I } from '../lib/pointer'
+import { useFrame } from '@react-three/fiber'
 
 class ViewportObserver {
   private els = new Set<Element>()
-  constructor(private cb: (entries: { target: Element; contentRect: DOMRectReadOnly }[]) => void) {
+  private cb: (entries: { target: Element; contentRect: DOMRectReadOnly }[]) => void
+  constructor(cb: (entries: { target: Element; contentRect: DOMRectReadOnly }[]) => void) {
+    this.cb = cb
     window.addEventListener('resize', this.fire)
     window.addEventListener('orientationchange', this.fire)
   }
@@ -57,6 +61,12 @@ function Studio() {
   )
 }
 
+/** Resolves the image out of black rather than cutting to it. */
+function Exposure() {
+  useFrame(({ gl }) => { gl.toneMappingExposure = I.v * 1.15 })
+  return null
+}
+
 export default function Scene() {
   return (
     <Canvas
@@ -70,7 +80,7 @@ export default function Scene() {
       onCreated={({ gl }) => {
         gl.domElement.addEventListener('webglcontextlost', (e) => e.preventDefault())
         gl.toneMapping = THREE.ACESFilmicToneMapping
-        gl.toneMappingExposure = 1.15
+        gl.toneMappingExposure = 0
       }}
     >
       <color attach="background" args={['#08090C']} />
@@ -78,13 +88,14 @@ export default function Scene() {
       <directionalLight position={[3.5, 4, 2.5]} intensity={0.6} />
 
       <Instrument />
+      <Exposure />
 
       <ContactShadows position={[0, -1.55, 0]} opacity={0.5} scale={14} blur={3} far={5} />
 
       <EffectComposer multisampling={0}>
         <DepthOfField focusDistance={0.02} focalLength={0.16} bokehScale={2.2} />
         <Bloom intensity={0.55} luminanceThreshold={0.7} luminanceSmoothing={0.35} mipmapBlur />
-        <ChromaticAberration offset={[0.0007, 0.0007]} blendFunction={BlendFunction.NORMAL} />
+        <ChromaticAberration offset={new THREE.Vector2(0.0007, 0.0007)} />
         <Noise opacity={0.035} blendFunction={BlendFunction.OVERLAY} />
         <Vignette offset={0.24} darkness={0.82} />
       </EffectComposer>

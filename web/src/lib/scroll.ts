@@ -1,6 +1,7 @@
 import Lenis from 'lenis'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { initPointer, I } from './pointer'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -58,6 +59,15 @@ export function initScroll() {
   window.addEventListener('resize', update)
   update()
 
+  const stopPointer = initPointer()
+
+  // The entrance. No preloader — the content already painted; this is the
+  // instrument resolving out of black while the lines stagger up over it.
+  gsap.from('[data-sec="hero"] > *', {
+    y: 34, autoAlpha: 0, duration: 1, ease: 'power3.out', stagger: 0.11, delay: 0.12,
+  })
+  gsap.to(I, { v: 1, duration: 1.7, ease: 'power2.inOut', delay: 0.1 })
+
   // the copy rises as its section takes the viewport
   const reveals = gsap.utils.toArray<HTMLElement>('.col, .hero > *')
   reveals.forEach((el) => {
@@ -76,6 +86,7 @@ export function initScroll() {
 
   return () => {
     lenis.destroy()
+    stopPointer()
     window.removeEventListener('resize', update)
     ScrollTrigger.getAll().forEach((t) => t.kill())
   }

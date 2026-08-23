@@ -1,6 +1,6 @@
 # Art direction & scroll narrative
 
-Supersedes `PLAN.md` §3 and §5. Read this before writing any component.
+The single design contract for this site. Read it before writing any component.
 
 ---
 
@@ -142,12 +142,42 @@ colour is **light inside the scene**, not decoration on the UI.
 - Skip link; every section keyboard reachable; visible focus.
 - **No autoplay audio.** The reference sites do it; we are not going to.
 
-## 9. Stack
+## 9. Stack and budget
 
 React · React Three Fiber · drei · Three.js · GSAP ScrollTrigger · Lenis ·
-`@react-three/postprocessing`. HDRI lighting, self-hosted at ship time.
+`@react-three/postprocessing`, built with Vite.
 
-**Budget consequence, stated plainly:** this stack is ~400 KB gzipped before our
-own code. `PLAN.md` §4 Tier 1's "≤40 KB JS" cannot survive it and is void. What
-survives is the *floor*: content prerendered, readable and navigable without
-JS, no preloader, no layout shift. The experience layer is uncapped.
+The budget is **split, and only one half is capped.**
+
+- **The document** — prerendered, readable and navigable with the canvas dead,
+  no preloader, zero layout shift. This is a floor, not a target.
+- **The experience layer** — deliberately uncapped. ~283 KB gzipped and that is
+  fine. It loads after idle and never blocks first paint.
+
+An earlier revision capped total JS at 40 KB. This stack is ~400 KB gzipped
+before a line of our own code, so that number is void. The floor is what
+survived, and the floor is the part that actually mattered.
+
+## 10. Hosting and headers
+
+**Netlify, not GitHub Pages.** Pages cannot set HTTP response headers, which
+rules out a real CSP, HSTS and `frame-ancestors`. That single limitation
+decides the host. Config lives in `netlify.toml`; headers in
+`web/public/_headers`:
+
+```
+Content-Security-Policy: default-src 'none'; script-src 'self'; ...
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: geolocation=(), camera=(), microphone=(), payment=(), usb=()
+```
+
+`default-src 'none'` is reachable precisely *because* nothing is loaded from a
+third party. The performance choice and the security choice are the same
+choice. The one outstanding exception is the fonts — still on Google's CDN, and
+named explicitly in `style-src`/`font-src` until they are self-hosted as subset
+`woff2`, at which point the whole policy collapses to `'self'`.
+
+No third-party JS. No analytics that phone home. Contact is a `mailto:`, so
+`form-action` stays `'none'`.

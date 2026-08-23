@@ -36,21 +36,21 @@ costing zero bytes. All geometry is generated in code; there is no `.glb`.
 
 ## Ground rules the build keeps
 
-- Content is readable with the canvas dead. The experience layer loads after
-  idle and is skipped entirely on `save-data`, `prefers-reduced-motion`, or
-  when WebGL is unavailable.
+- Content is readable with the canvas dead — the build prerenders the markup
+  into `index.html` (`web/prerender.js`) and the client hydrates it. The
+  experience layer loads after idle and is skipped entirely on `save-data`,
+  `prefers-reduced-motion`, or when WebGL is unavailable.
 - A lost WebGL context can never take the page down — see
   `web/src/lib/ExperienceBoundary.tsx`.
 - No preloader, no autoplay audio, no third-party requests.
 
 ## Documents
 
-- [`ART-DIRECTION.md`](ART-DIRECTION.md) — the concept, palette, type, scroll
-  narrative. Read this before touching a component.
-- [`PLAN.md`](PLAN.md) / [`HANDOFF.md`](HANDOFF.md) — earlier planning, kept
-  for the record. Where they disagree with `ART-DIRECTION.md`, it wins.
+[`ART-DIRECTION.md`](ART-DIRECTION.md) — the concept, palette, type, scroll
+narrative and the rules the build keeps. The single design contract; read it
+before touching a component.
 
 ## Status
 
-Work in progress. The hero renders; the per-section mechanisms are implemented
-and still being tuned.
+Work in progress. Hero, entrance and pointer parallax are done; the
+per-section mechanisms are implemented and still being tuned.
