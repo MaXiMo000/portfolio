@@ -32,7 +32,7 @@ a:focus-visible,[href]:focus-visible{outline:2px solid var(--beam);outline-offse
   backdrop-filter:blur(18px);padding:6px 0}
 .rail a{display:flex;align-items:center;justify-content:flex-end;gap:12px;
   padding:9px 22px 9px 28px;color:#8791A0;text-decoration:none;font-size:9.5px;letter-spacing:.26em}
-.rail a u{font-family:var(--mono);font-size:9px;color:#414A56;text-decoration:none}
+.rail a u{font-family:var(--mono);font-size:9px;color:#7E8794;text-decoration:none}
 .rail a::after{content:"";width:18px;height:1px;background:rgba(255,255,255,.12)}
 .rail a:hover{color:var(--chalk)}
 .rail a:hover::after{background:var(--beam);width:30px}
@@ -149,6 +149,11 @@ dd b{font-family:var(--mono);color:var(--beam);font-weight:400}
 @media (max-width:820px){
   /* narrow: object is ~37vh tall, centred at 19% down */
   .resolving{left:52%;top:18%;height:62vh}
+  /* touch targets were 20px tall; 44 is the floor */
+  .go{padding:12px 0}
+  .role{display:none}
+  .go.big{padding:14px 0}
+  .ends a{padding:12px 0}
 }
 @media (prefers-reduced-motion:reduce){
   .resolving .d{animation:none;stroke-dashoffset:0}

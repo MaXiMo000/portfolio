@@ -1,0 +1,50 @@
+<!doctype html>
+<!-- Source for public/og.png. Rendered at 1200x630 with headless Chrome:
+     see `npm run og`. Not part of the site build. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:1200px;height:630px;overflow:hidden}
+  body{background:#08090C;color:#EDECE8;
+    font-family:"Archivo","Helvetica Neue",sans-serif;position:relative}
+  .glow{position:absolute;inset:0;
+    background:radial-gradient(42% 60% at 78% 38%, rgba(178,200,226,.16), transparent 70%),
+               radial-gradient(26% 34% at 88% 22%, rgba(134,233,222,.10), transparent 72%)}
+  .wrap{position:relative;height:100%;padding:64px 72px;display:flex;flex-direction:column}
+  .top{display:flex;align-items:center;gap:14px;
+    font-family:"JetBrains Mono",monospace;font-size:15px;letter-spacing:.26em;
+    text-transform:uppercase;color:#8791A0}
+  .mark{width:26px;height:26px;fill:#EDECE8}
+  h1{margin-top:auto;font-size:88px;line-height:.94;font-weight:800;
+    letter-spacing:-.045em;font-stretch:118%;text-transform:uppercase;max-width:15ch}
+  h1 .q{color:#8B95A2}
+  h1 .s{font-family:"Instrument Serif",serif;font-style:italic;font-weight:400;
+    text-transform:none;letter-spacing:-.01em;font-stretch:100%}
+  .foot{margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;
+    font-family:"JetBrains Mono",monospace;font-size:16px;letter-spacing:.2em;
+    text-transform:uppercase;color:#78818E}
+  .foot b{color:#86E9DE;font-weight:400}
+  .gear{position:absolute;right:-58px;top:50%;transform:translateY(-50%);
+    width:430px;height:430px;opacity:.2;fill:#C4CEDA}
+  .rule{height:1px;background:rgba(255,255,255,.08);margin:26px 0 22px}
+</style></head>
+<body>
+  <div class="glow"></div>
+  <svg class="gear" viewBox="-50 -50 100 100"><path fill-rule="evenodd" d="M 15 0 A 15 15 0 1 0 -15 0 A 15 15 0 1 0 15 0 Z M 33 0 L 40.6 14.8 L 31 11.3 L 33.1 27.8 L 25.3 21.2 L 21.6 37.4 L 16.5 28.6 L 7.5 42.6 L 5.7 32.5 L -7.5 42.6 L -5.7 32.5 L -21.6 37.4 L -16.5 28.6 L -33.1 27.8 L -25.3 21.2 L -40.6 14.8 L -31 11.3 L -43.2 0 L -33 0 L -40.6 -14.8 L -31 -11.3 L -33.1 -27.8 L -25.3 -21.2 L -21.6 -37.4 L -16.5 -28.6 L -7.5 -42.6 L -5.7 -32.5 L 7.5 -42.6 L 5.7 -32.5 L 21.6 -37.4 L 16.5 -28.6 L 33.1 -27.8 L 25.3 -21.2 L 40.6 -14.8 L 31 -11.3 L 43.2 0 Z"/></svg>
+  <div class="wrap">
+    <div class="top">
+      <svg class="mark" viewBox="-50 -50 100 100"><path d="M 33 0 L 40.6 14.8 L 31 11.3 L 33.1 27.8 L 25.3 21.2 L 21.6 37.4 L 16.5 28.6 L 7.5 42.6 L 5.7 32.5 L -7.5 42.6 L -5.7 32.5 L -21.6 37.4 L -16.5 28.6 L -33.1 27.8 L -25.3 21.2 L -40.6 14.8 L -31 11.3 L -43.2 0 L -33 0 L -40.6 -14.8 L -31 -11.3 L -33.1 -27.8 L -25.3 -21.2 L -21.6 -37.4 L -16.5 -28.6 L -7.5 -42.6 L -5.7 -32.5 L 7.5 -42.6 L 5.7 -32.5 L 21.6 -37.4 L 16.5 -28.6 L 33.1 -27.8 L 25.3 -21.2 L 40.6 -14.8 L 31 -11.3 L 43.2 0 Z"/></svg>
+      Ritish Saini
+    </div>
+    <h1>Noise <span class="q">goes in.</span><br><span class="s">Signal</span> comes out.</h1>
+    <div class="rule"></div>
+    <div class="foot">
+      <span>Python · FastAPI · PostgreSQL · Security</span>
+      <span><b>5</b> systems that refuse to guess</span>
+    </div>
+  </div>
+</body></html>
