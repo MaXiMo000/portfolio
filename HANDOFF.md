@@ -63,19 +63,26 @@ Our budget is **ten times smaller**. See `PLAN.md` §4.
 
 ## The design direction, in one paragraph
 
-**The page is a machinist's drawing of the person.** The 3D hero is a machined
-ratchet — asymmetric teeth, one direction only, which is carabiner's central
-idea made physical — so the page around it is the document a machined part
-actually ships with: dimension lines that measure the real layout, tolerance
-callouts, a parts list, and a title block. Ground is a **pale drafting sheet**
-(`#E6E4DE`), not the near-black every other 3D portfolio uses; machined metal
-reads far better against bone, and it is the harder thing to execute. One
-signal colour (`#1B45D8`, anodised blue) reserved strictly for live data.
+**A machine room, shot like a film.** The 3D hero is a machined ratchet —
+asymmetric teeth, one direction only, which is carabiner's central idea made
+physical — cropped hard off the right edge of a dark, lit stage. **Steel wheel,
+brass pawl**, and that material pair *is* the colour system: brass (`#C9A45E`)
+appears only where something is being held, which means live values and active
+state. Ground is `#06070A` with a real off-canvas key light, vignette and film
+grain. The drafting rigor from the earlier revision survives as the **HUD** —
+section rail, callouts, telemetry — not as the page ground.
 
-**Signature element: a fixed title block, bottom-right, showing the page's own
-live telemetry** — bytes actually transferred, LCP once it fires, scroll depth
-as a dimension. Real `PerformanceObserver` numbers. The site measures itself in
-public while you read it. Full tokens and type in `PLAN.md` §3.
+An earlier revision proposed a pale drafting sheet. Ritish rejected it against
+reference renders. Do not reopen that; the reversal is recorded in `PLAN.md` §3.
+
+**Signature element: a fixed title block, bottom-left, showing the page's own
+live telemetry** — bytes actually transferred, LCP once it fires, whether the
+3D layer is still idle. Real `PerformanceObserver` numbers. The site measures
+itself in public while you read it.
+
+**Reference mockup: `mockups/hero.html`.** Open it. It is the agreed
+composition, built in plain HTML/CSS/SVG. The gear in it is a hand-shaded SVG
+stand-in — Phase 1 replaces it with three.js.
 
 ## Status
 

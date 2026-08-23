@@ -50,7 +50,7 @@ three unless there is a specific reason:
 
 ### The direction to take instead
 
-**The drawing sheet.** Ritish's work is measurement: query plans, LOINC codes,
+**The machine room.** Ritish's work is measurement: query plans, LOINC codes,
 tenant isolation proofs, 60-repo corpora, entropy thresholds. And the 3D hero
 (§5) is a *machined part*. A machined part ships with a document — dimensioned
 views, a title block, tolerance callouts, a material spec, a revision row.
@@ -58,26 +58,34 @@ views, a title block, tolerance callouts, a material spec, a revision row.
 So the site is not a dark tech portfolio with a 3D object dropped in it. The
 site **is the drawing**, and the ratchet is the part it documents.
 
-This also settles the ground value, which is the decision most portfolios get
-backwards. **Pale sheet, not near-black.** Machined metal under an HDRI reads
-far better against bone than against black, dark-with-one-accent is the most
-worn AI-portfolio default there is, and a light ground is the harder thing to
-execute — which is the point.
+**Reversed on 2026-08-23.** An earlier revision of this plan argued for a pale
+drafting sheet. Ritish rejected it against reference renders and he was right:
+the machine wants a machine room. **Dark, cinematic, lit** — the difference from
+the generic dark portfolio is not the hue, it is *depth and light*. Generic dark
+is a flat near-black with a neon accent. This is layered darkness with a real
+key light, warm champagne specular against cool steel shadow, film grain, and a
+vignette. The drafting rigor survives as the **HUD layer** — the callouts,
+telemetry and section rail — not as the ground.
 
-**Palette** — six tokens, all named. No gradient meshes, no glassmorphism.
+**Palette** — six tokens, all named. No neon, no glassmorphic cards.
 
 | Token | Value | Used for |
 |---|---|---|
-| `--sheet` | `#E6E4DE` | page ground — drafting vellum, grey-green, *not* cream `#F4F1EA` |
-| `--ink` | `#191B1E` | all type, all rules at full weight |
-| `--rule` | `#B4B1A9` | hairlines, dimension lines, arrowheads, grid |
-| `--anodize` | `#1B45D8` | **signal.** Live data and interactive state only. Nothing else. |
-| `--witness` | `#C8340C` | warning. Used ~three times on the whole site. |
-| `--bed` | `#111316` | the canvas well the 3D sits in, and nowhere else |
+| `--void` | `#06070A` | page ground |
+| `--chalk` | `#E9E7E2` | primary type |
+| `--steel` | `#8B95A2` | secondary type, the wheel's cool body |
+| `--brass` | `#C9A45E` | **signal.** The pawl is brass; so is every live value and active state. |
+| `--witness` | `#C8340C` | warning. Three uses on the whole site. |
+| `--hair` | `rgba(255,255,255,.07)` | every rule and panel border. Never brighter. |
 
-`--anodize` and `--witness` are climbing-hardware anodizing colours, which is
-where a carabiner's own colour vocabulary comes from. They are not decoration
-and they are not applied by area — they are applied by *meaning*.
+The material story carries the colour story: **steel wheel, brass pawl.** Gold
+is not a "premium accent" borrowed from a template — it is the pawl, the part
+that does the locking. Anywhere brass appears, something is being held.
+
+Atmosphere is not optional and is where cheap dark UIs fail: a radial key light
+off-canvas top-right, a warm secondary, a vignette, and a real film grain
+(`feTurbulence`, ~25% over `overlay`). Grain also kills gradient banding, which
+is the single most common tell of an amateur dark page.
 
 **Type** — two variable faces, two `woff2` files, both self-hosted and subset.
 
@@ -97,7 +105,7 @@ true:
 - **Part numbering on projects only**, because the projects genuinely are a
   parts list. No `01 / 02 / 03` on anything that is not a sequence.
 
-**Signature — the live title block.** Bottom-right of the viewport, fixed, the
+**Signature — the live title block.** Bottom-left of the viewport, fixed, the
 way a title block sits on a real drawing sheet. It holds sheet name, revision,
 and a **live readout of the page's own telemetry**: bytes actually transferred
 so far, LCP once it fires, current scroll depth as a dimension. Real
@@ -334,7 +342,7 @@ second, and the page's motion is choreographed to it once it exists.
 
 ### Phase 0 — the whole site, no JavaScript *(still first, non-negotiable)*
 Static HTML and CSS. Every section, all real copy, all project cards, the
-drafting-sheet type and palette from §3, responsive from 320px up, keyboard
+type and palette from §3, responsive from 320px up, keyboard
 navigable, semantic landmarks. Deployed with headers.
 **Exit:** complete and good with JS disabled. Lighthouse ≥ 98. Under 150 KB.
 
