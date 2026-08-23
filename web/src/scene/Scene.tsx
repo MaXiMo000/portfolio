@@ -67,7 +67,7 @@ function Studio() {
 function Ready({ onReady }: { onReady: () => void }) {
   const seen = useRef(0)
   useFrame(() => {
-    if (seen.current < 3 && ++seen.current === 3) onReady()
+    if (seen.current < 2 && ++seen.current === 2) onReady()
   })
   return null
 }

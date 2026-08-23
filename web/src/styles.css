@@ -123,13 +123,18 @@ dd b{font-family:var(--mono);color:var(--beam);font-weight:400}
 .ends a:hover{color:var(--chalk);border-color:var(--beam)}
 
 /* ---- the instrument, drawn, while the render is still downloading -------- */
+/* Registered to where the instrument actually lands. Frustum maths under-read
+   it (the rig scale and intro dolly both bite), so these are measured off the
+   render: object is ~68vh tall, centred at 73% / 46%. The cylinder is 74.7% of
+   this svg's viewBox height, hence 90vh of svg. */
 .resolving{position:fixed;z-index:1;pointer-events:none;color:#5C6672;
-  left:56%;top:50%;transform:translateY(-50%);width:min(30vw,360px);
-  display:flex;flex-direction:column;align-items:center;gap:22px;
-  opacity:1;transition:opacity .7s ease}
+  left:73%;top:46%;transform:translate(-50%,-50%);height:90vh;
+  display:flex;align-items:center;justify-content:center;
+  opacity:1;transition:opacity .34s ease}
 .resolving.done{opacity:0}
-.resolving svg{width:100%;height:auto;overflow:visible}
-.rl-label{font-family:var(--mono);font-size:9px;letter-spacing:.34em;
+.resolving svg{height:100%;width:auto;overflow:visible}
+.rl-label{position:absolute;bottom:-26px;left:50%;transform:translateX(-50%);
+  white-space:nowrap;font-family:var(--mono);font-size:9px;letter-spacing:.34em;
   text-transform:uppercase;color:#4F5866;animation:breathe 2.4s ease-in-out infinite}
 @keyframes breathe{50%{opacity:.35}}
 
@@ -142,7 +147,8 @@ dd b{font-family:var(--mono);color:var(--beam);font-weight:400}
 @keyframes draw{to{stroke-dashoffset:0}}
 
 @media (max-width:820px){
-  .resolving{left:50%;top:20%;transform:translate(-50%,-50%);width:52vw}
+  /* narrow: object is ~37vh tall, centred at 19% down */
+  .resolving{left:52%;top:18%;height:62vh}
 }
 @media (prefers-reduced-motion:reduce){
   .resolving .d{animation:none;stroke-dashoffset:0}
