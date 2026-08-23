@@ -35,6 +35,11 @@ npm run dev --prefix web
 | `npm run fonts` | re-download the self-hosted woff2, regenerate `src/fonts.css` |
 | `npm run og` | re-render `og.html` → `public/og.png` |
 
+CI is gated by [carabiner](https://github.com/MaXiMo000/carabiner) — this
+repository is scanned by the scanner in it, SARIF is uploaded to code scanning,
+and the drill re-runs weekly. Actions are pinned to commit SHAs with a
+read-only default token. See [`SECURITY.md`](SECURITY.md).
+
 `shots` exists because dev preview surfaces blank out on scroll, and headless
 Chrome without a GL backend silently falls back to the no-WebGL path — so you
 end up auditing the wrong page. Pass a viewport: `npm run shots -- 1440 900`.
@@ -107,5 +112,6 @@ Measured on the live site — desktop **94 / 94 / 100 / 100**, mobile
   composition per section that it should
 - four of the five handovers still just scale and recede; only housing→ratchet
   is a real morph
-- no CI and no `SECURITY.md`; carabiner should gate this repo and say so on the site
-- no custom domain, no CV link, no `404.html` / `robots.txt` / `sitemap.xml`
+- no custom domain yet — `web/site.config.js` is the single switch; set
+  `SITE_URL` in Netlify and og:url, og:image, robots.txt and sitemap.xml all
+  follow

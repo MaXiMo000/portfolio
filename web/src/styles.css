@@ -117,7 +117,7 @@ dd b{font-family:var(--mono);color:var(--beam);font-weight:400}
   html{scroll-behavior:auto}
 }
 
-.ends{display:flex;gap:28px;margin-top:46px}
+.ends{display:flex;flex-wrap:wrap;gap:28px;margin-top:46px}
 .ends a{font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;
   color:#6E7885;text-decoration:none;border-bottom:1px solid var(--hair);padding-bottom:6px}
 .ends a:hover{color:var(--chalk);border-color:var(--beam)}

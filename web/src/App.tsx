@@ -64,7 +64,7 @@ export default function App() {
           </svg>
           Ritish Saini
         </span>
-        <span className="role">Python · FastAPI · PostgreSQL · Security</span>
+        <span className="role">Python · FastAPI · PostgreSQL · Elasticsearch · Celery</span>
       </header>
 
       <nav className="hud rail" aria-label="Sections">
@@ -116,7 +116,7 @@ export default function App() {
             <dl>
               <dt>Problem</dt><dd>A bank export is a wall of rows. The subscriptions are in there somewhere.</dd>
               <dt>Hard</dt><dd>Postgres row-level security, so a query that forgets its tenant filter returns zero rows instead of someone else's money.</dd>
-              <dt>Cost</dt><dd>argon2id · OAuth 2.1 + PKCE · remote MCP server · <b>0</b> bank credentials stored, ever</dd>
+              <dt>Cost</dt><dd>FastAPI · SQLAlchemy · argon2id · OAuth 2.1 + PKCE · remote MCP server · <b>0</b> bank credentials stored, ever</dd>
             </dl>
           </div>
         </section>
@@ -170,6 +170,7 @@ export default function App() {
           </h1>
           <a className="go big" href="mailto:ritishsaini1995@gmail.com">ritishsaini1995@gmail.com</a>
           <p className="ends">
+            <a href="/ritish-saini-cv.pdf" download>CV (PDF)</a>
             <a href="https://github.com/MaXiMo000">GitHub</a>
             <a href="https://www.linkedin.com/in/ritish-saini-2540a5253">LinkedIn</a>
           </p>
