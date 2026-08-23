@@ -12,6 +12,10 @@ gsap.registerPlugin(ScrollTrigger)
  */
 export const S = { i: 0, t: 0, p: 0 }
 
+// dev only: lets the scene be driven without scrolling, so a transition can be
+// parked at any point and inspected
+if (import.meta.env.DEV) (globalThis as Record<string, unknown>).__S = S
+
 export const SECTIONS = [
   'hero',
   'carabiner',

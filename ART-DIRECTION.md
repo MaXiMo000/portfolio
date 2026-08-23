@@ -138,8 +138,15 @@ colour is **light inside the scene**, not decoration on the UI.
    orchestrated entrance: three staggered line masks, then the instrument
    resolving out of black on the specular sweep.
 2. **Camera never moves linearly.** Eased curves only. Lenis damping ~0.09.
-3. **Transitions are continuous.** The object transforms between sections; it
-   never cuts, never fades out and back in.
+3. **Transitions are continuous.** Presence is a *weight*, not a flag: it peaks
+   at the middle of a section and falls to zero at its neighbours' middles, so
+   at every boundary two mechanisms are each half-present and hand over.
+   Departing mechanisms recede in Z into the dark; arriving ones come forward,
+   which turns the overlap into depth instead of clutter.
+   The housing does not fade — **it opens.** Eight wedges of the same lathed
+   profile hinge outward in sequence, driven by the arriving mechanism's own
+   weight, and the ratchet grows inside them. One object reconfiguring, never
+   two objects swapping.
 4. **~60% of every frame stays empty.** Negative space is the luxury signal.
    Everything above fails if the frame is crowded.
 

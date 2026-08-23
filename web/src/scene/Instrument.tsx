@@ -33,36 +33,98 @@ function useAlloy() {
   )
 }
 
-/** Damped visibility weight: 1 while this section is active, 0 otherwise.
- *  Nothing ever cuts — the instrument reconfigures. */
+const smoothstep = (t: number) => t * t * (3 - 2 * t)
+
+/** Scroll position as one continuous number across the whole page. */
+export const flow = () => S.i + S.t
+
+/**
+ * Presence, not visibility. Weight peaks at the middle of a section and falls
+ * linearly to zero at its neighbours' middles, so at every boundary the two
+ * mechanisms are each half-present and genuinely hand over.
+ *
+ * The previous version damped toward a binary "is this the active section",
+ * which made mechanisms pop in and out at full size — a swap, not a morph.
+ */
 function useWeight(index: number) {
   const w = useRef(index === 0 ? 1 : 0)
   useFrame((_, dt) => {
-    w.current = damp(w.current, S.i === index ? 1 : 0, 6, Math.min(dt, 0.05))
+    const d = Math.abs(flow() - (index + 0.5))
+    const target = smoothstep(THREE.MathUtils.clamp(1 - d, 0, 1))
+    w.current = damp(w.current, target, 9, Math.min(dt, 0.05))
   })
   return w
 }
 
+/** Departing mechanisms fall back into the dark; arriving ones come forward.
+ *  Without this the overlap at a boundary reads as clutter instead of depth. */
+function stage(g: THREE.Group, k: number, scale: number) {
+  g.visible = k > 0.005
+  g.scale.setScalar(k * scale)
+  g.position.z = (1 - k) * -1.6
+}
+
 /* ---------------------------------------------------------------- 00 / 06 */
-function Housing({ index }: { index: number }) {
+const PETALS = 8
+
+/**
+ * The housing does not fade out — it opens. Eight wedges of the same lathed
+ * profile hinge outward as the next mechanism arrives inside them, driven by
+ * that mechanism's own weight. This is the morph: one object reconfiguring,
+ * never two objects swapping.
+ */
+function Housing({ index, opensWith }: { index: number; opensWith: number }) {
   const g = useRef<THREE.Group>(null!)
+  const shell = useRef<THREE.Group>(null!)
   const alloy = useAlloy()
-  const geo = useMemo(housingGeometry, [])
   const w = useWeight(index)
 
+  const petals = useMemo(
+    () =>
+      Array.from({ length: PETALS }, (_, i) => {
+        const span = (Math.PI * 2) / PETALS
+        const mid = i * span + span / 2
+        return {
+          geo: housingGeometry(i * span, span),
+          // LatheGeometry places vertices at (x·sin φ, y, x·cos φ), so the
+          // outward radial for this wedge is (sin, 0, cos) — not (cos, 0, -sin),
+          // which was 90° off and scattered the petals instead of blooming them.
+          radial: new THREE.Vector3(Math.sin(mid), 0, Math.cos(mid)),
+          // hinge about the tangent so each petal tips outward in place
+          hinge: new THREE.Vector3(Math.cos(mid), 0, -Math.sin(mid)),
+          delay: i * 0.045,
+        }
+      }),
+    [],
+  )
+
   useFrame((state, dt) => {
-    const k = w.current
-    g.current.visible = k > 0.01
-    g.current.scale.setScalar(k * 1.35)
-    // slow drift; the seam catches the key light once per rotation
-    g.current.rotation.y += dt * 0.12
+    const d = Math.min(dt, 0.05)
+    stage(g.current, w.current, 1.35)
+
+    // how far the neighbouring mechanism has arrived == how far we are open
+    const open = smoothstep(
+      THREE.MathUtils.clamp(1 - Math.abs(flow() - (opensWith + 0.5)), 0, 1),
+    )
+    shell.current.children.forEach((petal, i) => {
+      const p = petals[i]
+      // they bloom in sequence, not all at once
+      const o = smoothstep(THREE.MathUtils.clamp((open - p.delay) / 0.7, 0, 1))
+      petal.position.copy(p.radial).multiplyScalar(o * 0.44)
+      petal.quaternion.setFromAxisAngle(p.hinge, o * 0.62)
+    })
+
+    g.current.rotation.y += d * 0.12
     g.current.rotation.x = -0.22 + Math.sin(state.clock.elapsedTime * 0.25) * 0.04
   })
 
   return (
     <group ref={g}>
-      <mesh geometry={geo} material={alloy} castShadow receiveShadow />
-      {/* the seam */}
+      <group ref={shell}>
+        {petals.map((p, i) => (
+          <mesh key={i} geometry={p.geo} material={alloy} castShadow receiveShadow />
+        ))}
+      </group>
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[0.605, 0.006, 8, 128]} />
         <meshStandardMaterial color="#0A0C10" metalness={0.4} roughness={0.9} />
@@ -135,8 +197,7 @@ function Ratchet({ index }: { index: number }) {
   useFrame((_, dt) => {
     const d = Math.min(dt, 0.05)
     const k = w.current
-    g.current.visible = k > 0.01
-    g.current.scale.setScalar(k * 1.5)
+    stage(g.current, k, 1.5)
 
     // Quantised: scroll advances exactly one tooth at a time.
     if (S.i === index) {
@@ -275,8 +336,7 @@ function Rotor({ index }: { index: number }) {
 
   useFrame((state, dt) => {
     const k = w.current
-    g.current.visible = k > 0.01
-    g.current.scale.setScalar(k)
+    stage(g.current, k, 1)
     const t = S.i === index ? S.t : 0
     spin.current += dt * (0.35 + t * 3.2)
 
@@ -332,8 +392,7 @@ function Spectrometer({ index }: { index: number }) {
 
   useFrame((state) => {
     const k = w.current
-    g.current.visible = k > 0.01
-    g.current.scale.setScalar(k * 1.15)
+    stage(g.current, k, 1.15)
     const t = S.i === index ? S.t : 0
     bands.current.children.forEach((b, i) => {
       const r = rows[i]
@@ -400,8 +459,7 @@ function Tumbler({ index }: { index: number }) {
   useFrame((state, dt) => {
     const d = Math.min(dt, 0.05)
     const k = w.current
-    g.current.visible = k > 0.01
-    g.current.scale.setScalar(k * 1.25)
+    stage(g.current, k, 1.25)
     const t = S.i === index ? S.t : 0
 
     let aligned = 0
@@ -460,8 +518,7 @@ function Manifold({ index }: { index: number }) {
   useFrame((state, dt) => {
     const d = Math.min(dt, 0.05)
     const k = w.current
-    g.current.visible = k > 0.01
-    g.current.scale.setScalar(k * 1.1)
+    stage(g.current, k, 1.1)
     const t = S.i === index ? S.t : 0
 
     pistons.current.children.forEach((p, i) => {
@@ -565,13 +622,13 @@ export default function Instrument() {
   return (
     // right of centre, cropped: the copy owns the left third
     <group ref={rig} position={[1.15, 0.05, 0]} scale={0.78}>
-      <Housing index={0} />
+      <Housing index={0} opensWith={1} />
       <Ratchet index={1} />
       <Rotor index={2} />
       <Spectrometer index={3} />
       <Tumbler index={4} />
       <Manifold index={5} />
-      <Housing index={6} />
+      <Housing index={6} opensWith={5} />
     </group>
   )
 }

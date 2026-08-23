@@ -40,15 +40,17 @@ export function ratchetGeometry(teeth = 24, rTip = 1, rRoot = 0.86) {
   return g
 }
 
-/** The closed housing: a lathed cylinder with real chamfers and a seam. */
-export function housingGeometry() {
+/** The closed housing, or one wedge of it. Passing a phi range yields a petal,
+ *  so the same profile can be a sealed shell or an assembly that hinges open. */
+export function housingGeometry(phiStart = 0, phiLength = Math.PI * 2) {
   const pts: THREE.Vector2[] = []
   const v = (x: number, y: number) => pts.push(new THREE.Vector2(x, y))
   v(0, -0.62); v(0.52, -0.62); v(0.6, -0.55)
   v(0.6, -0.34); v(0.63, -0.31); v(0.63, -0.26); v(0.6, -0.23)
   v(0.6, 0.23); v(0.63, 0.26); v(0.63, 0.31); v(0.6, 0.34)
   v(0.6, 0.55); v(0.52, 0.62); v(0, 0.62)
-  const g = new THREE.LatheGeometry(pts, 96)
+  const segs = Math.max(8, Math.round(96 * (phiLength / (Math.PI * 2))))
+  const g = new THREE.LatheGeometry(pts, segs, phiStart, phiLength)
   g.computeVertexNormals()
   return g
 }
