@@ -63,6 +63,7 @@ h1 .quiet{color:var(--alloy)}
 h1 .serif,.claim .serif{font-family:var(--serif);font-style:italic;font-weight:400;
   text-transform:none;letter-spacing:-.01em;font-stretch:100%}
 .lede{margin-top:34px;max-width:34ch;font-size:15px;line-height:1.68;color:#8E97A4}
+.lede b{color:var(--chalk);font-weight:500}
 
 .num{font-family:var(--mono);font-size:10px;letter-spacing:.28em;color:var(--beam);
   text-transform:uppercase;margin-bottom:22px}

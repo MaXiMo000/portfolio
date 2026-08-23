@@ -63,9 +63,9 @@ export default function App() {
             <span>comes out.</span>
           </h1>
           <p className="lede">
-            Five things I built. Each one takes something messy and untrusted —
-            a repository, a bank export, a lab PDF — and returns something you
-            can rely on.
+            A repository. A bank export. A lab PDF. Five systems that take input
+            nobody vetted — and <b>refuse to guess</b> about the parts they
+            can't resolve.
           </p>
         </section>
 
