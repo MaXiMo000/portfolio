@@ -106,12 +106,30 @@ real CSP, HSTS and `frame-ancestors`. `netlify.toml` sets base `web/`;
 Measured on the live site — desktop **94 / 94 / 100 / 100**, mobile
 **97 / 100 / 100 / 100**, CLS 0, TBT 0 ms.
 
+## Three modes, not two
+
+`live` is the full experience. `off` (save-data, or no WebGL) drops the canvas
+entirely and the prerendered page stands alone. **`prefers-reduced-motion` gets
+`still`** — the same instrument, lighting and composition, held in a chosen
+pose per section and rendered once when the section changes. Reduced motion
+should not mean a stripped page. Smooth scrolling is handed back to the OS,
+the entrance and reveals are off, and sparks never fire. Verified: 0 pixels
+change over 2.5s of idle.
+
+## Handovers
+
+Every boundary is a transformation, not a cross-fade. Each mechanism begins in
+the shape of the one before it:
+
+- **ratchet → rotor** — the teeth detach and become the transactions
+- **rotor → spectrometer** — the cloud collapses onto one axis; that line is
+  the beam the prism splits
+- **spectrometer → tumbler** — the flat spectral rows curl into concentric rings
+- **tumbler → manifold** — the rings extrude into the piston barrels
+- **housing → ratchet** — eight lathe wedges hinge open around it
+
 ## Not done yet
 
-- `prefers-reduced-motion` gets a plain page, not the composed static
-  composition per section that it should
-- four of the five handovers still just scale and recede; only housing→ratchet
-  is a real morph
 - no custom domain yet — `web/site.config.js` is the single switch; set
   `SITE_URL` in Netlify and og:url, og:image, robots.txt and sitemap.xml all
   follow

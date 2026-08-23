@@ -2,6 +2,7 @@ import Lenis from 'lenis'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { initPointer, I } from './pointer'
+import { STILL } from './mode'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -30,10 +31,14 @@ export const SECTIONS = [
 const clamp = (n: number, a = 0, b = 1) => (n < a ? a : n > b ? b : n)
 
 export function initScroll() {
-  const lenis = new Lenis({ lerp: 0.09, wheelMultiplier: 0.9 })
-  lenis.on('scroll', ScrollTrigger.update)
-  gsap.ticker.add((time) => lenis.raf(time * 1000))
-  gsap.ticker.lagSmoothing(0)
+  // Smooth scrolling is itself motion. Under reduce, hand scrolling back to
+  // the OS entirelyrather than damping it.
+  const lenis = STILL ? null : new Lenis({ lerp: 0.09, wheelMultiplier: 0.9 })
+  if (lenis) {
+    lenis.on('scroll', ScrollTrigger.update)
+    gsap.ticker.add((time) => lenis.raf(time * 1000))
+    gsap.ticker.lagSmoothing(0)
+  }
 
   const els = SECTIONS.map((n) => document.querySelector<HTMLElement>(`[data-sec="${n}"]`))
 
@@ -61,21 +66,25 @@ export function initScroll() {
     S.p = max > 0 ? window.scrollY / max : 0
   }
 
-  lenis.on('scroll', update)
+  if (lenis) lenis.on('scroll', update)
+  else window.addEventListener('scroll', update, { passive: true })
   window.addEventListener('resize', update)
   update()
 
-  const stopPointer = initPointer()
+  const stopPointer = STILL ? () => {} : initPointer()
+  if (STILL) I.v = 1  // no entrance ramp; the image is simply there
 
   // The entrance. No preloader — the content already painted; this is the
   // instrument resolving out of black while the lines stagger up over it.
-  gsap.from('[data-sec="hero"] > *', {
-    y: 34, autoAlpha: 0, duration: 1, ease: 'power3.out', stagger: 0.11, delay: 0.12,
-  })
-  gsap.to(I, { v: 1, duration: 1.7, ease: 'power2.inOut', delay: 0.1 })
+  if (!STILL) {
+    gsap.from('[data-sec="hero"] > *', {
+      y: 34, autoAlpha: 0, duration: 1, ease: 'power3.out', stagger: 0.11, delay: 0.12,
+    })
+    gsap.to(I, { v: 1, duration: 1.7, ease: 'power2.inOut', delay: 0.1 })
+  }
 
   // the copy rises as its section takes the viewport
-  const reveals = gsap.utils.toArray<HTMLElement>('.col, .hero > *')
+  const reveals = STILL ? [] : gsap.utils.toArray<HTMLElement>('.col, .hero > *')
   reveals.forEach((el) => {
     // Never hide anything that is already on screen. If a trigger ever failed
     // to fire, the worst case has to be "no animation", never "no content".
@@ -91,7 +100,8 @@ export function initScroll() {
   })
 
   return () => {
-    lenis.destroy()
+    lenis?.destroy()
+    window.removeEventListener('scroll', update)
     stopPointer()
     window.removeEventListener('resize', update)
     ScrollTrigger.getAll().forEach((t) => t.kill())

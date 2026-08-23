@@ -7,6 +7,8 @@ import { BlendFunction } from 'postprocessing'
 import * as THREE from 'three'
 import Instrument from './Instrument'
 import { I } from '../lib/pointer'
+import { STILL } from '../lib/mode'
+import { S } from '../lib/scroll'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useEffect, useRef } from 'react'
 
@@ -71,6 +73,21 @@ function Studio() {
  * It never pauses before a frame has been painted: a page opened straight into
  * a background tab would otherwise show an empty canvas when finally focused.
  */
+/** In still mode nothing animates, so a frame is only drawn when the section
+ *  changes — the composition is recomposed, then the GPU goes quiet. */
+function StillFrames() {
+  const invalidate = useThree((s) => s.invalidate)
+  const last = useRef(-1)
+  useEffect(() => {
+    const id = setInterval(() => {
+      if (S.i !== last.current) { last.current = S.i; invalidate() }
+    }, 120)
+    invalidate()
+    return () => clearInterval(id)
+  }, [invalidate])
+  return null
+}
+
 function Frameloop() {
   const setFrameloop = useThree((s) => s.setFrameloop)
   const invalidate = useThree((s) => s.invalidate)
@@ -120,13 +137,14 @@ export default function Scene({ onReady }: { onReady: () => void }) {
       // measure the container at zero height and never start the loop.
       style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}
       dpr={[1, 1.5]}
+      frameloop={STILL ? 'demand' : 'always'}
       resize={{ polyfill: ViewportObserver as never }}
       gl={{ antialias: true, powerPreference: 'high-performance' }}
       camera={{ fov: 38, position: [0, 0, 3.1] }}
       onCreated={({ gl }) => {
         gl.domElement.addEventListener('webglcontextlost', (e) => e.preventDefault())
         gl.toneMapping = THREE.ACESFilmicToneMapping
-        gl.toneMappingExposure = 0
+        gl.toneMappingExposure = STILL ? 1.15 : 0
       }}
     >
       <color attach="background" args={['#08090C']} />
@@ -136,7 +154,7 @@ export default function Scene({ onReady }: { onReady: () => void }) {
       <Instrument />
       <Exposure />
       <Ready onReady={onReady} />
-      <Frameloop />
+      {STILL ? <StillFrames /> : <Frameloop />}
 
       <ContactShadows position={[0, -1.55, 0]} opacity={0.5} scale={14} blur={3} far={5} />
 

@@ -4,6 +4,7 @@ import * as THREE from 'three'
 import { S, VIEW, damp } from '../lib/scroll'
 import { P, I } from '../lib/pointer'
 import { NUDGE } from '../lib/nudge'
+import { STILL } from '../lib/mode'
 import { ratchetGeometry, housingGeometry, pawlGeometry, tumblerGeometry } from './geometry'
 
 const BEAM = '#86E9DE'
@@ -51,10 +52,21 @@ function useWeight(index: number) {
   useFrame((_, dt) => {
     const d = Math.abs(flow() - (index + 0.5))
     const target = smoothstep(THREE.MathUtils.clamp(1 - d, 0, 1))
-    w.current = damp(w.current, target, 9, Math.min(dt, 0.05))
+    w.current = STILL ? target : damp(w.current, target, 9, Math.min(dt, 0.05))
   })
   return w
 }
+
+/**
+ * How far this mechanism has *arrived* across the previous boundary (0 -> 1),
+ * and how far it has *departed* across the next one. Mechanisms use these to
+ * start in the shape of the thing before them and leave in the shape of the
+ * thing after, so a handover is a transformation rather than a cross-fade.
+ */
+const arrive = (index: number) =>
+  smoothstep(THREE.MathUtils.clamp(flow() - (index - 0.5), 0, 1))
+const depart = (index: number) =>
+  smoothstep(THREE.MathUtils.clamp(flow() - (index + 0.5), 0, 1))
 
 /** Departing mechanisms fall back into the dark; arriving ones come forward.
  *  Without this the overlap at a boundary reads as clutter instead of depth. */
@@ -114,8 +126,13 @@ function Housing({ index, opensWith }: { index: number; opensWith: number }) {
       petal.quaternion.setFromAxisAngle(p.hinge, o * 0.62)
     })
 
-    g.current.rotation.y += d * 0.12
-    g.current.rotation.x = -0.22 + Math.sin(state.clock.elapsedTime * 0.25) * 0.04
+    if (STILL) {
+      g.current.rotation.y = 0.6
+      g.current.rotation.x = -0.22
+    } else {
+      g.current.rotation.y += d * 0.12
+      g.current.rotation.x = -0.22 + Math.sin(state.clock.elapsedTime * 0.25) * 0.04
+    }
   })
 
   return (
@@ -174,6 +191,7 @@ function Ratchet({ index }: { index: number }) {
    *            slower, cold, scattered. A graze, not a strike.
    */
   const emit = (reverse: boolean) => {
+    if (STILL) return          // sparks are motion; a still frame has none
     const n = reverse ? 5 : 9
     const col = reverse ? COLD : HOT
     let spawned = 0
@@ -249,7 +267,13 @@ function Ratchet({ index }: { index: number }) {
       settled.current += STEP
       emit(false)
     }
-    angle.current = damp(angle.current, settled.current, 11, d)
+    if (STILL) {
+      // held mid-tooth, pawl seated: the moment the mechanism describes
+      settled.current = STEP * 3.5
+      angle.current = settled.current
+    } else {
+      angle.current = damp(angle.current, settled.current, 11, d)
+    }
     wheel.current.rotation.z = angle.current
 
     // engaged: rides up the flank and drops into the valley.
@@ -326,6 +350,8 @@ function Rotor({ index }: { index: number }) {
             (Math.random() - 0.5) * 2.2,
             (Math.random() - 0.5) * 3.2,
           ),
+          // where this chip sits on the ratchet before it is one: a tooth tip
+          tooth: (i % TEETH) / TEETH * Math.PI * 2,
           a: Math.random() * Math.PI * 2,
           drift: 2.4 + Math.random() * 2.2,
           spinOff: Math.random() * Math.PI,
@@ -337,8 +363,10 @@ function Rotor({ index }: { index: number }) {
   useFrame((state, dt) => {
     const k = w.current
     stage(g.current, k, 1)
-    const t = S.i === index ? S.t : 0
-    spin.current += dt * (0.35 + t * 3.2)
+    const t = STILL ? 0.9 : (S.i === index ? S.t : 0)
+    const born = arrive(index)   // 0 = still the ratchet's teeth
+    const gone = depart(index)   // 1 = collapsed into the spectrometer's beam
+    if (!STILL) spin.current += dt * (0.35 + t * 3.2)
 
     chips.forEach((c, i) => {
       const a = c.a + spin.current * (c.recurring ? 1 : 0.4)
@@ -348,15 +376,28 @@ function Rotor({ index }: { index: number }) {
         ? THREE.MathUtils.lerp(c.chaos.length(), c.ring + 0.55, t)
         : THREE.MathUtils.lerp(c.chaos.length(), c.drift, t * t)
       const y = THREE.MathUtils.lerp(c.chaos.y, c.recurring ? 0 : c.chaos.y * 2.4, t)
-      dummy.position.set(r * Math.cos(a), y, r * Math.sin(a))
+      // Handover in: every chip starts life as a tooth tip on the ratchet,
+      // sitting on its circle in the wheel plane, and is thrown loose from
+      // there. The teeth become the transactions.
+      const ta = c.tooth
+      const px = THREE.MathUtils.lerp(1.5 * Math.cos(ta), r * Math.cos(a), born)
+      const py = THREE.MathUtils.lerp(1.5 * Math.sin(ta), y, born)
+      const pz = THREE.MathUtils.lerp(0, r * Math.sin(a), born)
+      // Handover out: the cloud collapses onto one axis — that line is the
+      // beam the spectrometer then splits.
+      dummy.position.set(
+        THREE.MathUtils.lerp(px, -1.6 + (i / CHIPS) * 3.2, gone),
+        THREE.MathUtils.lerp(py, 0, gone),
+        THREE.MathUtils.lerp(pz, 0, gone),
+      )
       dummy.rotation.set(0, -a + c.spinOff, c.recurring ? 0 : c.spinOff)
       const s = c.recurring ? 0.075 : THREE.MathUtils.lerp(0.055, 0.02, t)
-      dummy.scale.set(s * 2.6, s * 0.32, s)
+      dummy.scale.set(s * 2.6 * (1 - gone * 0.7), s * 0.32, s * (1 - gone * 0.8))
       dummy.updateMatrix()
       inst.current.setMatrixAt(i, dummy.matrix)
     })
     inst.current.instanceMatrix.needsUpdate = true
-    g.current.rotation.x = -0.42 + Math.sin(state.clock.elapsedTime * 0.2) * 0.03
+    g.current.rotation.x = STILL ? -0.42 : -0.42 + Math.sin(state.clock.elapsedTime * 0.2) * 0.03
   })
 
   return (
@@ -376,6 +417,7 @@ const BANDS = 7
 function Spectrometer({ index }: { index: number }) {
   const g = useRef<THREE.Group>(null!)
   const bands = useRef<THREE.Group>(null!)
+  const prism = useRef<THREE.Mesh>(null!)
   const alloy = useAlloy()
   const w = useWeight(index)
 
@@ -393,7 +435,11 @@ function Spectrometer({ index }: { index: number }) {
   useFrame((state) => {
     const k = w.current
     stage(g.current, k, 1.15)
-    const t = S.i === index ? S.t : 0
+    const t = STILL ? 0.95 : (S.i === index ? S.t : 0)
+    // the prism is not there until the rotor's chips have become the beam
+    const born = arrive(index)
+    prism.current.scale.setScalar(born)
+    prism.current.rotation.z = Math.PI + (1 - born) * 2.4
     bands.current.children.forEach((b, i) => {
       const r = rows[i]
       // continuous spectrum snaps to discrete, labelled rows
@@ -402,13 +448,13 @@ function Spectrometer({ index }: { index: number }) {
       b.position.x = THREE.MathUtils.lerp(1.1, 1.95, snap)
       b.scale.x = THREE.MathUtils.lerp(0.5, 1, snap)
     })
-    g.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.18) * 0.06
+    g.current.rotation.y = STILL ? 0.05 : Math.sin(state.clock.elapsedTime * 0.18) * 0.06
   })
 
   return (
     <group ref={g}>
       {/* the prism */}
-      <mesh rotation={[0, 0, Math.PI]} position={[0.1, 0, 0]}>
+      <mesh ref={prism} rotation={[0, 0, Math.PI]} position={[0.1, 0, 0]}>
         <cylinderGeometry args={[0, 0.62, 0.62, 3]} />
         <meshPhysicalMaterial
           transmission={0.94} thickness={0.9} roughness={0.04}
@@ -452,6 +498,8 @@ function Tumbler({ index }: { index: number }) {
         z: (i - (RINGS - 1) / 2) * 0.13,
         from: (i * 2.399) % (Math.PI * 2) + 0.7, // scrambled start
         delay: i * 0.11,                          // they align in sequence
+        // where this ring was when it was a spectral band: a flat row
+        band: (i - (RINGS - 1) / 2) * 0.34,
       })),
     [],
   )
@@ -460,14 +508,21 @@ function Tumbler({ index }: { index: number }) {
     const d = Math.min(dt, 0.05)
     const k = w.current
     stage(g.current, k, 1.25)
-    const t = S.i === index ? S.t : 0
+    const t = STILL ? 1 : (S.i === index ? S.t : 0)
+    // Handover in: each ring arrives as one of the spectrometer's flat bands,
+    // stacked in y, and curls into the concentric stack. Discrete rows become
+    // a lock.
+    const born = arrive(index)
 
     let aligned = 0
     rings.current.children.forEach((r, i) => {
       const sp = spec[i]
+      r.position.y = (1 - born) * sp.band
+      r.position.z = born * sp.z
+      r.scale.setScalar(0.15 + born * 0.85)
       const local = THREE.MathUtils.clamp((t - sp.delay) / 0.45, 0, 1)
       const e = local * local * (3 - 2 * local)
-      r.rotation.z = damp(r.rotation.z, sp.from * (1 - e), 9, d)
+      r.rotation.z = STILL ? 0 : damp(r.rotation.z, sp.from * (1 - e), 9, d)
       if (Math.abs(r.rotation.z) < 0.05) aligned++
     })
 
@@ -476,7 +531,7 @@ function Tumbler({ index }: { index: number }) {
     const m = beam.current.material as THREE.MeshBasicMaterial
     m.opacity = damp(m.opacity, open > 0.99 ? 1 : 0.05, 6, d)
     beam.current.scale.y = damp(beam.current.scale.y, 0.3 + open * 0.7, 6, d)
-    g.current.rotation.y = -0.5 + Math.sin(state.clock.elapsedTime * 0.16) * 0.05
+    g.current.rotation.y = STILL ? -0.5 : -0.5 + Math.sin(state.clock.elapsedTime * 0.16) * 0.05
     g.current.rotation.x = -0.22
   })
 
@@ -484,7 +539,7 @@ function Tumbler({ index }: { index: number }) {
     <group ref={g}>
       <group ref={rings}>
         {spec.map((sp, i) => (
-          <mesh key={i} geometry={sp.geo} material={alloy} position={[0, 0, sp.z]} castShadow />
+          <mesh key={i} geometry={sp.geo} material={alloy} castShadow />
         ))}
       </group>
       <mesh ref={beam} rotation={[Math.PI / 2, 0, 0]}>
@@ -511,6 +566,8 @@ function Manifold({ index }: { index: number }) {
         x: (i - (DOSES - 1) / 2) * 0.46,
         delay: i * 0.13,
         travel: 0.34 + (i % 2) * 0.1,
+        // the tumbler ring this barrel was a moment ago
+        ringZ: (i - (DOSES - 1) / 2) * 0.13,
       })),
     [],
   )
@@ -519,12 +576,18 @@ function Manifold({ index }: { index: number }) {
     const d = Math.min(dt, 0.05)
     const k = w.current
     stage(g.current, k, 1.1)
-    const t = S.i === index ? S.t : 0
+    const t = STILL ? 0.75 : (S.i === index ? S.t : 0)
 
+    // Handover in: each barrel starts as a tumbler ring — flat, stacked in z,
+    // no length — and extrudes into a cylinder as it slides to its station.
+    const born = arrive(index)
     pistons.current.children.forEach((p, i) => {
       const sp = spec[i]
       const local = THREE.MathUtils.clamp((t - sp.delay) / 0.4, 0, 1)
       const e = 1 - Math.pow(1 - local, 3)
+      p.position.x = THREE.MathUtils.lerp(0, sp.x, born)
+      p.position.z = THREE.MathUtils.lerp(sp.ringZ, 0, born)
+      p.scale.y = 0.06 + born * 0.94          // a disc extruding into a barrel
       p.position.y = damp(p.position.y, 0.72 - e * sp.travel, 9, d)
     })
 
@@ -540,7 +603,7 @@ function Manifold({ index }: { index: number }) {
       ;((b as THREE.Mesh).material as THREE.MeshBasicMaterial).opacity = 1 - slide * 0.35
     })
 
-    g.current.rotation.y = 0.22 + Math.sin(state.clock.elapsedTime * 0.15) * 0.05
+    g.current.rotation.y = STILL ? 0.22 : 0.22 + Math.sin(state.clock.elapsedTime * 0.15) * 0.05
     g.current.rotation.x = -0.16
   })
 
@@ -561,7 +624,7 @@ function Manifold({ index }: { index: number }) {
         ))}
       </group>
 
-      <group ref={beads}>
+      <group ref={beads} visible={arrive(index) > 0.85}>
         {spec.map((sp, i) => (
           <mesh key={i} position={[sp.x, 0.34, 0]}>
             <sphereGeometry args={[0.055, 16, 16]} />
@@ -611,11 +674,20 @@ export default function Instrument() {
     // Pointer parallax. Turning the object against a fixed environment is what
     // rakes the specular across the machined faces — the light appears to move
     // because the reflection does.
-    state.camera.position.x = damp(state.camera.position.x, x + P.x * 0.22, 3, d)
-    state.camera.position.y = damp(state.camera.position.y, y - P.y * 0.14, 3, d)
-    state.camera.position.z = damp(state.camera.position.z, z + intro, 3, d)
-    rig.current.rotation.y = damp(rig.current.rotation.y, S.t * 0.3 + P.x * 0.16, 2.5, d)
-    rig.current.rotation.x = damp(rig.current.rotation.x, -P.y * 0.1, 2.5, d)
+    const par = STILL ? 0 : 1
+    if (STILL) {
+      state.camera.position.set(x, y, z)
+    } else {
+      state.camera.position.x = damp(state.camera.position.x, x + P.x * 0.22 * par, 3, d)
+      state.camera.position.y = damp(state.camera.position.y, y - P.y * 0.14 * par, 3, d)
+      state.camera.position.z = damp(state.camera.position.z, z + intro, 3, d)
+    }
+    if (STILL) {
+      rig.current.rotation.set(0, 0.18, 0)
+    } else {
+      rig.current.rotation.y = damp(rig.current.rotation.y, S.t * 0.3 + P.x * 0.16, 2.5, d)
+      rig.current.rotation.x = damp(rig.current.rotation.x, -P.y * 0.1, 2.5, d)
+    }
 
     const m = VIEW.mobile
     // At fov 38 and z~3.3 the half-height is ~1.14 world units, so y 0.78 with

@@ -2,27 +2,21 @@ import { useEffect, useState, lazy, Suspense } from 'react'
 import { initScroll } from './lib/scroll'
 import ExperienceBoundary from './lib/ExperienceBoundary'
 import { nudge } from './lib/nudge'
+import { MODE, STILL } from './lib/mode'
 import Resolving from './Resolving'
 import './fonts.css'
 import './styles.css'
 
 const Scene = lazy(() => import('./scene/Scene'))
 
-/** The experience never gates the content. Canvas is skipped entirely when the
- *  visitor or the hardware says no; the composed static page stands alone. */
+/** The experience never gates the content: it is always loaded after idle,
+ *  and 'off' means no canvas at all. */
 function useExperienceAllowed() {
   const [ok, setOk] = useState(false)
   useEffect(() => {
-    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
-    const saveData = (navigator as any).connection?.saveData === true
-    let webgl = false
-    try {
-      webgl = !!document.createElement('canvas').getContext('webgl2')
-    } catch { /* no webgl */ }
-    if (!reduced && !saveData && webgl) {
-      const idle = (window as any).requestIdleCallback ?? ((f: () => void) => setTimeout(f, 200))
-      idle(() => setOk(true))
-    }
+    if (MODE === 'off') return
+    const idle = (window as any).requestIdleCallback ?? ((f: () => void) => setTimeout(f, 200))
+    idle(() => setOk(true))
   }, [])
   return ok
 }
@@ -53,7 +47,7 @@ export default function App() {
         </ExperienceBoundary>
       )}
 
-      {allowed && <Resolving done={ready} />}
+      {allowed && !STILL && <Resolving done={ready} />}
 
       <header className="hud top">
         <span className="brand">
