@@ -52,9 +52,18 @@ The housing opens; a ratchet wheel and pawl extend.
 **Scroll → rotation, quantized.** Each scroll segment advances exactly one
 tooth: ease-out snap, then a small recoil as the pawl catches. Cyan flash on
 the contact face at each click.
-**Scroll back and the wheel does not reverse.** The camera returns; the
-mechanism holds. This is the one deliberate violation of scroll reversibility
-on the entire site, and it is the whole argument of the project.
+**Scroll back and the pawl lifts.** A ratchet does not run in reverse — it gets
+*released*. So the two directions are two different mechanical events, not one
+animation played twice:
+
+| | Forward | Backward |
+|---|---|---|
+| Pawl | engaged, rides each flank | swung clear of the tips, chattering |
+| Motion | quantised, snaps tooth to tooth | continuous slip |
+| Sparks | few, fast, **hot** — a strike | many, slow, **cold** — a graze |
+
+The wheel can be let go, but it never *drives* backwards, and the accumulator
+never falls below zero. The copy next to it stays true.
 
 ### 02 · recur — the sorting rotor
 The ratchet retracts. ~180 small chips appear as a chaotic cloud — transactions.

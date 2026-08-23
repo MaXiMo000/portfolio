@@ -10,7 +10,9 @@ const BEAM = '#86E9DE'
 const ESCALATE = '#E8873B'
 const TEETH = 24
 const STEP = (Math.PI * 2) / TEETH
-const SPARKS = 40
+const SPARKS = 56
+const HOT = new THREE.Color('#FFE3B4')   // forward: struck metal
+const COLD = new THREE.Color('#9FD8FF')  // reverse: the pawl skating, no bite
 // pawl pivot sits outside the wheel; the arm reaches back to r ~0.94, just
 // inside the tooth tips, so it actually rides the flank
 const PIVOT = { x: 1.6, y: 0.55, z: 0.05 }
@@ -81,6 +83,8 @@ function Ratchet({ index }: { index: number }) {
   const armed = useRef(false)
   const advanced = useRef(0)
   const seenNudge = useRef(0)
+  const tooth = useRef(0)
+  const release = useRef(0)
   const alloy = useAlloy()
   const brass = useMemo(
     () => new THREE.MeshStandardMaterial({
@@ -96,22 +100,36 @@ function Ratchet({ index }: { index: number }) {
   const dummy = useMemo(() => new THREE.Object3D(), [])
   const sparkState = useMemo(
     () => Array.from({ length: SPARKS }, () => ({
-      life: 0, p: new THREE.Vector3(), v: new THREE.Vector3(),
+      life: 0, decay: 3, p: new THREE.Vector3(), v: new THREE.Vector3(),
     })),
     [],
   )
-  const emit = () => {
+
+  /**
+   * Two spark characters, because the two directions are different events.
+   *  forward — the pawl bites a tooth: few, fast, hot, thrown hard one way.
+   *  reverse — the pawl is lifted and skating over the tooth backs: many,
+   *            slower, cold, scattered. A graze, not a strike.
+   */
+  const emit = (reverse: boolean) => {
+    const n = reverse ? 5 : 9
+    const col = reverse ? COLD : HOT
     let spawned = 0
-    for (const sp of sparkState) {
+    for (let i = 0; i < SPARKS; i++) {
+      const sp = sparkState[i]
       if (sp.life > 0) continue
       sp.life = 1
+      sp.decay = reverse ? 4.4 : 2.9
       sp.p.set(CONTACT.x, CONTACT.y, CONTACT.z + (Math.random() - 0.5) * 0.12)
-      // thrown along the tooth's direction of travel, with scatter
-      const a = -1.15 + (Math.random() - 0.5) * 1.5
-      const sp0 = 1.1 + Math.random() * 2.2
-      sp.v.set(Math.cos(a) * sp0, Math.sin(a) * sp0, (Math.random() - 0.5) * 0.9)
-      if (++spawned >= 9) break
+      const a = reverse
+        ? 1.5 + (Math.random() - 0.5) * 2.4
+        : -1.15 + (Math.random() - 0.5) * 1.5
+      const speed = reverse ? 0.5 + Math.random() * 1.0 : 1.1 + Math.random() * 2.2
+      sp.v.set(Math.cos(a) * speed, Math.sin(a) * speed, (Math.random() - 0.5) * 0.9)
+      sparks.current?.setColorAt(i, col)
+      if (++spawned >= n) break
     }
+    if (sparks.current?.instanceColor) sparks.current.instanceColor.needsUpdate = true
   }
 
   useFrame((_, dt) => {
@@ -130,37 +148,62 @@ function Ratchet({ index }: { index: number }) {
       // Accumulate *travel* rather than reading absolute progress. Reading S.t
       // directly meant the wheel maxed out on the first scroll through and
       // never moved again on any later pass.
-      if (delta > 0) advanced.current += delta
-      const target = Math.floor(advanced.current * TEETH * 0.6) * STEP
-      // It still never reverses: scroll back and the camera returns, the
-      // mechanism holds. That is the whole argument of carabiner.
-      if (target > settled.current) {
-        settled.current = target
-        emit()
+      // Forward, the pawl is engaged: quantised, one tooth at a time.
+      // Backward, the pawl LIFTS and the wheel is released — it back-drives
+      // smoothly instead of clicking. A ratchet does not run in reverse; it
+      // gets let go. That keeps the copy honest and makes the two directions
+      // genuinely different mechanical events rather than one played twice.
+      if (delta > 0) {
+        advanced.current += delta
+        release.current = damp(release.current, 0, 10, d)
+      } else if (delta < 0) {
+        advanced.current = Math.max(0, advanced.current + delta)
+        release.current = damp(release.current, 1, 7, d)
+      } else {
+        release.current = damp(release.current, 0, 3, d)
+      }
+
+      const travel = advanced.current * TEETH * 0.6
+      settled.current = release.current > 0.5
+        ? travel * STEP              // released: continuous slip
+        : Math.floor(travel) * STEP  // engaged: snaps tooth to tooth
+
+      const t = Math.floor(travel)
+      if (t !== tooth.current) {
+        emit(t < tooth.current)
+        tooth.current = t
       }
     } else {
       armed.current = false
+      release.current = damp(release.current, 0, 4, d)
     }
 
     // hovering "Open the repo" clicks it one tooth
     if (NUDGE.section === index && NUDGE.count !== seenNudge.current) {
       seenNudge.current = NUDGE.count
+      // a hover is a forward bite, so it advances the accumulator too —
+      // otherwise the next scroll would undo it
+      advanced.current += 1 / (TEETH * 0.6)
+      tooth.current = Math.floor(advanced.current * TEETH * 0.6)
       settled.current += STEP
-      emit()
+      emit(false)
     }
     angle.current = damp(angle.current, settled.current, 11, d)
     wheel.current.rotation.z = angle.current
 
-    // pawl rides up the tooth flank, then drops back against its spring
-    const phase = (angle.current % STEP) / STEP
-    pawl.current.rotation.z = -0.04 + Math.sin(phase * Math.PI) * 0.11
+    // engaged: rides up the flank and drops into the valley.
+    // released: swung clear of the tooth tips, chattering as it skates.
+    const phase = ((angle.current % STEP) + STEP) % STEP / STEP
+    const ride = Math.sin(phase * Math.PI) * 0.11
+    const skate = Math.sin(phase * Math.PI * 6) * 0.03 * release.current
+    pawl.current.rotation.z = -0.04 + ride + skate - release.current * 0.24
 
     // sparks: ballistic, short-lived, stretched along their own velocity
     for (let i = 0; i < SPARKS; i++) {
       const sp = sparkState[i]
       if (sp.life <= 0) { dummy.scale.setScalar(0.0001) }
       else {
-        sp.life -= d / 0.34
+        sp.life -= d * sp.decay
         sp.v.y -= 5.2 * d
         sp.v.multiplyScalar(1 - 1.6 * d)
         sp.p.addScaledVector(sp.v, d)
