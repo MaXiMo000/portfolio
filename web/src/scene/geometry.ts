@@ -69,3 +69,21 @@ export function pawlGeometry() {
   g.translate(0, 0, -0.05)
   return g
 }
+
+/** A tumbler ring: an annulus with a notch cut out of it. When every ring's
+ *  notch lines up, the beam passes. QuizNest — knowledge either aligns or it
+ *  does not. */
+export function tumblerGeometry(rOuter: number, rInner: number, notch = 0.34) {
+  const s = new THREE.Shape()
+  const a0 = -Math.PI / 2 + notch / 2
+  const a1 = -Math.PI / 2 - notch / 2 + Math.PI * 2
+  s.absarc(0, 0, rOuter, a0, a1, false)
+  s.absarc(0, 0, rInner, a1, a0, true)
+  s.closePath()
+  const g = new THREE.ExtrudeGeometry(s, {
+    depth: 0.09, bevelEnabled: true, bevelSize: 0.008,
+    bevelThickness: 0.008, bevelSegments: 2, curveSegments: 64,
+  })
+  g.center()
+  return g
+}

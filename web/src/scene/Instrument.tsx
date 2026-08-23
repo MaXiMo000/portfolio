@@ -2,7 +2,7 @@ import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { S, damp } from '../lib/scroll'
-import { ratchetGeometry, housingGeometry, pawlGeometry } from './geometry'
+import { ratchetGeometry, housingGeometry, pawlGeometry, tumblerGeometry } from './geometry'
 
 const BEAM = '#86E9DE'
 const ESCALATE = '#E8873B'
@@ -258,68 +258,148 @@ function Spectrometer({ index }: { index: number }) {
 }
 
 /* --------------------------------------------------------------------- 04 */
-function Plates({ index }: { index: number }) {
+const RINGS = 5
+function Tumbler({ index }: { index: number }) {
   const g = useRef<THREE.Group>(null!)
+  const rings = useRef<THREE.Group>(null!)
+  const beam = useRef<THREE.Mesh>(null!)
   const alloy = useAlloy()
   const w = useWeight(index)
-  useFrame((_, dt) => {
+
+  const spec = useMemo(
+    () =>
+      Array.from({ length: RINGS }, (_, i) => ({
+        geo: tumblerGeometry(1.22 - i * 0.17, 1.22 - i * 0.17 - 0.13),
+        z: (i - (RINGS - 1) / 2) * 0.13,
+        from: (i * 2.399) % (Math.PI * 2) + 0.7, // scrambled start
+        delay: i * 0.11,                          // they align in sequence
+      })),
+    [],
+  )
+
+  useFrame((state, dt) => {
+    const d = Math.min(dt, 0.05)
     const k = w.current
     g.current.visible = k > 0.01
-    g.current.scale.setScalar(k * 1.1)
+    g.current.scale.setScalar(k * 1.25)
     const t = S.i === index ? S.t : 0
-    g.current.rotation.y = damp(g.current.rotation.y, -0.4 + t * 4.2, 5, Math.min(dt, 0.05))
+
+    let aligned = 0
+    rings.current.children.forEach((r, i) => {
+      const sp = spec[i]
+      const local = THREE.MathUtils.clamp((t - sp.delay) / 0.45, 0, 1)
+      const e = local * local * (3 - 2 * local)
+      r.rotation.z = damp(r.rotation.z, sp.from * (1 - e), 9, d)
+      if (Math.abs(r.rotation.z) < 0.05) aligned++
+    })
+
+    // the beam only passes once every notch lines up
+    const open = aligned / RINGS
+    const m = beam.current.material as THREE.MeshBasicMaterial
+    m.opacity = damp(m.opacity, open > 0.99 ? 1 : 0.05, 6, d)
+    beam.current.scale.y = damp(beam.current.scale.y, 0.3 + open * 0.7, 6, d)
+    g.current.rotation.y = -0.5 + Math.sin(state.clock.elapsedTime * 0.16) * 0.05
+    g.current.rotation.x = -0.22
   })
+
   return (
-    <group ref={g} rotation={[-0.12, 0, 0]}>
-      {[0, 1, 2].map((i) => (
-        <group key={i} rotation={[0, (i / 3) * Math.PI * 2, 0]}>
-          <mesh position={[1.35, 0, 0]} rotation={[0, Math.PI / 2, 0]} castShadow>
-            <boxGeometry args={[1.5, 0.95, 0.05]} />
-            <primitive object={alloy} attach="material" />
-          </mesh>
-        </group>
-      ))}
-      <mesh>
-        <cylinderGeometry args={[0.09, 0.09, 2.1, 24]} />
-        <primitive object={alloy} attach="material" />
+    <group ref={g}>
+      <group ref={rings}>
+        {spec.map((sp, i) => (
+          <mesh key={i} geometry={sp.geo} material={alloy} position={[0, 0, sp.z]} castShadow />
+        ))}
+      </group>
+      <mesh ref={beam} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.035, 0.035, 3.4, 16]} />
+        <meshBasicMaterial color={BEAM} transparent opacity={0.05} />
       </mesh>
     </group>
   )
 }
 
 /* --------------------------------------------------------------------- 05 */
-function Gauge({ index, value = 0.98 }: { index: number; value?: number }) {
+const DOSES = 5
+function Manifold({ index }: { index: number }) {
   const g = useRef<THREE.Group>(null!)
-  const needle = useRef<THREE.Group>(null!)
+  const pistons = useRef<THREE.Group>(null!)
+  const beads = useRef<THREE.Group>(null!)
   const alloy = useAlloy()
   const w = useWeight(index)
-  useFrame((_, dt) => {
+
+  // each piston doses a measured amount; they fire in sequence, then converge
+  const spec = useMemo(
+    () =>
+      Array.from({ length: DOSES }, (_, i) => ({
+        x: (i - (DOSES - 1) / 2) * 0.46,
+        delay: i * 0.13,
+        travel: 0.34 + (i % 2) * 0.1,
+      })),
+    [],
+  )
+
+  useFrame((state, dt) => {
+    const d = Math.min(dt, 0.05)
     const k = w.current
     g.current.visible = k > 0.01
-    g.current.scale.setScalar(k * 1.3)
+    g.current.scale.setScalar(k * 1.1)
     const t = S.i === index ? S.t : 0
-    // sweeps, overshoots slightly, settles on the real measured number
-    const target = -2.2 + Math.min(t * 1.35, 1) * value * 4.4
-    needle.current.rotation.z = damp(needle.current.rotation.z, target, 7, Math.min(dt, 0.05))
+
+    pistons.current.children.forEach((p, i) => {
+      const sp = spec[i]
+      const local = THREE.MathUtils.clamp((t - sp.delay) / 0.4, 0, 1)
+      const e = 1 - Math.pow(1 - local, 3)
+      p.position.y = damp(p.position.y, 0.72 - e * sp.travel, 9, d)
+    })
+
+    // the dose falls, then slides along the collector to the single output
+    beads.current.children.forEach((b, i) => {
+      const sp = spec[i]
+      const local = THREE.MathUtils.clamp((t - sp.delay - 0.12) / 0.5, 0, 1)
+      const fall = Math.min(local * 2, 1)
+      const slide = THREE.MathUtils.clamp((local - 0.5) * 2, 0, 1)
+      b.position.y = 0.34 - fall * 0.86
+      b.position.x = THREE.MathUtils.lerp(sp.x, 0, slide * slide)
+      b.scale.setScalar(local > 0.01 ? 1 : 0.001)
+      ;((b as THREE.Mesh).material as THREE.MeshBasicMaterial).opacity = 1 - slide * 0.35
+    })
+
+    g.current.rotation.y = 0.22 + Math.sin(state.clock.elapsedTime * 0.15) * 0.05
+    g.current.rotation.x = -0.16
   })
+
   return (
-    <group ref={g} rotation={[-0.1, 0, 0]}>
-      <mesh>
-        <cylinderGeometry args={[1.15, 1.15, 0.14, 96]} />
+    <group ref={g}>
+      <group ref={pistons}>
+        {spec.map((sp, i) => (
+          <group key={i} position={[sp.x, 0.72, 0]}>
+            <mesh castShadow>
+              <cylinderGeometry args={[0.145, 0.145, 0.62, 32]} />
+              <primitive object={alloy} attach="material" />
+            </mesh>
+            <mesh position={[0, 0.4, 0]}>
+              <cylinderGeometry args={[0.05, 0.05, 0.3, 16]} />
+              <primitive object={alloy} attach="material" />
+            </mesh>
+          </group>
+        ))}
+      </group>
+
+      <group ref={beads}>
+        {spec.map((sp, i) => (
+          <mesh key={i} position={[sp.x, 0.34, 0]}>
+            <sphereGeometry args={[0.055, 16, 16]} />
+            <meshBasicMaterial color={BEAM} transparent opacity={1} />
+          </mesh>
+        ))}
+      </group>
+
+      {/* the collector: five measured inputs, one output */}
+      <mesh position={[0, -0.58, 0]} castShadow receiveShadow>
+        <boxGeometry args={[2.6, 0.1, 0.5]} />
         <primitive object={alloy} attach="material" />
       </mesh>
-      <mesh position={[0, 0, 0.075]} rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[0.98, 0.02, 10, 120, Math.PI * 1.4]} />
-        <meshBasicMaterial color={BEAM} />
-      </mesh>
-      <group ref={needle} position={[0, 0, 0.12]}>
-        <mesh position={[0.44, 0, 0]}>
-          <boxGeometry args={[0.9, 0.028, 0.02]} />
-          <meshBasicMaterial color="#FFFFFF" />
-        </mesh>
-      </group>
-      <mesh position={[0, 0, 0.13]}>
-        <cylinderGeometry args={[0.09, 0.09, 0.06, 24]} />
+      <mesh position={[0, -0.92, 0]}>
+        <cylinderGeometry args={[0.13, 0.19, 0.6, 32]} />
         <primitive object={alloy} attach="material" />
       </mesh>
     </group>
@@ -332,13 +412,13 @@ export default function Instrument() {
 
   // camera keyframes, one per section — eased, never linear
   const KEYS: [number, number, number][] = [
-    [0, 0, 3.1],
-    [0.35, 0.1, 4.4],
-    [0, 0.9, 5.4],
-    [0.2, 0, 4.8],
-    [0, 0.25, 5.0],
-    [0, 0, 4.2],
-    [0, 0, 3.1],
+    [0, 0, 3.3],      // 00 housing, close
+    [0.35, 0.1, 4.4], // 01 ratchet
+    [0, 0.9, 5.4],    // 02 rotor, from above
+    [0.2, 0, 4.8],    // 03 spectrometer, side on
+    [0, 0.15, 4.3],   // 04 tumbler, down the barrel
+    [0, 0.35, 4.6],   // 05 manifold
+    [0, 0, 3.6],      // 06 housing, closed again
   ]
 
   useFrame((state, dt) => {
@@ -363,8 +443,8 @@ export default function Instrument() {
       <Ratchet index={1} />
       <Rotor index={2} />
       <Spectrometer index={3} />
-      <Plates index={4} />
-      <Gauge index={5} />
+      <Tumbler index={4} />
+      <Manifold index={5} />
       <Housing index={6} />
     </group>
   )

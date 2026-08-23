@@ -37,16 +37,13 @@ a:focus-visible,[href]:focus-visible{outline:2px solid var(--beam);outline-offse
 .rail a:hover{color:var(--chalk)}
 .rail a:hover::after{background:var(--beam);width:30px}
 
-.tblock{left:44px;bottom:34px;border:1px solid var(--hair);
-  background:rgba(8,9,12,.6);backdrop-filter:blur(18px)}
-.tbh{display:flex;justify-content:space-between;gap:40px;padding:9px 15px;
-  border-bottom:1px solid var(--hair);font-size:8.5px;color:#79828F}
-.tbg{display:grid;grid-template-columns:repeat(3,1fr)}
-.tbg>div{padding:11px 15px;border-right:1px solid var(--hair)}
-.tbg>div:last-child{border-right:0}
-.tbg b{display:block;font-size:7.5px;letter-spacing:.22em;color:#5B6470;font-weight:600}
-.live{display:block;font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums;
-  color:var(--beam);margin-top:6px;letter-spacing:0;text-transform:none}
+
+
+
+
+
+
+
 
 /* ---------------- sections: 150vh each. Pacing is the design. ------------ */
 .sec{min-height:150vh;display:flex;flex-direction:column;justify-content:center;
@@ -58,12 +55,14 @@ a:focus-visible,[href]:focus-visible{outline:2px solid var(--beam);outline-offse
   color:#6E7885;margin-bottom:34px;display:flex;align-items:center;gap:14px}
 .eyebrow::before{content:"";width:38px;height:1px;background:var(--beam)}
 
-h1{font-size:clamp(44px,7vw,112px);line-height:.9;font-weight:800;letter-spacing:-.045em;
-  font-stretch:118%;text-transform:uppercase;display:flex;flex-direction:column}
+h1{font-size:clamp(40px,5.4vw,88px);line-height:.92;font-weight:800;letter-spacing:-.045em;
+  font-stretch:118%;text-transform:uppercase;display:flex;flex-direction:column;
+  max-width:13ch}
+h1.close{max-width:11ch}
 h1 .quiet{color:var(--alloy)}
 h1 .serif,.claim .serif{font-family:var(--serif);font-style:italic;font-weight:400;
   text-transform:none;letter-spacing:-.01em;font-stretch:100%}
-.lede{margin-top:34px;max-width:40ch;font-size:15px;line-height:1.68;color:#8E97A4}
+.lede{margin-top:34px;max-width:34ch;font-size:15px;line-height:1.68;color:#8E97A4}
 
 .num{font-family:var(--mono);font-size:10px;letter-spacing:.28em;color:var(--beam);
   text-transform:uppercase;margin-bottom:22px}
@@ -87,32 +86,29 @@ dd b{font-family:var(--mono);color:var(--beam);font-weight:400}
 .go:hover{border-color:var(--beam)}
 .go.big{font-family:var(--mono);font-size:16px;letter-spacing:.04em;text-transform:none;margin-top:44px}
 
-.aside{position:absolute;right:120px;bottom:22vh;max-width:19ch;text-align:right;
-  font-family:var(--mono);font-size:9.5px;line-height:1.8;letter-spacing:.13em;
-  text-transform:uppercase;color:#4E5764}
 
-.plates{list-style:none;margin-top:38px;border-top:1px solid var(--hair)}
-.plates li{display:grid;grid-template-columns:190px 1fr auto;gap:20px;align-items:baseline;
-  padding:22px 0;border-bottom:1px solid var(--hair)}
-.plates b{font-size:19px;font-weight:700;letter-spacing:-.02em}
-.plates span{font-size:13px;color:#7B8492;line-height:1.5}
-.plates a{font-family:var(--mono);font-size:10px;color:var(--beam);text-decoration:none;letter-spacing:.1em}
 
-.mt{margin-top:38px;border-collapse:collapse;width:100%;max-width:36rem}
-.mt th{text-align:left;font-weight:400;font-size:13.5px;color:#98A3B1;
-  padding:15px 0;border-bottom:1px solid var(--hair)}
-.mt td{text-align:right;font-family:var(--mono);font-size:12.5px;color:#7B8492;
-  padding:15px 0;border-bottom:1px solid var(--hair);font-variant-numeric:tabular-nums}
-.mt td.ok{color:var(--beam)}
+
+
+
+
+
+
+
+
+
+
 
 @media (max-width:820px){
   .rail{display:none}
   .sec{padding:0 22px;min-height:130vh}
-  .aside{position:static;text-align:left;margin-top:40px;max-width:none}
-  .tblock{left:0;right:0;bottom:0}
-  .plates li{grid-template-columns:1fr}
 }
 @media (prefers-reduced-motion:reduce){
   .pip{animation:none}
   html{scroll-behavior:auto}
 }
+
+.ends{display:flex;gap:28px;margin-top:46px}
+.ends a{font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;
+  color:#6E7885;text-decoration:none;border-bottom:1px solid var(--hair);padding-bottom:6px}
+.ends a:hover{color:var(--chalk);border-color:var(--beam)}

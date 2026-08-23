@@ -30,6 +30,33 @@ class ViewportObserver {
   }
 }
 
+
+/**
+ * The environment is built from lightformers rather than an HDRI file.
+ * On machined metal the environment *is* the material, and shaped softboxes
+ * give sharper, art-directable specular streaks than a photographic probe —
+ * while costing zero bytes and needing no third-party origin.
+ */
+function Studio() {
+  return (
+    <Environment resolution={256}>
+      {/* long key streak: the highlight that rakes across the turned faces */}
+      <Lightformer form="rect" intensity={14} color="#EAF2FF"
+        position={[-3, 2.6, 2]} scale={[9, 0.4, 1]} target={[0, 0, 0]} />
+      <Lightformer form="rect" intensity={8} color="#CFE0F5"
+        position={[3.4, 1.2, 1.6]} scale={[5, 0.22, 1]} target={[0, 0, 0]} />
+      {/* cool fill from behind, separates the silhouette from the void */}
+      <Lightformer form="rect" intensity={5} color="#7E93B5"
+        position={[0, -1.8, -4]} scale={[10, 3, 1]} target={[0, 0, 0]} />
+      {/* the one warm bounce — keeps the alloy from reading blue-dead */}
+      <Lightformer form="circle" intensity={2.4} color="#FFD9A8"
+        position={[4.2, -1.4, 2.4]} scale={3} target={[0, 0, 0]} />
+      <Lightformer form="ring" intensity={2} color="#FFFFFF"
+        position={[-2.2, -2.4, 1.2]} scale={2.4} target={[0, 0, 0]} />
+    </Environment>
+  )
+}
+
 export default function Scene() {
   return (
     <Canvas

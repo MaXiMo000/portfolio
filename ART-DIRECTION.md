@@ -17,7 +17,6 @@ built:
 | LabLedger | a lab PDF | LOINC codes, converted units, real intervals |
 | QuizNest | raw material | assessed knowledge |
 | AI-Recipe-Maker | what's in the fridge | a plan with nutrition |
-| HouseofBooks | a catalogue | a fulfilled order |
 
 > **He builds instruments that resolve noise into signal.**
 
@@ -70,15 +69,22 @@ One band refuses to snap and holds amber: *anything uncertain goes to a human.*
 That is the only amber in the entire scene, and it is the most honest thing on
 the site.
 
-### 04 · The rest — the plate carousel
-The instrument idles, reflective. QuizNest, AI-Recipe-Maker, HouseofBooks
-arrive on machined plates swinging in on a spindle. Faster, lighter — a
-deliberate release of pressure after three heavy sections. Pacing needs a
-downbeat or the whole thing reads as one long shout.
+### 04 · QuizNest — the tumbler
+Five concentric rings, each with a notch, each scrambled.
+**Scroll → the rings rotate into alignment, one after another.** When every
+notch lines up, a beam passes straight through the stack. Knowledge either
+aligns or it does not; a score out of ten does not tell you which ring is off.
 
-### 05 · Measurements — the gauge
-The instrument becomes a dial. The needle sweeps and settles on the **real**
-measured Lighthouse number, read live. The performance argument lives here.
+### 05 · AI-Recipe-Maker — the dosing manifold
+Five pistons over a collector.
+**Scroll → each piston fires in sequence, dosing a measured amount.** The
+doses fall, slide along the collector and converge into one output. Five
+measured inputs, one plan.
+
+*(Cut: the plate carousel and the gauge. HouseofBooks is out for now, and the
+performance section went with it — the perf argument stopped being the story
+once the experience became the priority, so a whole section defending it was
+dead weight.)*
 
 ### 06 · Contact — closes
 The housing seals. Ends exactly where it started.

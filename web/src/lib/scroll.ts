@@ -16,8 +16,8 @@ export const SECTIONS = [
   'carabiner',
   'recur',
   'labledger',
-  'range',
-  'measurements',
+  'quiznest',
+  'recipe',
   'contact',
 ] as const
 
