@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "og": "\"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome\" --headless=new --disable-gpu --hide-scrollbars --force-device-scale-factor=1 --window-size=1200,630 --virtual-time-budget=6000 --screenshot=public/og.png \"file://$PWD/og.html\"",
     "shots": "mkdir -p shots && node shots.mjs",
-    "fonts": "node scripts/fonts.mjs"
+    "fonts": "node scripts/fonts.mjs",
+    "check": "node check-build.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.8",

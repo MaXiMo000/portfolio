@@ -25,13 +25,13 @@ jobs:
         working-directory: web
       - run: npm run build
         working-directory: web
-      # the build's own guarantee: the page must be readable without JS
-      - name: Assert the markup is prerendered
+      # the build's own guarantee: the page must be readable without JS, every
+      # project must be reachable, and the security headers must have shipped.
+      # This replaced a two-string grep that a page missing half its links
+      # passed comfortably -- which is how two sections went link-less.
+      - name: Verify the built site
         working-directory: web
-        run: |
-          grep -q 'carabiner' dist/index.html
-          grep -q 'Noise' dist/index.html
-          echo "prerendered content present"
+        run: npm run check
 
   carabiner:
     # This repo is gated by the scanner its author wrote. If carabiner fails

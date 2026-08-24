@@ -91,7 +91,7 @@ export default function App() {
             <dl>
               <dt>Problem</dt><dd>Repository posture rots silently between audits.</dd>
               <dt>Hard</dt><dd>A ratchet that never loosens — not by accident, not by a well-meaning PR.</dd>
-              <dt>Cost</dt><dd><b>60</b> repos calibrated · <b>57</b> tests · SARIF · PyPI, GHCR, Marketplace</dd>
+              <dt>Cost</dt><dd><b>60</b> repos calibrated · <b>59</b> tests · SARIF · PyPI, GHCR, Marketplace</dd>
             </dl>
             <a
               className="go" href="https://github.com/MaXiMo000/carabiner"
@@ -112,6 +112,12 @@ export default function App() {
               <dt>Hard</dt><dd>Postgres row-level security, so a query that forgets its tenant filter returns zero rows instead of someone else's money.</dd>
               <dt>Cost</dt><dd>FastAPI · SQLAlchemy · argon2id · OAuth 2.1 + PKCE · remote MCP server · <b>0</b> bank credentials stored, ever</dd>
             </dl>
+            <a
+              className="go" href="https://github.com/MaXiMo000/recur"
+              onPointerEnter={() => nudge(2)} onFocus={() => nudge(2)}
+            >
+              Open the repo →
+            </a>
           </div>
         </section>
 
@@ -125,7 +131,12 @@ export default function App() {
               <dt>Hard</dt><dd>Resolving each test to a LOINC code, converting units, and picking the right reference interval.</dd>
               <dt>Cost</dt><dd>Multi-page PDFs · trend charts · <span className="esc">anything uncertain goes to a human</span></dd>
             </dl>
-            <a className="go" href="https://labledger-web.onrender.com/">See it live →</a>
+            <a
+              className="go" href="https://labledger-web.onrender.com/"
+              onPointerEnter={() => nudge(3)} onFocus={() => nudge(3)}
+            >
+              See it live →
+            </a>
           </div>
         </section>
 
@@ -139,7 +150,12 @@ export default function App() {
               <dt>Hard</dt><dd>Generating questions that actually discriminate, then turning a stream of answers into analytics a learner can act on.</dd>
               <dt>Cost</dt><dd>MERN · AI-generated question sets · per-topic analytics · gamification</dd>
             </dl>
-            <a className="go" href="https://quiz-app-cp2h.onrender.com/">See it live →</a>
+            <a
+              className="go" href="https://quiz-app-cp2h.onrender.com/"
+              onPointerEnter={() => nudge(4)} onFocus={() => nudge(4)}
+            >
+              See it live →
+            </a>
           </div>
         </section>
 
@@ -153,6 +169,12 @@ export default function App() {
               <dt>Hard</dt><dd>Dosing the constraints — what's in the fridge, what it costs nutritionally, what a week of it looks like — into one coherent plan.</dd>
               <dt>Cost</dt><dd>TypeScript · Claude-powered generation · nutrition analysis · meal plans</dd>
             </dl>
+            <a
+              className="go" href="https://github.com/MaXiMo000/AI-Recipe-Maker"
+              onPointerEnter={() => nudge(5)} onFocus={() => nudge(5)}
+            >
+              Open the repo →
+            </a>
           </div>
         </section>
 
