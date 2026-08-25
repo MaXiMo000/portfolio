@@ -95,6 +95,7 @@ export default function App() {
             </dl>
             <a
               className="go" href="https://github.com/MaXiMo000/carabiner"
+              aria-label="Open the carabiner repository on GitHub"
               onPointerEnter={() => nudge(1)} onFocus={() => nudge(1)}
             >
               Open the repo →
@@ -114,6 +115,7 @@ export default function App() {
             </dl>
             <a
               className="go" href="https://github.com/MaXiMo000/recur"
+              aria-label="Open the recur repository on GitHub"
               onPointerEnter={() => nudge(2)} onFocus={() => nudge(2)}
             >
               Open the repo →
@@ -133,6 +135,7 @@ export default function App() {
             </dl>
             <a
               className="go" href="https://labledger-web.onrender.com/"
+              aria-label="See LabLedger running live"
               onPointerEnter={() => nudge(3)} onFocus={() => nudge(3)}
             >
               See it live →
@@ -152,6 +155,7 @@ export default function App() {
             </dl>
             <a
               className="go" href="https://quiz-app-cp2h.onrender.com/"
+              aria-label="See QuizNest running live"
               onPointerEnter={() => nudge(4)} onFocus={() => nudge(4)}
             >
               See it live →
@@ -171,6 +175,7 @@ export default function App() {
             </dl>
             <a
               className="go" href="https://github.com/MaXiMo000/AI-Recipe-Maker"
+              aria-label="Open the AI-Recipe-Maker repository on GitHub"
               onPointerEnter={() => nudge(5)} onFocus={() => nudge(5)}
             >
               Open the repo →

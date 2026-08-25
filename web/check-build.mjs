@@ -62,6 +62,24 @@ for (const sec of PROJECTS) {
   ok(`section ${sec} links somewhere`, /class="go\b/.test(body))
 }
 
+// No two links may announce the same thing.
+//
+// Three links read "Open the repo →" and two read "See it live →". Visually
+// the surrounding section says which project; to a screen reader pulling up a
+// list of links they are indistinguishable, which is WCAG 2.4.4. aria-label
+// gives each one a destination you can tell apart, and this keeps it that way.
+const accessibleNames = []
+for (const m of html.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/g)) {
+  const aria = /aria-label="([^"]*)"/.exec(m[1])
+  const name = aria ? aria[1] : m[2].replace(/<[^>]+>/g, '').trim()
+  if (name) accessibleNames.push(name)
+}
+const seen = new Map()
+for (const n of accessibleNames) seen.set(n, (seen.get(n) || 0) + 1)
+const ambiguous = [...seen].filter(([, c]) => c > 1).map(([n]) => n)
+ok(`every link has a distinct accessible name${ambiguous.length ? ` (repeated: ${ambiguous.join(', ')})` : ''}`,
+   ambiguous.length === 0)
+
 // Contact routes somewhere.
 ok('email link present', html.includes('mailto:'))
 ok('CV is linked and shipped', html.includes('ritish-saini-cv.pdf')
