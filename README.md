@@ -116,6 +116,35 @@ should not mean a stripped page. Smooth scrolling is handed back to the OS,
 the entrance and reveals are off, and sparks never fire. Verified: 0 pixels
 change over 2.5s of idle.
 
+## The rail
+
+The right-hand rail is a readout, not a menu — so it has to do the two things a
+readout does.
+
+**It says where you are.** The active link takes `--beam`, the colour reserved
+for live values, and holds the extended hairline that hover only borrows. It
+also carries `aria-current`, which is the half that is not decoration: seven
+links reading `01 carabiner … 06 Contact` are, to a screen reader, seven
+identical destinations with nothing saying which one you are standing in. The
+marker is written straight to the DOM from the scroll handler for the same
+reason `S` is not React state — re-rendering the tree to move one hairline
+would put the whole page on the scroll path.
+
+**Clicking it travels.** A bare `#s4` is a native hash jump, and the scroll
+position is the only input the scene has, so moving it in one step *is* a cut —
+the one control on the site that broke the rule the rest of it is built around.
+Rail and skip-link clicks go through `lenis.scrollTo` instead, eased on the same
+`power3.out` used everywhere, over a duration that grows with the distance and
+caps at 1.6s. Continuity is the point, not holding somebody hostage to their own
+navigation.
+
+Focus follows the jump, which `preventDefault` would otherwise take away — and
+which the native jump never did either: it left focus on `<body>`, so the skip
+link scrolled the page and then sent the next Tab back to the top. Under
+`prefers-reduced-motion` none of this is wired at all; there is no Lenis to
+route through, and the instant jump is the correct behaviour there rather than
+a fallback.
+
 ## Handovers
 
 Every boundary is a transformation, not a cross-fade. Each mechanism begins in
