@@ -36,6 +36,13 @@ a:focus-visible,[href]:focus-visible{outline:2px solid var(--beam);outline-offse
 .rail a::after{content:"";width:18px;height:1px;background:rgba(255,255,255,.12)}
 .rail a:hover{color:var(--chalk)}
 .rail a:hover::after{background:var(--beam);width:30px}
+/* Where you are, in the one colour the palette reserves for a live value —
+   which is what a current section is. The rail reads as a measurement
+   readout rather than a menu, so hover is the question and this is the
+   answer: the number lights, the hairline extends and holds. */
+.rail a.on{color:var(--chalk)}
+.rail a.on u{color:var(--beam)}
+.rail a.on::after{background:var(--beam);width:34px}
 
 
 
