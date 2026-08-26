@@ -190,18 +190,28 @@ export default function App() {
           <div className="col">
             <p className="num">06 <em>/ the core sample</em></p>
             <h2>Wizcommerce</h2>
-            <p className="claim">Backend in production, for <span className="serif">real tenants.</span></p>
+            <p className="claim">Backend in production, on a <span className="serif">multi-tenant</span> platform.</p>
             <p className="post">
               <span className="post__role">Backend Developer</span>
-              <span className="post__where">Gurgaon &middot; Apr 2025 &mdash; present</span>
+              <span className="post__where">Gurgaon &middot; Apr 2025 &mdash; Sep 2026</span>
             </p>
+            {/* Written as the things that were actually built and handed over,
+                not as ownership of the platform they went into. Six lines,
+                because the core reads six bands. */}
             <ul className="strata">
-              <li><b>30+</b> production REST APIs on FastAPI, and <b>30%</b> off data retrieval</li>
-              <li>Multi-tenant architecture &mdash; client-level isolation, enforced rather than intended</li>
-              <li>Elasticsearch search: query latency down <b>~40%</b></li>
-              <li>Celery for the long-running work, so it is off the request path</li>
-              <li>PostgreSQL and SQLAlchemy tuning &mdash; <b>25%</b> less database load</li>
-              <li>Centralised logging and Sentry, so a failure is found before it is reported</li>
+              <li>Search features on Elasticsearch &mdash; the indexes, the queries and the
+                  endpoints over them. Query latency down <b>~40%</b></li>
+              <li>A server-side row model over SQL, so grids too large to load at once
+                  page, sort and filter the way the Elasticsearch path already did</li>
+              <li>A payment gateway integration, taken end to end</li>
+              <li>Address validation before send, through Mailgun &mdash; a bad address
+                  fails on our side instead of against the sending domain</li>
+              {/* The space before the number is explicit: JSX trims the end of a
+                  text line, so a dash at a line break runs straight into it. */}
+              <li>Query and index work across PostgreSQL and SQLAlchemy &mdash;{' '}
+                  <b>25%</b> less database load</li>
+              <li><b>30+</b> REST APIs on FastAPI, a good number of them small projects
+                  in their own right &mdash; <b>30%</b> off data retrieval</li>
             </ul>
           </div>
         </section>
