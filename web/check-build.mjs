@@ -31,7 +31,8 @@ ok('the headline is in the markup', html.includes('Noise'))
 ok('the lede is in the markup', html.includes('refuse to guess'))
 
 // Every section the rail links to must exist, or the nav points at nothing.
-const RAIL = ['Resolve', 'carabiner', 'recur', 'LabLedger', 'QuizNest', 'Recipe', 'Contact']
+const RAIL = ['Resolve', 'carabiner', 'recur', 'LabLedger', 'QuizNest', 'Recipe',
+              'Experience', 'Skills', 'Contact']
 RAIL.forEach((name, i) => {
   ok(`section #s${i} (${name}) exists`, html.includes(`id="s${i}"`))
   ok(`rail links to #s${i}`, html.includes(`href="#s${i}"`))

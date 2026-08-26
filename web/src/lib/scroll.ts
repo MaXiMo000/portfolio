@@ -25,6 +25,8 @@ export const SECTIONS = [
   'labledger',
   'quiznest',
   'recipe',
+  'experience',
+  'skills',
   'contact',
 ] as const
 

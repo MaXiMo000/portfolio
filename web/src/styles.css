@@ -89,6 +89,33 @@ dd{font-size:14.5px;line-height:1.6;color:#98A3B1}
 dd b{font-family:var(--mono);color:var(--beam);font-weight:400}
 .esc{color:var(--escalate)}
 
+/* ---- 06 experience -------------------------------------------------------
+   The post is set as a label, not as a heading: the company is the h2 above
+   it, and a second heading here would compete with it for the same job. */
+.post{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 18px;margin-top:22px;
+  font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase}
+.post__role{color:var(--chalk)}
+.post__where{color:#6E7885}
+
+/* One line per band in the core, and the rule down the left is the column the
+   sonde runs. The marker is where that band sits. */
+.strata{list-style:none;margin:34px 0 0;padding:0 0 0 26px;position:relative;
+  border-left:1px solid var(--hair);display:grid;gap:16px;max-width:36rem}
+.strata li{position:relative;font-size:14.5px;line-height:1.6;color:#98A3B1}
+.strata li::before{content:"";position:absolute;left:-30px;top:.62em;width:9px;height:1px;
+  background:var(--rule,rgba(255,255,255,.22))}
+/* Measured values only, in the colour reserved for them. */
+.strata b{font-family:var(--mono);font-weight:400;color:var(--beam)}
+
+/* ---- 07 skills -----------------------------------------------------------
+   Same dl as a project's Problem/Hard/Cost, widened: "Judgement" does not fit
+   the 74px column those use, and a wrapped label stops reading as a label. */
+.gauge{grid-template-columns:98px 1fr}
+.gauge dd{color:#98A3B1}
+
+.footnote{margin-top:30px;max-width:34rem;font-size:12.5px;line-height:1.65;color:#6E7885}
+.footnote b{font-family:var(--mono);font-weight:400;color:var(--alloy)}
+
 .go{display:inline-block;align-self:flex-start;margin-top:36px;font-size:10.5px;letter-spacing:.24em;
   text-transform:uppercase;color:var(--chalk);text-decoration:none;
   border-bottom:1px solid var(--hair);padding-bottom:7px}

@@ -71,7 +71,7 @@ const depart = (index: number) =>
 /** Departing mechanisms fall back into the dark; arriving ones come forward.
  *  Without this the overlap at a boundary reads as clutter instead of depth. */
 function stage(g: THREE.Group, k: number, scale: number) {
-  g.visible = k > 0.005
+  g.visible = k > 0.06
   g.scale.setScalar(k * scale)
   g.position.z = (1 - k) * -1.6
 }
@@ -646,6 +646,258 @@ function Manifold({ index }: { index: number }) {
   )
 }
 
+/* ---------------------------------------------------------------------- 06 */
+const STRATA = 6
+const BEAM_C = new THREE.Color(BEAM)
+
+/**
+ * The core sample. Wizcommerce — one job, read as strata.
+ *
+ * Handover in: the manifold's five barrels converge on the axis and lie down,
+ * and its single output nozzle becomes the sixth band. Same cylinder
+ * throughout, only ever rescaled — a barrel is tall and narrow, a band is
+ * short and wide. Nothing is swapped for anything.
+ *
+ * A logging sonde then runs the length of it once, and each band takes the
+ * beam as the sonde reaches it. A band it has already passed keeps a trace,
+ * so the column reads as a record being taken rather than as a light show.
+ * Nothing is lit before it has been measured, which is the rule the rest of
+ * the page keeps.
+ */
+function CoreSample({ index }: { index: number }) {
+  const g = useRef<THREE.Group>(null!)
+  const column = useRef<THREE.Group>(null!)
+  const bands = useRef<THREE.Group>(null!)
+  const sonde = useRef<THREE.Group>(null!)
+  const alloy = useAlloy()
+  const w = useWeight(index)
+
+  // Its own materials rather than the shared alloy: the sonde lights one band
+  // at a time, and one shared material would light all six together.
+  const mats = useMemo(
+    () =>
+      Array.from({ length: STRATA }, () =>
+        new THREE.MeshStandardMaterial({
+          color: '#AEB8C6', metalness: 0.92, roughness: 0.26, envMapIntensity: 2.1,
+        }),
+      ),
+    [],
+  )
+
+  const spec = useMemo(
+    () =>
+      Array.from({ length: STRATA }, (_, i) => ({
+        y: 0.66 - i * 0.26,
+        // The barrel this band was a moment ago. The sixth has no barrel: it
+        // comes from the collector's output, which is where the other five
+        // were pouring anyway.
+        fromX: i < DOSES ? (i - (DOSES - 1) / 2) * 0.46 : 0,
+        fromY: i < DOSES ? 0.72 : -0.92,
+      })),
+    [],
+  )
+
+  useFrame((state, dt) => {
+    const d = Math.min(dt, 0.05)
+    const m = VIEW.mobile
+    stage(g.current, w.current, m ? 0.92 : 1.15)
+    // Every other mechanism here is about as wide as it is tall. A column is
+    // not, so at the narrow layout it hung well below the top quarter the
+    // scrim protects and stood behind the copy — which is the one contrast
+    // failure this design says no palette can fix. Squashed, not shrunk: the
+    // bands stay legible as bands and the strata only read as thinner.
+    column.current.scale.y = damp(column.current.scale.y, m ? 0.56 : 1, 6, d)
+    const t = STILL ? 0.55 : (S.i === index ? S.t : 0)
+    const born = arrive(index)
+
+    bands.current.children.forEach((b, i) => {
+      const sp = spec[i]
+      b.position.x = THREE.MathUtils.lerp(sp.fromX, 0, born)
+      b.position.y = THREE.MathUtils.lerp(sp.fromY, sp.y, born)
+      b.scale.x = b.scale.z = THREE.MathUtils.lerp(1, 2.35, born)
+      b.scale.y = THREE.MathUtils.lerp(1, 0.34, born)
+    })
+
+    // One pass, top to bottom, over the middle of the section. It starts after
+    // the column has actually formed, or the sonde reads a stack of barrels.
+    const travel = THREE.MathUtils.clamp((t - 0.12) / 0.72, 0, 1)
+    const head = 0.86 - travel * 1.78
+    sonde.current.position.y = damp(sonde.current.position.y, head, 8, d)
+    sonde.current.visible = born > 0.72 && depart(index) < 0.3
+
+    mats.forEach((m, i) => {
+      const near = 1 - THREE.MathUtils.clamp(Math.abs(spec[i].y - head) / 0.19, 0, 1)
+      const read = travel > 0.01 && spec[i].y > head ? 0.06 : 0
+      m.emissive.copy(BEAM_C).multiplyScalar(Math.max(near, read) * born * 0.95)
+    })
+
+    g.current.rotation.y = STILL ? 0.3 : 0.3 + Math.sin(state.clock.elapsedTime * 0.13) * 0.06
+    g.current.rotation.x = -0.05
+  })
+
+  return (
+    <group ref={g}>
+     <group ref={column}>
+      <group ref={bands}>
+        {spec.map((sp, i) => (
+          <mesh key={i} position={[sp.fromX, sp.fromY, 0]} castShadow receiveShadow
+                material={mats[i]}>
+            <cylinderGeometry args={[0.145, 0.145, 0.62, 40]} />
+          </mesh>
+        ))}
+      </group>
+
+      {/* the sonde: a collar that runs the core and reads it */}
+      <group ref={sonde}>
+        <mesh rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[0.42, 0.018, 12, 56]} />
+          <meshBasicMaterial color={BEAM} />
+        </mesh>
+        <mesh rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[0.05, 0.05, 0.96, 16]} />
+          <primitive object={alloy} attach="material" />
+        </mesh>
+      </group>
+
+      {/* the shoe the core was cut with, and which it still stands in */}
+      <mesh position={[0, -0.88, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[0.37, 0.44, 0.11, 40]} />
+        <primitive object={alloy} attach="material" />
+      </mesh>
+     </group>
+    </group>
+  )
+}
+
+/* ---------------------------------------------------------------------- 07 */
+const LEAVES = 7
+
+/**
+ * The feeler gauge. One shape, ground to seven calibrated thicknesses — which
+ * is what a set of skills is, and why this and not a chart.
+ *
+ * Handover in: the core's bands come off the column and swing out around one
+ * rivet. Still the same cylinder, now drawn long and ground thin; a gauge leaf
+ * and a core band differ only in how the same primitive is scaled.
+ *
+ * They fan in the order the section lists them, and then fold shut — which is
+ * what lets the housing close around a stack rather than around nothing.
+ */
+function FeelerGauge({ index }: { index: number }) {
+  const g = useRef<THREE.Group>(null!)
+  const fan = useRef<THREE.Group>(null!)
+  const alloy = useAlloy()
+  const w = useWeight(index)
+
+  // Satin, not mirror. A gauge leaf is surface-ground, and the rest of the
+  // page's polish put a lightformer straight back down the lens: the fan
+  // bloomed into one white mass and stopped reading as seven separate leaves.
+  // Rougher and dimmer is both what the object is and what makes it legible.
+  const mats = useMemo(
+    () =>
+      Array.from({ length: LEAVES }, () =>
+        new THREE.MeshStandardMaterial({
+          color: '#A9B3C1', metalness: 0.86, roughness: 0.41, envMapIntensity: 1.25,
+        }),
+      ),
+    [],
+  )
+
+  const spec = useMemo(
+    () =>
+      Array.from({ length: LEAVES }, (_, i) => ({
+        // Fanned across a right angle in the plane of the screen, which is the
+        // only orientation a fan of flat leaves reads as a fan without the
+        // reader having to be told. Rotating them about Y instead left seven
+        // near-coplanar blades intersecting each other.
+        angle: 0.95 - (i * 1.92) / (LEAVES - 1),
+        // Lengths vary slightly, as they do in a real set. Nothing depends on
+        // it — it is what stops seven identical blades reading as a fan icon.
+        len: 1.16 + (i % 3) * 0.09,
+        // Stacked on the rivet in thickness order, so no two leaves occupy the
+        // same plane. A real set is a stack before it is a fan.
+        z: (i - (LEAVES - 1) / 2) * 0.036,
+        // The core band this leaf was. The seventh comes from the shoe at the
+        // foot of the column, which is the only part of the core the sonde
+        // never had to read.
+        fromY: i < STRATA ? 0.66 - i * 0.26 : -0.88,
+        // Drawn one at a time, and all seven out by the middle of the section
+        // — which is where the section is read from.
+        open: i * 0.042,
+      })),
+    [],
+  )
+
+  useFrame((state, dt) => {
+    const d = Math.min(dt, 0.05)
+    const m = VIEW.mobile
+    stage(g.current, w.current, m ? 0.66 : 1.15)
+    // The rivet is the origin and every leaf reaches away from it, so unlike
+    // the other mechanisms this one is not centred on its own group. Left
+    // alone at the narrow layout it sprayed across the headline; pulled back,
+    // the fan sits under it.
+    g.current.position.x = damp(g.current.position.x, m ? -0.34 : 0, 6, d)
+    const t = STILL ? 0.7 : (S.i === index ? S.t : 0)
+    const born = arrive(index)
+    const gone = depart(index)
+
+    fan.current.children.forEach((pivot, i) => {
+      const sp = spec[i]
+      // Drawn out one at a time, then folded shut together. Folding is not the
+      // reverse of drawing: leaves come out in order and go back as a set,
+      // which is how you actually put one away.
+      const drawn = THREE.MathUtils.clamp((t - sp.open) / 0.26, 0, 1)
+      const eased = smoothstep(drawn) * (1 - smoothstep(gone))
+      pivot.rotation.z = damp(pivot.rotation.z, sp.angle * eased * born, 7, d)
+
+      const leaf = pivot.children[0]
+      leaf.position.x = THREE.MathUtils.lerp(0, sp.len / 2, born)
+      leaf.position.y = THREE.MathUtils.lerp(sp.fromY, 0, born)
+      leaf.position.z = THREE.MathUtils.lerp(0, sp.z, born)
+      // band -> leaf: drawn long in x, kept about as wide in y, ground thin in
+      // z. The y barely moves, which is what makes it read as the same object.
+      leaf.scale.x = THREE.MathUtils.lerp(2.35, sp.len / 0.29, born)
+      leaf.scale.y = THREE.MathUtils.lerp(0.34, 0.3, born)
+      leaf.scale.z = THREE.MathUtils.lerp(2.35, 0.1, born)
+
+      // the leaf being drawn carries the beam, and only while it is moving
+      const live = drawn > 0.02 && drawn < 0.98 ? 1 - Math.abs(drawn - 0.5) * 2 : 0
+      mats[i].emissive.copy(BEAM_C).multiplyScalar(live * born * 0.7)
+    })
+
+    // Barely turned: the fan is already facing the camera, and rotating it
+    // far in either axis is what turns a fan back into a sheaf of edges.
+    g.current.rotation.y = STILL ? -0.3 : -0.3 + Math.sin(state.clock.elapsedTime * 0.12) * 0.05
+    g.current.rotation.x = STILL ? -0.3 : -0.3 - P.y * 0.05
+  })
+
+  return (
+    <group ref={g}>
+      <group ref={fan}>
+        {spec.map((sp, i) => (
+          <group key={i}>
+            <mesh position={[0, sp.fromY, 0]} castShadow receiveShadow material={mats[i]}>
+              <cylinderGeometry args={[0.145, 0.145, 0.62, 40]} />
+            </mesh>
+          </group>
+        ))}
+      </group>
+
+      {/* the rivet every leaf turns on */}
+      <mesh rotation={[Math.PI / 2, 0, 0]} castShadow>
+        <cylinderGeometry args={[0.055, 0.055, 0.34, 24]} />
+        <primitive object={alloy} attach="material" />
+      </mesh>
+      {[-0.17, 0.17].map((z) => (
+        <mesh key={z} position={[0, 0, z]} rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[0.11, 0.11, 0.03, 24]} />
+          <primitive object={alloy} attach="material" />
+        </mesh>
+      ))}
+    </group>
+  )
+}
+
 /* ------------------------------------------------------------------------ */
 export default function Instrument() {
   const rig = useRef<THREE.Group>(null!)
@@ -658,7 +910,11 @@ export default function Instrument() {
     [0.2, 0, 4.8],    // 03 spectrometer, side on
     [0, 0.15, 4.3],   // 04 tumbler, down the barrel
     [0, 0.35, 4.6],   // 05 manifold
-    [0, 0, 3.6],      // 06 housing, closed again
+    [0.3, 0.1, 4.9],  // 06 core — side on and slightly raked, so the column
+                      //    reads as a column and the sonde's travel is visible
+    [0, 0.75, 4.5],   // 07 gauge — from above, which is the only angle a fan
+                      //    of flat leaves is a fan from
+    [0, 0, 3.6],      // 08 housing, closed again
   ]
 
   useFrame((state, dt) => {
@@ -711,7 +967,9 @@ export default function Instrument() {
       <Spectrometer index={3} />
       <Tumbler index={4} />
       <Manifold index={5} />
-      <Housing index={6} opensWith={5} />
+      <CoreSample index={6} />
+      <FeelerGauge index={7} />
+      <Housing index={8} opensWith={7} />
     </group>
   )
 }

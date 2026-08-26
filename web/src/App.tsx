@@ -21,7 +21,8 @@ function useExperienceAllowed() {
   return ok
 }
 
-const RAIL = ['Resolve', 'carabiner', 'recur', 'LabLedger', 'QuizNest', 'Recipe', 'Contact']
+const RAIL = ['Resolve', 'carabiner', 'recur', 'LabLedger', 'QuizNest', 'Recipe',
+              'Experience', 'Skills', 'Contact']
 
 export default function App() {
   const allowed = useExperienceAllowed()
@@ -183,7 +184,61 @@ export default function App() {
           </div>
         </section>
 
-        <section id="s6" data-sec="contact" className="sec hero">
+        {/* 06 — the core sample. One band per line below, which is not a
+            coincidence: the instrument reads this list. */}
+        <section id="s6" data-sec="experience" className="sec">
+          <div className="col">
+            <p className="num">06 <em>/ the core sample</em></p>
+            <h2>Wizcommerce</h2>
+            <p className="claim">Backend in production, on a <span className="serif">multi-tenant</span> platform.</p>
+            <p className="post">
+              <span className="post__role">Backend Developer</span>
+              <span className="post__where">Gurgaon &middot; Apr 2025 &mdash; Sep 2026</span>
+            </p>
+            {/* Written as the things that were actually built and handed over,
+                not as ownership of the platform they went into. Six lines,
+                because the core reads six bands. */}
+            <ul className="strata">
+              <li>Search features on Elasticsearch &mdash; the indexes, the queries and the
+                  endpoints over them. Query latency down <b>~40%</b></li>
+              <li>A server-side row model over SQL, so grids too large to load at once
+                  page, sort and filter the way the Elasticsearch path already did</li>
+              <li>A payment gateway integration, taken end to end</li>
+              <li>Address validation before send, through Mailgun &mdash; a bad address
+                  fails on our side instead of against the sending domain</li>
+              {/* The space before the number is explicit: JSX trims the end of a
+                  text line, so a dash at a line break runs straight into it. */}
+              <li>Query and index work across PostgreSQL and SQLAlchemy &mdash;{' '}
+                  <b>25%</b> less database load</li>
+              <li><b>30+</b> REST APIs on FastAPI, a good number of them small projects
+                  in their own right &mdash; <b>30%</b> off data retrieval</li>
+            </ul>
+          </div>
+        </section>
+
+        {/* 07 — the feeler gauge. Seven groups, seven leaves. */}
+        <section id="s7" data-sec="skills" className="sec">
+          <div className="col">
+            <p className="num">07 <em>/ the feeler gauge</em></p>
+            <h2>What I reach for</h2>
+            <p className="claim">Seven leaves, each ground to <span className="serif">one thickness.</span></p>
+            <dl className="gauge">
+              <dt>Language</dt><dd>Python &middot; SQL &middot; Java</dd>
+              <dt>Backend</dt><dd>FastAPI &middot; REST &middot; JWT auth</dd>
+              <dt>Data</dt><dd>PostgreSQL &middot; MongoDB &middot; SQLAlchemy</dd>
+              <dt>Search</dt><dd>Elasticsearch &middot; Redis</dd>
+              <dt>Async</dt><dd>Celery &middot; background jobs</dd>
+              <dt>Ship</dt><dd>Docker &middot; Git &middot; CI/CD &middot; Sentry</dd>
+              <dt>Judgement</dt><dd>System design &middot; API design &middot; performance tuning &middot; debugging</dd>
+            </dl>
+            <p className="footnote">
+              B.Tech Computer Science, Chitkara University &mdash; CGPA <b>9.02</b>.
+              Certificates in deep learning, data science and product management.
+            </p>
+          </div>
+        </section>
+
+        <section id="s8" data-sec="contact" className="sec hero">
           <h1 className="close">
             <span>Let's build</span>
             <span className="serif">something</span>
