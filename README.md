@@ -19,7 +19,9 @@ cuts between sections; it transforms.
 | 03 | [LabLedger](https://labledger-web.onrender.com/) | spectrometer — bands snap to LOINC rows; one holds amber and escalates |
 | 04 | [QuizNest](https://quiz-app-cp2h.onrender.com/) | tumbler — five notched rings; the beam passes only when all align |
 | 05 | AI-Recipe-Maker | dosing manifold — five pistons fire in sequence into one output |
-| 06 | — | the housing seals; ends where it started |
+| 06 | Wizcommerce | **core sample** — five barrels converge and lie down into one column; a sonde runs its length and each band takes the beam as it is read |
+| 07 | what I reach for | **feeler gauge** — the bands come off the column and swing out around one rivet. Seven leaves: one shape, ground seven ways |
+| 08 | — | the housing seals; ends where it started |
 
 ## Running it
 
@@ -155,7 +157,16 @@ the shape of the one before it:
   the beam the prism splits
 - **spectrometer → tumbler** — the flat spectral rows curl into concentric rings
 - **tumbler → manifold** — the rings extrude into the piston barrels
+- **manifold → core** — the barrels converge on the axis and lie down; the
+  collector's single output becomes the sixth band
+- **core → gauge** — the bands come off the column and swing out around one
+  rivet, drawn long and ground thin
+- **gauge → housing** — the leaves fold shut, and the wedges close on a stack
 - **housing → ratchet** — eight lathe wedges hinge open around it
+
+One primitive carries the last three of those: the cylinder that is a manifold
+barrel is the same cylinder that is a core band and then a gauge leaf, only ever
+rescaled. Tall and narrow, short and wide, long and thin.
 
 ## Not done yet
 

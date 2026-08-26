@@ -21,7 +21,8 @@ function useExperienceAllowed() {
   return ok
 }
 
-const RAIL = ['Resolve', 'carabiner', 'recur', 'LabLedger', 'QuizNest', 'Recipe', 'Contact']
+const RAIL = ['Resolve', 'carabiner', 'recur', 'LabLedger', 'QuizNest', 'Recipe',
+              'Experience', 'Skills', 'Contact']
 
 export default function App() {
   const allowed = useExperienceAllowed()
@@ -183,7 +184,51 @@ export default function App() {
           </div>
         </section>
 
-        <section id="s6" data-sec="contact" className="sec hero">
+        {/* 06 — the core sample. One band per line below, which is not a
+            coincidence: the instrument reads this list. */}
+        <section id="s6" data-sec="experience" className="sec">
+          <div className="col">
+            <p className="num">06 <em>/ the core sample</em></p>
+            <h2>Wizcommerce</h2>
+            <p className="claim">Backend in production, for <span className="serif">real tenants.</span></p>
+            <p className="post">
+              <span className="post__role">Backend Developer</span>
+              <span className="post__where">Gurgaon &middot; Apr 2025 &mdash; present</span>
+            </p>
+            <ul className="strata">
+              <li><b>30+</b> production REST APIs on FastAPI, and <b>30%</b> off data retrieval</li>
+              <li>Multi-tenant architecture &mdash; client-level isolation, enforced rather than intended</li>
+              <li>Elasticsearch search: query latency down <b>~40%</b></li>
+              <li>Celery for the long-running work, so it is off the request path</li>
+              <li>PostgreSQL and SQLAlchemy tuning &mdash; <b>25%</b> less database load</li>
+              <li>Centralised logging and Sentry, so a failure is found before it is reported</li>
+            </ul>
+          </div>
+        </section>
+
+        {/* 07 — the feeler gauge. Seven groups, seven leaves. */}
+        <section id="s7" data-sec="skills" className="sec">
+          <div className="col">
+            <p className="num">07 <em>/ the feeler gauge</em></p>
+            <h2>What I reach for</h2>
+            <p className="claim">Seven leaves, each ground to <span className="serif">one thickness.</span></p>
+            <dl className="gauge">
+              <dt>Language</dt><dd>Python &middot; SQL &middot; Java</dd>
+              <dt>Backend</dt><dd>FastAPI &middot; REST &middot; JWT auth</dd>
+              <dt>Data</dt><dd>PostgreSQL &middot; MongoDB &middot; SQLAlchemy</dd>
+              <dt>Search</dt><dd>Elasticsearch &middot; Redis</dd>
+              <dt>Async</dt><dd>Celery &middot; background jobs</dd>
+              <dt>Ship</dt><dd>Docker &middot; Git &middot; CI/CD &middot; Sentry</dd>
+              <dt>Judgement</dt><dd>System design &middot; API design &middot; performance tuning &middot; debugging</dd>
+            </dl>
+            <p className="footnote">
+              B.Tech Computer Science, Chitkara University &mdash; CGPA <b>9.02</b>.
+              Certificates in deep learning, data science and product management.
+            </p>
+          </div>
+        </section>
+
+        <section id="s8" data-sec="contact" className="sec hero">
           <h1 className="close">
             <span>Let's build</span>
             <span className="serif">something</span>
