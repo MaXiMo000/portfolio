@@ -328,6 +328,126 @@ function Ratchet({ index }: { index: number }) {
 }
 
 /* --------------------------------------------------------------------- 02 */
+const RIVETS = TEETH
+
+/**
+ * The vessel. firedrill — a claim about a backup means nothing until
+ * something actually restores it and looks inside.
+ *
+ * Handover in: the ratchet's struck teeth fly inward and become the rivets
+ * that seal the seam. Handover out: they return to that exact ring as the
+ * vessel opens again — the same ring Rotor's chips already lerp their own
+ * arrival from, so neither neighbour needs to know this sits between them.
+ */
+function Vessel({ index }: { index: number }) {
+  const g = useRef<THREE.Group>(null!)
+  const rivets = useRef<THREE.InstancedMesh>(null!)
+  const needle = useRef<THREE.Group>(null!)
+  const seal = useRef<THREE.Mesh>(null!)
+  const alloy = useAlloy()
+  const w = useWeight(index)
+  const dummy = useMemo(() => new THREE.Object3D(), [])
+  const angles = useMemo(
+    () => Array.from({ length: RIVETS }, (_, i) => (i / RIVETS) * Math.PI * 2),
+    [],
+  )
+
+  useFrame((state, dt) => {
+    const d = Math.min(dt, 0.05)
+    stage(g.current, w.current, 1.2)
+    const t = STILL ? 0.94 : (S.i === index ? S.t : 0)
+    const born = arrive(index)
+    const gone = depart(index)
+
+    // A ring of rivets, seated around the seam while the vessel is present,
+    // scattered back to the ratchet's tooth ring at either edge of this
+    // section -- the ring Rotor's own chips already arrive from.
+    angles.forEach((a, i) => {
+      const ringX = 1.5 * Math.cos(a), ringZ = 1.5 * Math.sin(a)
+      const seatX = 0.47 * Math.cos(a), seatZ = 0.47 * Math.sin(a)
+      const seated = THREE.MathUtils.lerp(ringX, seatX, born)
+      dummy.position.set(
+        THREE.MathUtils.lerp(seated, ringX, gone), 0,
+        THREE.MathUtils.lerp(THREE.MathUtils.lerp(ringZ, seatZ, born), ringZ, gone),
+      )
+      dummy.scale.setScalar(0.045 + born * (1 - gone) * 0.025)
+      dummy.updateMatrix()
+      rivets.current.setMatrixAt(i, dummy.matrix)
+    })
+    rivets.current.instanceMatrix.needsUpdate = true
+
+    // Sealed and unread, then checked, then -- only once it has actually
+    // been measured -- confirmed. Never earlier: the rule the rest of this
+    // page keeps. A restore that never settles never lights the seal.
+    // The seal ring is radial, not a single face, so it reads as "verified"
+    // from every angle the turntable rotation ever shows it at.
+    const searching = THREE.MathUtils.smoothstep(t, 0.32, 0.7)
+    const settled = THREE.MathUtils.smoothstep(t, 0.74, 0.98)
+    const jitter = STILL ? 0 : Math.sin(state.clock.elapsedTime * 26) * searching * (1 - settled) * 0.22
+    const restAngle = -0.9, goodAngle = 0.65
+    needle.current.rotation.y = damp(
+      needle.current.rotation.y,
+      THREE.MathUtils.lerp(restAngle, goodAngle, settled) + jitter,
+      settled > 0.5 ? 9 : 14, d,
+    )
+
+    const lit = settled * born
+    const seal_ = seal.current.material as THREE.MeshBasicMaterial
+    seal_.opacity = damp(seal_.opacity, 0.05 + lit * 0.95, 8, d)
+    seal.current.scale.setScalar(1 + lit * 0.04)
+
+    g.current.rotation.y = STILL ? 0.3 : 0.3 + Math.sin(state.clock.elapsedTime * 0.17) * 0.05
+    g.current.rotation.x = -0.06
+  })
+
+  return (
+    <group ref={g}>
+      {/* the drum */}
+      <mesh castShadow receiveShadow>
+        <cylinderGeometry args={[0.42, 0.42, 1.0, 40]} />
+        <primitive object={alloy} attach="material" />
+      </mesh>
+
+      <instancedMesh ref={rivets} args={[undefined, undefined, RIVETS]} castShadow>
+        <sphereGeometry args={[1, 12, 12]} />
+        <primitive object={alloy} attach="material" />
+      </instancedMesh>
+
+      {/* the seal: dark while sealed, lights only once a restore has
+          genuinely been read back -- radial, so it reads from any angle */}
+      <mesh ref={seal} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[0.47, 0.014, 10, 64]} />
+        <meshBasicMaterial color={BEAM} transparent opacity={0.05} toneMapped={false} />
+      </mesh>
+
+      {/* the gauge, riding on top, dial face up */}
+      <group position={[0, 0.56, 0]}>
+        <mesh>
+          <cylinderGeometry args={[0.17, 0.17, 0.04, 32]} />
+          <primitive object={alloy} attach="material" />
+        </mesh>
+        <mesh position={[0, 0.021, 0]}>
+          <ringGeometry args={[0.1, 0.155, 48]} />
+          <meshStandardMaterial color="#0A0C10" metalness={0.2} roughness={0.85} side={THREE.DoubleSide} />
+        </mesh>
+        <group ref={needle} position={[0, 0.023, 0]} rotation={[0, -0.9, 0]}>
+          <mesh position={[0, 0, 0.07]}>
+            <boxGeometry args={[0.012, 0.008, 0.135]} />
+            <meshBasicMaterial color={BEAM} toneMapped={false} />
+          </mesh>
+        </group>
+      </group>
+
+      {/* feet, so the drum reads as standing rather than floating */}
+      <mesh position={[0, -0.54, 0]}>
+        <cylinderGeometry args={[0.28, 0.34, 0.1, 32]} />
+        <primitive object={alloy} attach="material" />
+      </mesh>
+    </group>
+  )
+}
+
+/* --------------------------------------------------------------------- 03 */
 const CHIPS = 180
 function Rotor({ index }: { index: number }) {
   const g = useRef<THREE.Group>(null!)
@@ -376,9 +496,11 @@ function Rotor({ index }: { index: number }) {
         ? THREE.MathUtils.lerp(c.chaos.length(), c.ring + 0.55, t)
         : THREE.MathUtils.lerp(c.chaos.length(), c.drift, t * t)
       const y = THREE.MathUtils.lerp(c.chaos.y, c.recurring ? 0 : c.chaos.y * 2.4, t)
-      // Handover in: every chip starts life as a tooth tip on the ratchet,
-      // sitting on its circle in the wheel plane, and is thrown loose from
-      // there. The teeth become the transactions.
+      // Handover in: every chip starts life on the ratchet's own tooth ring —
+      // the same ring the vessel's rivets return to as it unseals — sitting
+      // on its circle in the wheel plane, and is thrown loose from there.
+      // The teeth become the transactions either way; the vessel in between
+      // just borrows the ring for the length of its own section.
       const ta = c.tooth
       const px = THREE.MathUtils.lerp(1.5 * Math.cos(ta), r * Math.cos(a), born)
       const py = THREE.MathUtils.lerp(1.5 * Math.sin(ta), y, born)
@@ -412,7 +534,7 @@ function Rotor({ index }: { index: number }) {
   )
 }
 
-/* --------------------------------------------------------------------- 03 */
+/* --------------------------------------------------------------------- 04 */
 const BANDS = 7
 function Spectrometer({ index }: { index: number }) {
   const g = useRef<THREE.Group>(null!)
@@ -482,7 +604,7 @@ function Spectrometer({ index }: { index: number }) {
   )
 }
 
-/* --------------------------------------------------------------------- 04 */
+/* --------------------------------------------------------------------- 05 */
 const RINGS = 5
 function Tumbler({ index }: { index: number }) {
   const g = useRef<THREE.Group>(null!)
@@ -550,7 +672,7 @@ function Tumbler({ index }: { index: number }) {
   )
 }
 
-/* --------------------------------------------------------------------- 05 */
+/* --------------------------------------------------------------------- 06 */
 const DOSES = 5
 function Manifold({ index }: { index: number }) {
   const g = useRef<THREE.Group>(null!)
@@ -646,7 +768,7 @@ function Manifold({ index }: { index: number }) {
   )
 }
 
-/* ---------------------------------------------------------------------- 06 */
+/* ---------------------------------------------------------------------- 07 */
 const STRATA = 6
 const BEAM_C = new THREE.Color(BEAM)
 
@@ -769,7 +891,7 @@ function CoreSample({ index }: { index: number }) {
   )
 }
 
-/* ---------------------------------------------------------------------- 07 */
+/* ---------------------------------------------------------------------- 08 */
 const LEAVES = 7
 
 /**
@@ -904,17 +1026,19 @@ export default function Instrument() {
 
   // camera keyframes, one per section — eased, never linear
   const KEYS: [number, number, number][] = [
-    [0, 0, 3.3],      // 00 housing, close
-    [0.95, 0.8, 4.3], // 01 ratchet — raked, so the teeth and pawl read
-    [0, 0.9, 5.4],    // 02 rotor, from above
-    [0.2, 0, 4.8],    // 03 spectrometer, side on
-    [0, 0.15, 4.3],   // 04 tumbler, down the barrel
-    [0, 0.35, 4.6],   // 05 manifold
-    [0.3, 0.1, 4.9],  // 06 core — side on and slightly raked, so the column
-                      //    reads as a column and the sonde's travel is visible
-    [0, 0.75, 4.5],   // 07 gauge — from above, which is the only angle a fan
-                      //    of flat leaves is a fan from
-    [0, 0, 3.6],      // 08 housing, closed again
+    [0, 0, 3.3],       // 00 housing, close
+    [0.95, 0.8, 4.3],  // 01 ratchet — raked, so the teeth and pawl read
+    [0.6, 0.3, 5.2],   // 02 vessel — raked from above, so the seam and the
+                       //    dial face both read
+    [0, 0.9, 5.4],     // 03 rotor, from above
+    [0.2, 0, 4.8],     // 04 spectrometer, side on
+    [0, 0.15, 4.3],    // 05 tumbler, down the barrel
+    [0, 0.35, 4.6],    // 06 manifold
+    [0.3, 0.1, 4.9],   // 07 core — side on and slightly raked, so the column
+                       //    reads as a column and the sonde's travel is visible
+    [0, 0.75, 4.5],    // 08 gauge — from above, which is the only angle a fan
+                       //    of flat leaves is a fan from
+    [0, 0, 3.6],       // 09 housing, closed again
   ]
 
   useFrame((state, dt) => {
@@ -963,13 +1087,14 @@ export default function Instrument() {
     <group ref={rig} position={[1.15, 0.05, 0]} scale={0.78}>
       <Housing index={0} opensWith={1} />
       <Ratchet index={1} />
-      <Rotor index={2} />
-      <Spectrometer index={3} />
-      <Tumbler index={4} />
-      <Manifold index={5} />
-      <CoreSample index={6} />
-      <FeelerGauge index={7} />
-      <Housing index={8} opensWith={7} />
+      <Vessel index={2} />
+      <Rotor index={3} />
+      <Spectrometer index={4} />
+      <Tumbler index={5} />
+      <Manifold index={6} />
+      <CoreSample index={7} />
+      <FeelerGauge index={8} />
+      <Housing index={9} opensWith={8} />
     </group>
   )
 }

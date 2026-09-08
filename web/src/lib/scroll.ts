@@ -21,6 +21,7 @@ if (import.meta.env.DEV) (globalThis as Record<string, unknown>).__S = S
 export const SECTIONS = [
   'hero',
   'carabiner',
+  'firedrill',
   'recur',
   'labledger',
   'quiznest',
@@ -54,8 +55,8 @@ export function initScroll() {
    * Guarded on the index actually changing, so it touches nothing for the
    * hundreds of events that land inside a section it has already marked.
    *
-   * `aria-current` is the half that is not decoration. Seven links reading
-   * "01 carabiner … 06 Contact" are, to a screen reader, seven identical
+   * `aria-current` is the half that is not decoration. Ten links reading
+   * "01 carabiner … 09 Contact" are, to a screen reader, ten identical
    * destinations with nothing saying which one you are standing in.
    */
   let marked = -1

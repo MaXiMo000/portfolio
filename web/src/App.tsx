@@ -21,8 +21,8 @@ function useExperienceAllowed() {
   return ok
 }
 
-const RAIL = ['Resolve', 'carabiner', 'recur', 'LabLedger', 'QuizNest', 'Recipe',
-              'Experience', 'Skills', 'Contact']
+const RAIL = ['Resolve', 'carabiner', 'firedrill', 'recur', 'LabLedger', 'QuizNest',
+              'Recipe', 'Experience', 'Skills', 'Contact']
 
 export default function App() {
   const allowed = useExperienceAllowed()
@@ -78,9 +78,9 @@ export default function App() {
             <span>comes out.</span>
           </h1>
           <p className="lede">
-            A repository. A bank export. A lab PDF. Five systems that take input
-            nobody vetted — and <b>refuse to guess</b> about the parts they
-            can't resolve.
+            A repository. A Postgres backup. A bank export. A lab PDF. Six
+            systems that take input nobody vetted — and <b>refuse to guess</b>{' '}
+            about the parts they can't resolve.
           </p>
         </section>
 
@@ -104,9 +104,29 @@ export default function App() {
           </div>
         </section>
 
-        <section id="s2" data-sec="recur" className="sec">
+        <section id="s2" data-sec="firedrill" className="sec">
           <div className="col">
-            <p className="num">02 <em>/ the rotor</em></p>
+            <p className="num">02 <em>/ the vessel</em></p>
+            <h2>firedrill</h2>
+            <p className="claim">A backup is not proven until <span className="serif">something restores it.</span></p>
+            <dl>
+              <dt>Problem</dt><dd>A <code>pg_dump</code> that exits 0 can still be a truncated file nobody has ever tried to read back.</dd>
+              <dt>Hard</dt><dd>Matching the archive's own Postgres major and restoring inside a disposable container with no path to production, ever.</dd>
+              <dt>Cost</dt><dd><b>6</b> Postgres majors, both directions on the corpus · field-tested against pagila, chinook and northwind — <span className="serif">and found a real gap</span> in a published sample database nobody had caught · PyPI, GHCR, GitHub Action</dd>
+            </dl>
+            <a
+              className="go" href="https://maximo000.github.io/firedrill/"
+              aria-label="Open the firedrill results page"
+              onPointerEnter={() => nudge(2)} onFocus={() => nudge(2)}
+            >
+              See the proof →
+            </a>
+          </div>
+        </section>
+
+        <section id="s3" data-sec="recur" className="sec">
+          <div className="col">
+            <p className="num">03 <em>/ the rotor</em></p>
             <h2>recur</h2>
             <p className="claim">Which charges <span className="serif">actually</span> recur.</p>
             <dl>
@@ -124,9 +144,9 @@ export default function App() {
           </div>
         </section>
 
-        <section id="s3" data-sec="labledger" className="sec">
+        <section id="s4" data-sec="labledger" className="sec">
           <div className="col">
-            <p className="num">03 <em>/ the spectrometer</em></p>
+            <p className="num">04 <em>/ the spectrometer</em></p>
             <h2>LabLedger</h2>
             <p className="claim">A lab PDF, resolved to <span className="serif">codes.</span></p>
             <dl>
@@ -137,16 +157,16 @@ export default function App() {
             <a
               className="go" href="https://labledger-web.onrender.com/"
               aria-label="See LabLedger running live"
-              onPointerEnter={() => nudge(3)} onFocus={() => nudge(3)}
+              onPointerEnter={() => nudge(4)} onFocus={() => nudge(4)}
             >
               See it live →
             </a>
           </div>
         </section>
 
-        <section id="s4" data-sec="quiznest" className="sec">
+        <section id="s5" data-sec="quiznest" className="sec">
           <div className="col">
-            <p className="num">04 <em>/ the tumbler</em></p>
+            <p className="num">05 <em>/ the tumbler</em></p>
             <h2>QuizNest</h2>
             <p className="claim">Knowledge either <span className="serif">aligns,</span> or it doesn't.</p>
             <dl>
@@ -157,16 +177,16 @@ export default function App() {
             <a
               className="go" href="https://quiz-app-cp2h.onrender.com/"
               aria-label="See QuizNest running live"
-              onPointerEnter={() => nudge(4)} onFocus={() => nudge(4)}
+              onPointerEnter={() => nudge(5)} onFocus={() => nudge(5)}
             >
               See it live →
             </a>
           </div>
         </section>
 
-        <section id="s5" data-sec="recipe" className="sec">
+        <section id="s6" data-sec="recipe" className="sec">
           <div className="col">
-            <p className="num">05 <em>/ the manifold</em></p>
+            <p className="num">06 <em>/ the manifold</em></p>
             <h2>AI-Recipe-Maker</h2>
             <p className="claim">Five measured inputs, <span className="serif">one plan.</span></p>
             <dl>
@@ -177,18 +197,18 @@ export default function App() {
             <a
               className="go" href="https://github.com/MaXiMo000/AI-Recipe-Maker"
               aria-label="Open the AI-Recipe-Maker repository on GitHub"
-              onPointerEnter={() => nudge(5)} onFocus={() => nudge(5)}
+              onPointerEnter={() => nudge(6)} onFocus={() => nudge(6)}
             >
               Open the repo →
             </a>
           </div>
         </section>
 
-        {/* 06 — the core sample. One band per line below, which is not a
+        {/* 07 — the core sample. One band per line below, which is not a
             coincidence: the instrument reads this list. */}
-        <section id="s6" data-sec="experience" className="sec">
+        <section id="s7" data-sec="experience" className="sec">
           <div className="col">
-            <p className="num">06 <em>/ the core sample</em></p>
+            <p className="num">07 <em>/ the core sample</em></p>
             <h2>Wizcommerce</h2>
             <p className="claim">Backend in production, on a <span className="serif">multi-tenant</span> platform.</p>
             <p className="post">
@@ -216,10 +236,10 @@ export default function App() {
           </div>
         </section>
 
-        {/* 07 — the feeler gauge. Seven groups, seven leaves. */}
-        <section id="s7" data-sec="skills" className="sec">
+        {/* 08 — the feeler gauge. Seven groups, seven leaves. */}
+        <section id="s8" data-sec="skills" className="sec">
           <div className="col">
-            <p className="num">07 <em>/ the feeler gauge</em></p>
+            <p className="num">08 <em>/ the feeler gauge</em></p>
             <h2>What I reach for</h2>
             <p className="claim">Seven leaves, each ground to <span className="serif">one thickness.</span></p>
             <dl className="gauge">
@@ -238,7 +258,7 @@ export default function App() {
           </div>
         </section>
 
-        <section id="s8" data-sec="contact" className="sec hero">
+        <section id="s9" data-sec="contact" className="sec hero">
           <h1 className="close">
             <span>Let's build</span>
             <span className="serif">something</span>

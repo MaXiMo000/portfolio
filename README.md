@@ -15,13 +15,14 @@ cuts between sections; it transforms.
 |---|---|---|
 | 00 | — | sealed housing; eight wedges hinge open as 01 arrives inside them |
 | 01 | [carabiner](https://github.com/MaXiMo000/carabiner) | ratchet — one tooth per step, hot sparks. Scroll back and the pawl *lifts*: a ratchet is released, never reversed |
-| 02 | recur | sorting rotor — recurring charges lock into rings, noise is flung outward |
-| 03 | [LabLedger](https://labledger-web.onrender.com/) | spectrometer — bands snap to LOINC rows; one holds amber and escalates |
-| 04 | [QuizNest](https://quiz-app-cp2h.onrender.com/) | tumbler — five notched rings; the beam passes only when all align |
-| 05 | AI-Recipe-Maker | dosing manifold — five pistons fire in sequence into one output |
-| 06 | Wizcommerce | **core sample** — five barrels converge and lie down into one column; a sonde runs its length and each band takes the beam as it is read |
-| 07 | what I reach for | **feeler gauge** — the bands come off the column and swing out around one rivet. Seven leaves: one shape, ground seven ways |
-| 08 | — | the housing seals; ends where it started |
+| 02 | [firedrill](https://maximo000.github.io/firedrill/) | **vessel** — the struck teeth become rivets sealing a drum; a gauge needle searches, then only settles and lights once a restore has genuinely been read back |
+| 03 | recur | sorting rotor — recurring charges lock into rings, noise is flung outward |
+| 04 | [LabLedger](https://labledger-web.onrender.com/) | spectrometer — bands snap to LOINC rows; one holds amber and escalates |
+| 05 | [QuizNest](https://quiz-app-cp2h.onrender.com/) | tumbler — five notched rings; the beam passes only when all align |
+| 06 | AI-Recipe-Maker | dosing manifold — five pistons fire in sequence into one output |
+| 07 | Wizcommerce | **core sample** — five barrels converge and lie down into one column; a sonde runs its length and each band takes the beam as it is read |
+| 08 | what I reach for | **feeler gauge** — the bands come off the column and swing out around one rivet. Seven leaves: one shape, ground seven ways |
+| 09 | — | the housing seals; ends where it started |
 
 ## Running it
 
@@ -125,8 +126,8 @@ readout does.
 
 **It says where you are.** The active link takes `--beam`, the colour reserved
 for live values, and holds the extended hairline that hover only borrows. It
-also carries `aria-current`, which is the half that is not decoration: seven
-links reading `01 carabiner … 06 Contact` are, to a screen reader, seven
+also carries `aria-current`, which is the half that is not decoration: ten
+links reading `01 carabiner … 09 Contact` are, to a screen reader, ten
 identical destinations with nothing saying which one you are standing in. The
 marker is written straight to the DOM from the scroll handler for the same
 reason `S` is not React state — re-rendering the tree to move one hairline
@@ -152,7 +153,12 @@ a fallback.
 Every boundary is a transformation, not a cross-fade. Each mechanism begins in
 the shape of the one before it:
 
-- **ratchet → rotor** — the teeth detach and become the transactions
+- **ratchet → vessel** — the struck teeth fly inward and become the rivets
+  sealing a drum shut
+- **vessel → rotor** — the rivets let go again, back onto the exact ring they
+  came from; the teeth become the transactions from there, same as always —
+  the vessel borrows the ring for the length of its own section, and neither
+  neighbour has to know it was there
 - **rotor → spectrometer** — the cloud collapses onto one axis; that line is
   the beam the prism splits
 - **spectrometer → tumbler** — the flat spectral rows curl into concentric rings
