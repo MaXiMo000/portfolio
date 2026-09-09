@@ -62,6 +62,10 @@ for (const sec of PROJECTS) {
   const body = end === -1 ? rest : rest.slice(0, end)
   ok(`section ${sec} exists`, start !== -1)
   ok(`section ${sec} links somewhere`, /class="go\b/.test(body))
+  // The deep-dive trigger, same reasoning as the .go link above: this is
+  // additive, not required, but a project silently missing it should fail
+  // here rather than be noticed by a visitor first.
+  ok(`section ${sec} has a "look inside" trigger`, body.includes('dive-trigger'))
 }
 
 // No two links may announce the same thing.

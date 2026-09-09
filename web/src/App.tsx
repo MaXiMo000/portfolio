@@ -4,6 +4,7 @@ import ExperienceBoundary from './lib/ExperienceBoundary'
 import { nudge } from './lib/nudge'
 import { MODE, STILL } from './lib/mode'
 import Resolving from './Resolving'
+import { DeepDive, DiveTrigger } from './DeepDive'
 import './fonts.css'
 import './styles.css'
 
@@ -27,6 +28,7 @@ const RAIL = ['Resolve', 'carabiner', 'firedrill', 'recur', 'LabLedger', 'QuizNe
 export default function App() {
   const allowed = useExperienceAllowed()
   const [ready, setReady] = useState(false)
+  const [dive, setDive] = useState<string | null>(null)
 
   // The drawing must never outlive its purpose. If the scene errors out or the
   // context is lost, onReady never fires — so retire it on a timer regardless.
@@ -140,6 +142,7 @@ export default function App() {
             >
               Open the repo →
             </a>
+            <DiveTrigger project="carabiner" onOpen={setDive} />
           </div>
         </section>
 
@@ -160,6 +163,7 @@ export default function App() {
             >
               See the proof →
             </a>
+            <DiveTrigger project="firedrill" onOpen={setDive} />
           </div>
         </section>
 
@@ -180,6 +184,7 @@ export default function App() {
             >
               Open the repo →
             </a>
+            <DiveTrigger project="recur" onOpen={setDive} />
           </div>
         </section>
 
@@ -200,6 +205,7 @@ export default function App() {
             >
               See it live →
             </a>
+            <DiveTrigger project="labledger" onOpen={setDive} />
           </div>
         </section>
 
@@ -220,6 +226,7 @@ export default function App() {
             >
               See it live →
             </a>
+            <DiveTrigger project="quiznest" onOpen={setDive} />
           </div>
         </section>
 
@@ -240,6 +247,7 @@ export default function App() {
             >
               Open the repo →
             </a>
+            <DiveTrigger project="recipe" onOpen={setDive} />
           </div>
         </section>
 
@@ -311,6 +319,8 @@ export default function App() {
           </p>
         </section>
       </main>
+
+      <DeepDive project={dive} onClose={() => setDive(null)} />
     </>
   )
 }

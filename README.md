@@ -201,6 +201,29 @@ One primitive carries the last three of those: the cylinder that is a manifold
 barrel is the same cylinder that is a core band and then a gauge leaf, only ever
 rescaled. Tall and narrow, short and wide, long and thin.
 
+## Look inside
+
+Every project section has a second, quieter control under its main link:
+"Look inside →" opens one real excerpt from that repository, unedited except
+for dedenting a class method to its own margin -- never rewritten for the
+panel, never trimmed without saying so (a comment `# ...` where something real
+was cut) -- next to a small schematic of that system's actual shape. The
+pitch is not enough to take on faith; this is the receipt for it.
+
+The schematic is one primitive reused six times, the same discipline the 3D
+side already holds itself to: a labelled box, a hairline connector, the last
+box in `--beam` -- the palette's one colour for a live value, here standing
+for the thing that comes out the other end. Six different systems read as one
+visual grammar instead of six unrelated diagrams.
+
+Pure `<dialog>`-shaped behaviour with none of the plumbing a library would
+add: `inert` on `<main>` while it's open (native, no hand-rolled focus trap),
+Escape and a backdrop click both close it, focus lands on the close control
+and returns to whichever project's link opened it. No new dependency, no
+animation library -- the panel appears and disappears in one frame, which
+needed nothing to reconcile with `prefers-reduced-motion` because there was
+never anything to reduce.
+
 ## Not done yet
 
 - no custom domain yet — `web/site.config.js` is the single switch; set
