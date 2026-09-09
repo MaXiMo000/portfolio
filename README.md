@@ -127,6 +127,15 @@ real CSP, HSTS and `frame-ancestors`. `netlify.toml` sets base `web/`;
 Measured on the live site — desktop **94 / 94 / 100 / 100**, mobile
 **97 / 100 / 100 / 100**, CLS 0, TBT 0 ms.
 
+CI also runs Lighthouse against every build (`.github/workflows/ci.yml`,
+`lighthouse` job) and keeps the report as a build artifact — informational,
+not a gate. A GitHub-hosted runner has no GPU, so its score on this page's
+WebGL-heavy hero is a different measurement from a real browser against the
+live CDN; asserting the numbers above as a CI threshold would fail on the
+runner's own limits, not a real regression. What the job does check is that
+a report exists for every commit, rather than the numbers above being the
+only measurement anyone can point to.
+
 ## Three modes, not two
 
 `live` is the full experience. `off` (save-data, or no WebGL) drops the canvas
