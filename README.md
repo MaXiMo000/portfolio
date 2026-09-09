@@ -96,6 +96,24 @@ empty.
 - **Everything is same-origin**, so the CSP is `default-src 'none'` with the rest
   `'self'`. Fonts are self-hosted, unmodified and deliberately un-subsetted — a
   dropped glyph is a worse failure than a few kB.
+- **The canvas is `aria-hidden`.** It is purely decorative — the prerendered
+  DOM above already carries every word — so a screen reader must not announce
+  an unlabelled graphic instead of skipping straight to the content.
+
+## The header's fast path
+
+GitHub, LinkedIn, email and CV sit in the header, not only in section 09. The
+rail already lets a keyboard or screen-reader user jump to "Contact" in one
+step, but a visitor scanning the page visually has no reason to know that —
+the four destinations most worth reaching (an evaluator's first move,
+usually) were otherwise a nine-section scroll away. Same four links, same
+order, as the closing section: landing at the top is not shown a different
+set than the one waiting at the end. Icons only, each with its own
+`aria-label` distinct from section 09's plain-text versions of the same
+links — `check-build.mjs` already asserts every link's accessible name is
+unique sitewide, which is what caught the first attempt reusing "GitHub" and
+"LinkedIn" verbatim. 44×44px targets under 820px, matching the floor the
+rest of the mobile layout already holds itself to.
 
 ## Stack and deploying
 

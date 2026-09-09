@@ -136,6 +136,10 @@ export default function Scene({ onReady }: { onReady: () => void }) {
       // inline, not a class: styles.css is injected after mount and R3F would
       // measure the container at zero height and never start the loop.
       style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}
+      // Purely decorative -- the prerendered DOM already carries every word a
+      // screen reader needs (see "Content is readable with the canvas dead"),
+      // so the canvas itself must not be announced as an unlabelled graphic.
+      aria-hidden="true"
       dpr={[1, 1.5]}
       frameloop={STILL ? 'demand' : 'always'}
       resize={{ polyfill: ViewportObserver as never }}

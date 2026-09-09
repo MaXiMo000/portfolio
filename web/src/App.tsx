@@ -59,7 +59,46 @@ export default function App() {
           </svg>
           Ritish Saini
         </span>
-        <span className="role">Python · FastAPI · PostgreSQL · Elasticsearch · Celery</span>
+        <span className="hud-right">
+          <span className="role">Python · FastAPI · PostgreSQL · Elasticsearch · Celery</span>
+          {/* The fast path section 09 already offers, reachable without
+              scrolling past eight instruments first. Same four destinations,
+              same order, so a visitor who lands here first isn't shown a
+              different set of links than the one waiting for them at the end. */}
+          <span className="links">
+            <a href="https://github.com/MaXiMo000" aria-label="GitHub profile">
+              <svg viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38
+                  0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13
+                  -.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07
+                  -1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82
+                  .64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12
+                  .51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48
+                  0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
+              </svg>
+            </a>
+            <a href="https://www.linkedin.com/in/ritish-saini-2540a5253" aria-label="LinkedIn profile">
+              <svg viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M3.58 5.6H.53V16h3.05V5.6ZM2.06.6C1 .6 .25 1.36.25 2.34c0 .96.73 1.73 1.78 1.73h.02
+                  c1.08 0 1.79-.77 1.79-1.73C3.82 1.36 3.12.6 2.06.6ZM15.75 16h-.01v-5.6c0-2.75-1.47-4.03-3.43-4.03
+                  -1.58 0-2.29.87-2.68 1.48V5.6H6.58c.04.86 0 10.4 0 10.4h3.05v-5.81c0-.31.02-.62.11-.84.24-.62.8-1.26
+                  1.73-1.26 1.22 0 1.71.93 1.71 2.3V16h3.05Z" />
+              </svg>
+            </a>
+            <a href="mailto:ritishsaini1995@gmail.com" aria-label="Email">
+              <svg viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M1.5 3A1.5 1.5 0 0 0 0 4.5v.28l8 4.44 8-4.44V4.5A1.5 1.5 0 0 0 14.5 3h-13Z" />
+                <path d="M16 6.16l-7.65 4.25a.75.75 0 0 1-.7 0L0 6.16V11.5A1.5 1.5 0 0 0 1.5 13h13a1.5 1.5 0 0 0 1.5-1.5V6.16Z" />
+              </svg>
+            </a>
+            <a href="/ritish-saini-cv.pdf" download aria-label="Download CV (PDF)">
+              <svg viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M8 0a.75.75 0 0 1 .75.75v7.94l2.47-2.47a.75.75 0 1 1 1.06 1.06l-3.75 3.75a.75.75 0 0 1-1.06 0L3.72 7.28a.75.75 0 0 1 1.06-1.06l2.47 2.47V.75A.75.75 0 0 1 8 0Z" />
+                <path d="M1.5 10a.75.75 0 0 1 .75.75v2.5c0 .14.11.25.25.25h11c.14 0 .25-.11.25-.25v-2.5a.75.75 0 0 1 1.5 0v2.5A1.75 1.75 0 0 1 13.5 15h-11A1.75 1.75 0 0 1 .75 13.25v-2.5A.75.75 0 0 1 1.5 10Z" />
+              </svg>
+            </a>
+          </span>
+        </span>
       </header>
 
       <nav className="hud rail" aria-label="Sections">

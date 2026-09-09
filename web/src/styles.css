@@ -25,7 +25,15 @@ a:focus-visible,[href]:focus-visible{outline:2px solid var(--beam);outline-offse
 .mark{width:17px;height:17px;fill:var(--chalk);flex:none;
   animation:markturn 24s linear infinite}
 @keyframes markturn{to{transform:rotate(360deg)}}
-.role{margin-left:auto;color:#8791A0;font-family:var(--mono);font-size:9px;letter-spacing:.2em}
+.hud-right{margin-left:auto;display:flex;align-items:center;gap:22px}
+.role{color:#8791A0;font-family:var(--mono);font-size:9px;letter-spacing:.2em}
+/* Section 09 has the same four links at full size; this is the fast path --
+   reachable without reading the rail's "Contact" label or scrolling past
+   eight instruments to find out there's an email address at the bottom. */
+.links{display:flex;gap:16px}
+.links a{color:#8791A0;display:flex;padding:4px}
+.links a:hover{color:var(--beam)}
+.links svg{width:15px;height:15px;fill:currentColor;flex:none}
 
 .rail{right:0;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;
   border:1px solid var(--hair);border-right:0;background:rgba(8,9,12,.6);
@@ -188,6 +196,10 @@ dd b{font-family:var(--mono);color:var(--beam);font-weight:400}
   .role{display:none}
   .go.big{padding:14px 0}
   .ends a{padding:12px 0}
+  /* Same 44px floor as .go: 4px of padding on a 15px icon is a 23px target,
+     and this row has room role's hiding just freed up. */
+  .links{gap:2px}
+  .links a{padding:14.5px}
 }
 @media (prefers-reduced-motion:reduce){
   .resolving .d{animation:none;stroke-dashoffset:0}
