@@ -224,6 +224,26 @@ animation library -- the panel appears and disappears in one frame, which
 needed nothing to reconcile with `prefers-reduced-motion` because there was
 never anything to reduce.
 
+## Six get an instrument. The rest get a list.
+
+The rail and its six full sections are a curated subset, not the whole
+portfolio -- and that used to be silent, which an audit of the site
+correctly flagged as the single biggest reason it hasn't kept pace: 17
+public repos exist, 4 of them (plus two older, non-portfolio projects) had
+a section here. The other dozen are real too -- tested, documented, most
+with their own CI -- they just don't each get a bespoke 3D transition,
+because that's the actual cost of adding one: `scene/geometry.ts` is
+hand-built per instrument, and `scene/Instrument.tsx`'s morphs are hand-
+tuned per handover (see Handovers, above). Inventing 12 more would be
+months of the same craft this site's own README elsewhere holds up as the
+point, not a content edit -- and would very likely dilute the six that
+currently get real attention rather than add to the site's actual case.
+
+So instead: a plain, un-rail-numbered list (`.more` in `App.tsx`, between
+Skills and Contact) names all twelve, one line each, linked straight to
+their repos. No new 3D, no new instrument, no silent gap -- the honest
+tradeoff stated once, in the one place on the page it's actually true.
+
 ## Not done yet
 
 - no custom domain yet — `web/site.config.js` is the single switch; set

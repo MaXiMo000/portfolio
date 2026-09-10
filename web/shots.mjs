@@ -30,13 +30,9 @@ await new Promise((r) => setTimeout(r, 6000))
 if (!(await page.evaluate(() => !!document.querySelector('canvas'))))
   console.warn('! no canvas — auditing the no-WebGL fallback, not the scene')
 
-for (const sec of await page.$$eval('[data-sec]', (e) => e.map((n) => n.dataset.sec))) {
-  await page.evaluate((n) => {
-    const el = document.querySelector(`[data-sec="${n}"]`)
-    window.scrollTo(0, el.offsetTop + el.offsetHeight / 2 - innerHeight / 2)
-  }, sec)
+const checkClipped = async (name) => {
   await new Promise((r) => setTimeout(r, 1800))
-  await page.screenshot({ path: `shots/${w}-${sec}.png` })
+  await page.screenshot({ path: `shots/${w}-${name}.png` })
   const bad = await page.evaluate(() => {
     const vw = innerWidth
     return [...document.querySelectorAll('main *, header *')]
@@ -45,6 +41,24 @@ for (const sec of await page.$$eval('[data-sec]', (e) => e.map((n) => n.dataset.
         return r.width > 0 && (r.right > vw + 1 || r.left < -1) })
       .map((e) => (e.className || e.tagName) + ': ' + e.textContent.trim().slice(0, 24))
   })
-  console.log(`${sec.padEnd(12)} ${bad.length ? 'CLIPPED ' + bad.join(' | ') : 'ok'}`)
+  console.log(`${name.padEnd(12)} ${bad.length ? 'CLIPPED ' + bad.join(' | ') : 'ok'}`)
 }
+
+for (const sec of await page.$$eval('[data-sec]', (e) => e.map((n) => n.dataset.sec))) {
+  await page.evaluate((n) => {
+    const el = document.querySelector(`[data-sec="${n}"]`)
+    window.scrollTo(0, el.offsetTop + el.offsetHeight / 2 - innerHeight / 2)
+  }, sec)
+  await checkClipped(sec)
+}
+
+// Not a [data-sec] instrument section (see the comment above it in App.tsx),
+// but it's real permanent page content now and deserves the same
+// clipped-text guard as everything else.
+await page.evaluate(() => {
+  const el = document.querySelector('.more')
+  window.scrollTo(0, el.offsetTop + el.offsetHeight / 2 - innerHeight / 2)
+})
+await checkClipped('more')
+
 await browser.close()

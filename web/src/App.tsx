@@ -305,6 +305,42 @@ export default function App() {
           </div>
         </section>
 
+        {/* Not a rail-numbered instrument section on purpose: the six above
+            each earned a bespoke 3D transition because each is a genuinely
+            different mechanism worth dwelling on. These twelve are real,
+            live, and tested (see each repo's own README/CI) but a flat list
+            is the honest way to surface them, not a claim that the rail
+            above is the whole portfolio. */}
+        <div className="more">
+          <div className="col">
+            <p className="num">&mdash; <em>/ the rest of the shop</em></p>
+            <h2>More, on GitHub</h2>
+            <p className="claim">
+              Six above get the full 3D treatment because each is a
+              <span className="serif"> different mechanism.</span> These are
+              real too &mdash; tested, documented, most with their own CI &mdash;
+              just not each worth inventing a new instrument for.
+            </p>
+            <ul className="strata more__list">
+              <li><a href="https://github.com/MaXiMo000/receipt" aria-label="Open the receipt repository on GitHub">receipt</a> &mdash; a receipt for what a shell command actually touched, not just what it was asked to do</li>
+              <li><a href="https://github.com/MaXiMo000/invariant" aria-label="Open the invariant repository on GitHub">invariant</a> &mdash; asserts a system property is still true, across six check types</li>
+              <li><a href="https://github.com/MaXiMo000/satchel" aria-label="Open the satchel repository on GitHub">satchel</a> &mdash; a local-first reading queue with one-click, SSRF-hardened capture</li>
+              <li><a href="https://github.com/MaXiMo000/witness" aria-label="Open the witness repository on GitHub">witness</a> &mdash; a browser extension that checks a site's real traffic against what it claims</li>
+              <li><a href="https://github.com/MaXiMo000/custody" aria-label="Open the custody repository on GitHub">custody</a> &mdash; a live Claude Code hook, a receipt for every file edit or shell call an agent makes</li>
+              <li><a href="https://github.com/MaXiMo000/providence" aria-label="Open the providence repository on GitHub">providence</a> &mdash; the shared evidence-bundle shape receipt and invariant each arrived at independently</li>
+              <li><a href="https://github.com/MaXiMo000/sourced" aria-label="Open the sourced repository on GitHub">sourced</a> &mdash; splits LLM output into per-claim sentences, checks each against its own source</li>
+              <li><a href="https://github.com/MaXiMo000/escrow" aria-label="Open the escrow repository on GitHub">escrow</a> &mdash; a dead man's switch for cron and scheduled jobs</li>
+              <li><a href="https://github.com/MaXiMo000/lockstep" aria-label="Open the lockstep repository on GitHub">lockstep</a> &mdash; what's actually installed right now, checked against what's pinned</li>
+              <li><a href="https://github.com/MaXiMo000/portable" aria-label="Open the portable repository on GitHub">portable</a> &mdash; does your own data export actually contain what it promised</li>
+              <li><a href="https://github.com/MaXiMo000/clicked" aria-label="Open the clicked repository on GitHub">clicked</a> &mdash; proof of what one browser click actually did, network traffic included</li>
+              <li><a href="https://github.com/MaXiMo000/drift" aria-label="Open the drift repository on GitHub">drift</a> &mdash; does a device's real traffic match the domains it's declared to contact</li>
+            </ul>
+            <p className="footnote">
+              <a href="https://github.com/MaXiMo000?tab=repositories" aria-label="See every public repository on GitHub">Every public repo &rarr;</a>
+            </p>
+          </div>
+        </div>
+
         <section id="s9" data-sec="contact" className="sec hero">
           <h1 className="close">
             <span>Let's build</span>
