@@ -23,7 +23,7 @@ function useExperienceAllowed() {
 }
 
 const RAIL = ['Resolve', 'carabiner', 'firedrill', 'recur', 'LabLedger', 'QuizNest',
-              'Recipe', 'Experience', 'Skills', 'Contact']
+              'Recipe', 'Experience', 'Skills', 'More', 'Contact']
 
 export default function App() {
   const allowed = useExperienceAllowed()
@@ -305,21 +305,20 @@ export default function App() {
           </div>
         </section>
 
-        {/* Not a rail-numbered instrument section on purpose: the six above
-            each earned a bespoke 3D transition because each is a genuinely
-            different mechanism worth dwelling on. These twelve are real,
-            live, and tested (see each repo's own README/CI) but a flat list
-            is the honest way to surface them, not a claim that the rail
-            above is the whole portfolio. */}
-        <div className="more">
+        {/* 09 — the rack. Six above each get a bespoke instrument because
+            each is one system, read closely. These twelve share one rack
+            instead — a real 3D instrument in its own right, not a plain
+            content aside, but honestly one shelf of smaller modules rather
+            than six more invented mechanisms. */}
+        <section id="s9" data-sec="more" className="sec">
           <div className="col">
-            <p className="num">&mdash; <em>/ the rest of the shop</em></p>
+            <p className="num">09 <em>/ the rack</em></p>
             <h2>More, on GitHub</h2>
             <p className="claim">
-              Six above get the full 3D treatment because each is a
-              <span className="serif"> different mechanism.</span> These are
-              real too &mdash; tested, documented, most with their own CI &mdash;
-              just not each worth inventing a new instrument for.
+              Six above are one system each, worth their own
+              <span className="serif"> mechanism.</span> These twelve share a
+              rack instead &mdash; real, tested, documented, most with their
+              own CI, read at a glance rather than one at a time.
             </p>
             <ul className="strata more__list">
               <li><a href="https://github.com/MaXiMo000/receipt" aria-label="Open the receipt repository on GitHub">receipt</a> &mdash; a receipt for what a shell command actually touched, not just what it was asked to do</li>
@@ -339,9 +338,9 @@ export default function App() {
               <a href="https://github.com/MaXiMo000?tab=repositories" aria-label="See every public repository on GitHub">Every public repo &rarr;</a>
             </p>
           </div>
-        </div>
+        </section>
 
-        <section id="s9" data-sec="contact" className="sec hero">
+        <section id="s10" data-sec="contact" className="sec hero">
           <h1 className="close">
             <span>Let's build</span>
             <span className="serif">something</span>

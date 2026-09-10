@@ -124,10 +124,8 @@ dd b{font-family:var(--mono);color:var(--beam);font-weight:400}
 .footnote{margin-top:30px;max-width:34rem;font-size:12.5px;line-height:1.65;color:#6E7885}
 .footnote b{font-family:var(--mono);font-weight:400;color:var(--alloy)}
 
-/* ---- the rest of the shop: a flat list, deliberately not a rail-numbered
-   instrument section -- see the comment above it in App.tsx. Roughly a
-   third of .sec's padding: this is a footnote, not another beat. */
-.more{padding:80px 44px;position:relative}
+/* ---- 09 the rack: a real .sec like every other section now (see the
+   comment above it in App.tsx) -- only the link styling here is bespoke. */
 .more__list a{color:var(--chalk);text-decoration:none;border-bottom:1px solid var(--hair);
   padding-bottom:1px;font-family:var(--mono);font-weight:400}
 .more__list a:hover{border-color:rgba(134,233,222,.5);color:var(--beam)}
@@ -196,7 +194,6 @@ dd b{font-family:var(--mono);color:var(--beam);font-weight:400}
       rgba(8,9,12,.9) 44%, var(--void) 58%)}
   .rail{display:none}
   .sec{padding:0 22px;min-height:130vh}
-  .more{padding:56px 22px}
   .dive-backdrop{padding:0}
   .dive{max-width:none;max-height:none;height:100%;padding:64px 22px 40px}
   .dive__close{top:16px;right:14px}

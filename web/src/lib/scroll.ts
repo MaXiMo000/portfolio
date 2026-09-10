@@ -28,6 +28,7 @@ export const SECTIONS = [
   'recipe',
   'experience',
   'skills',
+  'more',
   'contact',
 ] as const
 

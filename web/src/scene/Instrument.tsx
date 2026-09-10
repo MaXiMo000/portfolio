@@ -5,7 +5,7 @@ import { S, VIEW, damp } from '../lib/scroll'
 import { P, I } from '../lib/pointer'
 import { NUDGE } from '../lib/nudge'
 import { STILL } from '../lib/mode'
-import { ratchetGeometry, housingGeometry, pawlGeometry, tumblerGeometry } from './geometry'
+import { ratchetGeometry, housingGeometry, pawlGeometry, tumblerGeometry, beaconGeometry } from './geometry'
 
 const BEAM = '#86E9DE'
 const ESCALATE = '#E8873B'
@@ -1020,6 +1020,168 @@ function FeelerGauge({ index }: { index: number }) {
   )
 }
 
+/* ---------------------------------------------------------------------- 09 */
+const MODULES = 12
+const RACK_COLS = 4
+
+/**
+ * The rack. The six sections above each earned a bespoke mechanism because
+ * each is one system read closely; this is a dozen smaller ones, read at a
+ * glance — so the honest shape is a shelf of identical modules, not a
+ * seventh invented mechanism pretending to be one more flagship system.
+ *
+ * Handover in: born lerps every module out from the origin — the same
+ * "everything starts bunched at the previous mechanism's own centre" idiom
+ * the rotor and the manifold already use. Handover out: they gather back
+ * onto the vertical axis as one line, mirroring the rotor's own chips-to-
+ * beam collapse — and that converged line is what the beacon, next, turns
+ * out to already be.
+ *
+ * One pass, left to right, row by row, reads them exactly once per visit —
+ * the core sample's own sonde discipline, run over a grid instead of a
+ * column: nothing here claims attention before it has actually been read.
+ */
+function Rack({ index }: { index: number }) {
+  const g = useRef<THREE.Group>(null!)
+  const mods = useRef<THREE.Group>(null!)
+  const alloy = useAlloy()
+  const w = useWeight(index)
+
+  const mats = useMemo(
+    () =>
+      Array.from({ length: MODULES }, () =>
+        new THREE.MeshStandardMaterial({
+          color: '#AEB8C6', metalness: 0.92, roughness: 0.26, envMapIntensity: 2.1,
+        }),
+      ),
+    [],
+  )
+
+  const rows = Math.ceil(MODULES / RACK_COLS)
+  const spec = useMemo(
+    () =>
+      Array.from({ length: MODULES }, (_, i) => ({
+        x: ((i % RACK_COLS) - (RACK_COLS - 1) / 2) * 0.38,
+        y: ((rows - 1) / 2 - Math.floor(i / RACK_COLS)) * 0.32,
+        // reading order, 0..1 — the single sweep below is timed against this
+        read: i / (MODULES - 1),
+      })),
+    [rows],
+  )
+
+  useFrame((state) => {
+    const k = w.current
+    stage(g.current, k, 1.05)
+    const t = STILL ? 0.55 : (S.i === index ? S.t : 0)
+    const born = arrive(index)
+    const gone = depart(index)
+
+    mods.current.children.forEach((mod, i) => {
+      const sp = spec[i]
+      // Handover in: bunched at the origin, arriving at the grid slot.
+      // Handover out: the same journey run in reverse, gathered back onto
+      // the axis — one shelf becoming one line becomes the beacon.
+      const arrived = new THREE.Vector2(
+        THREE.MathUtils.lerp(0, sp.x, born),
+        THREE.MathUtils.lerp(0, sp.y, born),
+      )
+      mod.position.x = THREE.MathUtils.lerp(arrived.x, 0, gone)
+      mod.position.y = THREE.MathUtils.lerp(arrived.y, 0, gone)
+      mod.scale.setScalar(THREE.MathUtils.lerp(0.15, 1, born) * (1 - gone * 0.85))
+
+      // one pass, reading order — a faint trace remains once it's been read,
+      // the same "already measured" residue the core sample's bands keep
+      const near = 1 - THREE.MathUtils.clamp(Math.abs(t - sp.read) / 0.11, 0, 1)
+      const read = t > sp.read ? 0.05 : 0
+      mats[i].emissive.copy(BEAM_C).multiplyScalar(Math.max(near, read) * born * 0.9)
+    })
+
+    g.current.rotation.y = STILL ? 0.22 : 0.22 + Math.sin(state.clock.elapsedTime * 0.15) * 0.05
+    g.current.rotation.x = -0.1
+  })
+
+  return (
+    <group ref={g}>
+      <group ref={mods}>
+        {spec.map((_, i) => (
+          <mesh key={i} castShadow receiveShadow material={mats[i]}>
+            <cylinderGeometry args={[0.075, 0.075, 0.24, 24]} />
+          </mesh>
+        ))}
+      </group>
+      {/* the shelf they stand on */}
+      <mesh position={[0, -0.7, 0]} castShadow receiveShadow>
+        <boxGeometry args={[1.75, 0.06, 0.5]} />
+        <primitive object={alloy} attach="material" />
+      </mesh>
+    </group>
+  )
+}
+
+/* ---------------------------------------------------------------------- 10 */
+/**
+ * The beacon. Everything else on this page is a claim being checked; this
+ * is the payoff the hero copy opened with — "Noise goes in. Signal comes
+ * out." — read literally, as the one thing here that emits rather than
+ * measures. A genuinely different silhouette from the housing this all
+ * started in, not a second telling of the same shape: the housing is a
+ * sealed case; this tapers to an open aperture. Closing the loop and
+ * repeating the opening beat are two different endings, and this is the one
+ * that actually means something for a page about signal recovered from noise.
+ *
+ * Handover in: the rack's dozen modules already converge onto this same
+ * vertical axis as they leave (its `gone`, above) — the beacon is simply
+ * what that gathered line becomes. Nothing departs from here; there is
+ * nothing after it, the same as the very first housing had nothing before.
+ */
+function Beacon({ index }: { index: number }) {
+  const g = useRef<THREE.Group>(null!)
+  const lens = useRef<THREE.Mesh>(null!)
+  const alloy = useAlloy()
+  const w = useWeight(index)
+  const geo = useMemo(beaconGeometry, [])
+
+  useFrame((state, dt) => {
+    const d = Math.min(dt, 0.05)
+    stage(g.current, w.current, 1.3)
+    const t = STILL ? 1 : (S.i === index ? S.t : 0)
+    const born = arrive(index)
+
+    // The signal steadies only once the very end of the page is actually
+    // reached — not before, the same "nothing lit before it's earned" rule
+    // the vessel's seal and the core sample's sonde both already keep.
+    const lit = THREE.MathUtils.smoothstep(t, 0.15, 0.85) * born
+    const mat = lens.current.material as THREE.MeshBasicMaterial
+    mat.opacity = damp(mat.opacity, 0.08 + lit * 0.92, 7, d)
+    lens.current.scale.setScalar(1 + lit * 0.05)
+
+    g.current.rotation.y = STILL ? 0.15 : 0.15 + Math.sin(state.clock.elapsedTime * 0.14) * 0.045
+    g.current.rotation.x = -0.05
+  })
+
+  return (
+    <group ref={g}>
+      <mesh geometry={geo} material={alloy} castShadow receiveShadow />
+      {/* the lens: dark until the signal is genuinely reached, then holds.
+          DoubleSide because a flat disc, unlike the vessel's seal torus,
+          has only one face -- and the rig's own ambient sway means no
+          single winding direction stays pointed at the camera. */}
+      <mesh ref={lens} position={[0, 0.79, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[0.052, 32]} />
+        <meshBasicMaterial
+          color={BEAM} transparent opacity={0.08} toneMapped={false}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
+      {/* the collar the gathered line of modules arrives into */}
+      <mesh position={[0, -0.56, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[0.3, 0.36, 0.14, 40]} />
+        <primitive object={alloy} attach="material" />
+      </mesh>
+    </group>
+  )
+}
+
 /* ------------------------------------------------------------------------ */
 export default function Instrument() {
   const rig = useRef<THREE.Group>(null!)
@@ -1038,7 +1200,10 @@ export default function Instrument() {
                        //    reads as a column and the sonde's travel is visible
     [0, 0.75, 4.5],    // 08 gauge — from above, which is the only angle a fan
                        //    of flat leaves is a fan from
-    [0, 0, 3.6],       // 09 housing, closed again
+    [0, 0.35, 4.7],    // 09 rack — a shade back and raised, so the grid
+                       //    reads as a shelf, not a wall
+    [0, 0.2, 3.9],     // 10 beacon — close again, slightly raised so the
+                       //    tip and its lens both clear the frame
   ]
 
   useFrame((state, dt) => {
@@ -1094,7 +1259,8 @@ export default function Instrument() {
       <Manifold index={6} />
       <CoreSample index={7} />
       <FeelerGauge index={8} />
-      <Housing index={9} opensWith={8} />
+      <Rack index={9} />
+      <Beacon index={10} />
     </group>
   )
 }

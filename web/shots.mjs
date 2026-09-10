@@ -52,13 +52,4 @@ for (const sec of await page.$$eval('[data-sec]', (e) => e.map((n) => n.dataset.
   await checkClipped(sec)
 }
 
-// Not a [data-sec] instrument section (see the comment above it in App.tsx),
-// but it's real permanent page content now and deserves the same
-// clipped-text guard as everything else.
-await page.evaluate(() => {
-  const el = document.querySelector('.more')
-  window.scrollTo(0, el.offsetTop + el.offsetHeight / 2 - innerHeight / 2)
-})
-await checkClipped('more')
-
 await browser.close()

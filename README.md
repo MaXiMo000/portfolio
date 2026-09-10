@@ -194,12 +194,16 @@ the shape of the one before it:
   collector's single output becomes the sixth band
 - **core → gauge** — the bands come off the column and swing out around one
   rivet, drawn long and ground thin
-- **gauge → housing** — the leaves fold shut, and the wedges close on a stack
+- **gauge → rack** — the leaves fold shut; a dozen small modules grow out of
+  that same origin point and fan into a shelf
+- **rack → beacon** — the modules gather back onto the vertical axis as one
+  line of light, which is what the beacon's lens turns out to already be
 - **housing → ratchet** — eight lathe wedges hinge open around it
 
-One primitive carries the last three of those: the cylinder that is a manifold
-barrel is the same cylinder that is a core band and then a gauge leaf, only ever
-rescaled. Tall and narrow, short and wide, long and thin.
+One primitive carries three of those: the cylinder that is a manifold barrel
+is the same cylinder that is a core band, a gauge leaf, and then one of the
+rack's own modules at a fifth the scale — tall and narrow, short and wide,
+long and thin, small and plain.
 
 ## Look inside
 
@@ -224,25 +228,32 @@ animation library -- the panel appears and disappears in one frame, which
 needed nothing to reconcile with `prefers-reduced-motion` because there was
 never anything to reduce.
 
-## Six get an instrument. The rest get a list.
+## Six get a mechanism. Twelve get a rack.
 
-The rail and its six full sections are a curated subset, not the whole
-portfolio -- and that used to be silent, which an audit of the site
-correctly flagged as the single biggest reason it hasn't kept pace: 17
-public repos exist, 4 of them (plus two older, non-portfolio projects) had
-a section here. The other dozen are real too -- tested, documented, most
-with their own CI -- they just don't each get a bespoke 3D transition,
-because that's the actual cost of adding one: `scene/geometry.ts` is
-hand-built per instrument, and `scene/Instrument.tsx`'s morphs are hand-
-tuned per handover (see Handovers, above). Inventing 12 more would be
-months of the same craft this site's own README elsewhere holds up as the
-point, not a content edit -- and would very likely dilute the six that
-currently get real attention rather than add to the site's actual case.
+The six full project sections used to be a curated subset with nothing on
+the page saying so -- an audit correctly flagged that as the single
+biggest reason the site hadn't kept pace with a 17-repo portfolio.
+Inventing twelve more bespoke instruments would have been months of the
+same hand-built work every other mechanism here took (`scene/geometry.ts`
+per shape, `scene/Instrument.tsx`'s morphs hand-tuned per handover -- see
+Handovers, above), and would very likely have diluted the six that
+actually earn a close look rather than added to the site's case.
 
-So instead: a plain, un-rail-numbered list (`.more` in `App.tsx`, between
-Skills and Contact) names all twelve, one line each, linked straight to
-their repos. No new 3D, no new instrument, no silent gap -- the honest
-tradeoff stated once, in the one place on the page it's actually true.
+The shape that fits the honest version of that tradeoff: one more real
+instrument -- `Rack`, section 09 -- built once for all twelve, not twelve
+built separately. A dozen small modules, the same cylinder every other
+mechanism already reuses at a fifth the scale, arrive on a shelf and are
+read left to right exactly once, each linking straight to its own repo.
+It costs one geometry and one handover, the same as any other section,
+instead of twelve.
+
+The closing section changed too: it used to reopen the exact housing the
+page started in, the same shape playing twice. It's a real, different
+final shape now -- `Beacon`, a lathed emitter rather than a sealed case,
+its lens dark until the very end of the page is actually reached. "Noise
+goes in. Signal comes out." was always the hero copy's claim; the ending
+beat says it back, literally, instead of just returning to where it
+began.
 
 ## Not done yet
 

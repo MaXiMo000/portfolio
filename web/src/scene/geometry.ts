@@ -91,3 +91,21 @@ export function tumblerGeometry(rOuter: number, rInner: number, notch = 0.34) {
   g.center()
   return g
 }
+
+/** The beacon: a lathed body tapering from a broad seated base to a narrow
+ *  aperture at the tip. "Noise goes in. Signal comes out." is the promise
+ *  the hero copy opens with; this is that promise closing the loop, a real
+ *  emitter shape rather than a container being sealed shut. The tip's small
+ *  flat disc is where the lens sits (added separately, in Beacon below, so
+ *  it can carry its own always-on-top glow material). */
+export function beaconGeometry() {
+  const pts: THREE.Vector2[] = []
+  const v = (x: number, y: number) => pts.push(new THREE.Vector2(x, y))
+  v(0, -0.5); v(0.44, -0.5); v(0.5, -0.4)
+  v(0.46, -0.22); v(0.34, 0.02); v(0.36, 0.08)
+  v(0.3, 0.14); v(0.14, 0.5); v(0.06, 0.7)
+  v(0.02, 0.8); v(0, 0.8)
+  const g = new THREE.LatheGeometry(pts, 64)
+  g.computeVertexNormals()
+  return g
+}
