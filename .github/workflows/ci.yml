@@ -57,7 +57,9 @@ jobs:
         working-directory: web
       - uses: treosh/lighthouse-ci-action@3e7e23fb74242897f95c0ba9cabad3d0227b9b18 # v12.6.2
         with:
-          staticDistDir: web/dist
+          # This action version dropped the staticDistDir input -- LHCI now
+          # takes it via a config file instead (see lighthouserc.json).
+          configPath: ./lighthouserc.json
           # Saved as a workflow artifact rather than treosh's own temporary
           # public storage -- this site's whole design avoids a third-party
           # destination for anything it doesn't need one for.
