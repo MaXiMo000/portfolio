@@ -133,7 +133,7 @@ export default function App() {
             <dl>
               <dt>Problem</dt><dd>Repository posture rots silently between audits.</dd>
               <dt>Hard</dt><dd>A ratchet that never loosens — not by accident, not by a well-meaning PR.</dd>
-              <dt>Cost</dt><dd><b>60</b> repos calibrated · <b>59</b> tests · SARIF · PyPI, GHCR, Marketplace</dd>
+              <dt>Cost</dt><dd><b>60</b> repos calibrated · <b>79</b> tests · <b>18</b> drills against live GitHub settings · SARIF · PyPI, GHCR, Marketplace</dd>
             </dl>
             <a
               className="go" href="https://github.com/MaXiMo000/carabiner"
@@ -152,7 +152,7 @@ export default function App() {
             <h2>firedrill</h2>
             <p className="claim">A backup is not proven until <span className="serif">something restores it.</span></p>
             <dl>
-              <dt>Problem</dt><dd>A <code>pg_dump</code> that exits 0 can still be a truncated file nobody has ever tried to read back.</dd>
+              <dt>Problem</dt><dd>A <code>pg_dump</code> that exits 0 can still be a truncated file nobody has ever tried to read back &mdash; and <code>psql</code> restores a truncated plain dump with exit 0, rows silently missing.</dd>
               <dt>Hard</dt><dd>Matching the archive's own Postgres major and restoring inside a disposable container with no path to production, ever.</dd>
               <dt>Cost</dt><dd><b>6</b> Postgres majors, both directions on the corpus · field-tested against pagila, chinook and northwind — <span className="serif">and found a real gap</span> in a published sample database nobody had caught · PyPI, GHCR, GitHub Action</dd>
             </dl>
@@ -316,23 +316,20 @@ export default function App() {
             <h2>More, on GitHub</h2>
             <p className="claim">
               Six above are one system each, worth their own
-              <span className="serif"> mechanism.</span> These twelve share a
-              rack instead &mdash; real, tested, documented, most with their
+              <span className="serif"> mechanism.</span> These share a
+              rack instead &mdash; real, tested, published, each with its
               own CI, read at a glance rather than one at a time.
             </p>
             <ul className="strata more__list">
-              <li><a href="https://github.com/MaXiMo000/receipt" aria-label="Open the receipt repository on GitHub">receipt</a> &mdash; a receipt for what a shell command actually touched, not just what it was asked to do</li>
-              <li><a href="https://github.com/MaXiMo000/invariant" aria-label="Open the invariant repository on GitHub">invariant</a> &mdash; asserts a system property is still true, across six check types</li>
-              <li><a href="https://github.com/MaXiMo000/satchel" aria-label="Open the satchel repository on GitHub">satchel</a> &mdash; a local-first reading queue with one-click, SSRF-hardened capture</li>
-              <li><a href="https://github.com/MaXiMo000/witness" aria-label="Open the witness repository on GitHub">witness</a> &mdash; a browser extension that checks a site's real traffic against what it claims</li>
-              <li><a href="https://github.com/MaXiMo000/custody" aria-label="Open the custody repository on GitHub">custody</a> &mdash; a live Claude Code hook, a receipt for every file edit or shell call an agent makes</li>
-              <li><a href="https://github.com/MaXiMo000/providence" aria-label="Open the providence repository on GitHub">providence</a> &mdash; the shared evidence-bundle shape receipt and invariant each arrived at independently</li>
-              <li><a href="https://github.com/MaXiMo000/sourced" aria-label="Open the sourced repository on GitHub">sourced</a> &mdash; splits LLM output into per-claim sentences, checks each against its own source</li>
-              <li><a href="https://github.com/MaXiMo000/escrow" aria-label="Open the escrow repository on GitHub">escrow</a> &mdash; a dead man's switch for cron and scheduled jobs</li>
-              <li><a href="https://github.com/MaXiMo000/lockstep" aria-label="Open the lockstep repository on GitHub">lockstep</a> &mdash; what's actually installed right now, checked against what's pinned</li>
-              <li><a href="https://github.com/MaXiMo000/portable" aria-label="Open the portable repository on GitHub">portable</a> &mdash; does your own data export actually contain what it promised</li>
-              <li><a href="https://github.com/MaXiMo000/clicked" aria-label="Open the clicked repository on GitHub">clicked</a> &mdash; proof of what one browser click actually did, network traffic included</li>
-              <li><a href="https://github.com/MaXiMo000/drift" aria-label="Open the drift repository on GitHub">drift</a> &mdash; does a device's real traffic match the domains it's declared to contact</li>
+              <li><a href="https://github.com/MaXiMo000/receipt" aria-label="Open the receipt repository on GitHub">receipt</a> &mdash; verified receipts for what a shell command, an AI agent's tool call or a browser click actually did, in one tamper-evident format</li>
+              <li><a href="https://github.com/MaXiMo000/invariant" aria-label="Open the invariant repository on GitHub">invariant</a> &mdash; declare what must stay true, check it in CI with its own GitHub Action, keep a proof bundle of every run</li>
+              <li><a href="https://github.com/MaXiMo000/playhead" aria-label="Open the playhead repository on GitHub">playhead</a> &mdash; replay an AI coding session like a video timeline, imported straight from its transcript</li>
+              <li><a href="https://github.com/MaXiMo000/satchel" aria-label="Open the satchel repository on GitHub">satchel</a> &mdash; a local-first reading archive that imports Pocket and Omnivore and rescues dead links from the Wayback Machine</li>
+              <li><a href="https://github.com/MaXiMo000/sourced" aria-label="Open the sourced repository on GitHub">sourced</a> &mdash; checks each claim of LLM output against its source; an optional Claude judge must quote its evidence verbatim</li>
+              <li><a href="https://github.com/MaXiMo000/lockstep" aria-label="Open the lockstep repository on GitHub">lockstep</a> &mdash; catches installed code edited after install, which a version number never shows</li>
+              <li><a href="https://github.com/MaXiMo000/escrow" aria-label="Open the escrow repository on GitHub">escrow</a> &mdash; a self-hosted dead man's switch for cron and CI jobs, alerting when one goes quiet or fails</li>
+              <li><a href="https://github.com/MaXiMo000/drift" aria-label="Open the drift repository on GitHub">drift</a> &mdash; checks a device's real traffic, HTTPS included, against its maker's own RFC 8520 MUD file</li>
+              <li><a href="https://github.com/MaXiMo000/witness" aria-label="Open the witness repository on GitHub">witness</a> &mdash; a browser extension that holds a site to the claims it publishes about itself</li>
             </ul>
             <p className="footnote">
               <a href="https://github.com/MaXiMo000?tab=repositories" aria-label="See every public repository on GitHub">Every public repo &rarr;</a>
