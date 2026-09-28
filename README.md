@@ -196,8 +196,8 @@ the shape of the one before it:
   rivet, drawn long and ground thin
 - **gauge → rack** — the leaves fold shut; a dozen small modules grow out of
   that same origin point and fan into a shelf
-- **rack → beacon** — the modules gather back onto the vertical axis as one
-  line of light, which is what the beacon's lens turns out to already be
+- **rack → gyroscope** — the modules gather back onto the vertical axis as
+  one line, and three gimbal rings unfold out of it, outermost first
 - **housing → ratchet** — eight lathe wedges hinge open around it
 
 One primitive carries three of those: the cylinder that is a manifold barrel
@@ -249,11 +249,11 @@ instead of twelve.
 
 The closing section changed too: it used to reopen the exact housing the
 page started in, the same shape playing twice. It's a real, different
-final shape now -- `Beacon`, a lathed emitter rather than a sealed case,
-its lens dark until the very end of the page is actually reached. "Noise
-goes in. Signal comes out." was always the hero copy's claim; the ending
-beat says it back, literally, instead of just returning to where it
-began.
+final shape now -- `Gyroscope`, three nested gimbals and a flywheel. The
+rings tumble loosely while the section is read, then settle into orthogonal
+rest as the page bottom is reached, the flywheel spins up and the core
+lights: "something that holds up", shown as the one mechanism whose whole
+job is holding its orientation.
 
 ## Not done yet
 

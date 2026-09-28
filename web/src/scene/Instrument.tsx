@@ -5,7 +5,7 @@ import { S, VIEW, damp } from '../lib/scroll'
 import { P, I } from '../lib/pointer'
 import { NUDGE } from '../lib/nudge'
 import { STILL } from '../lib/mode'
-import { ratchetGeometry, housingGeometry, pawlGeometry, tumblerGeometry, beaconGeometry } from './geometry'
+import { ratchetGeometry, housingGeometry, pawlGeometry, tumblerGeometry } from './geometry'
 
 const BEAM = '#86E9DE'
 const ESCALATE = '#E8873B'
@@ -1034,8 +1034,8 @@ const RACK_COLS = 4
  * "everything starts bunched at the previous mechanism's own centre" idiom
  * the rotor and the manifold already use. Handover out: they gather back
  * onto the vertical axis as one line, mirroring the rotor's own chips-to-
- * beam collapse — and that converged line is what the beacon, next, turns
- * out to already be.
+ * beam collapse — and that converged line is what the gyroscope's rings,
+ * next, unfold out of.
  *
  * One pass, left to right, row by row, reads them exactly once per visit —
  * the core sample's own sonde discipline, run over a grid instead of a
@@ -1080,7 +1080,7 @@ function Rack({ index }: { index: number }) {
       const sp = spec[i]
       // Handover in: bunched at the origin, arriving at the grid slot.
       // Handover out: the same journey run in reverse, gathered back onto
-      // the axis — one shelf becoming one line becomes the beacon.
+      // the axis — one shelf becoming one line becomes the gyroscope's axis.
       const arrived = new THREE.Vector2(
         THREE.MathUtils.lerp(0, sp.x, born),
         THREE.MathUtils.lerp(0, sp.y, born),
@@ -1119,64 +1119,119 @@ function Rack({ index }: { index: number }) {
 }
 
 /* ---------------------------------------------------------------------- 10 */
+const GIMBALS = [
+  // radius, the pose it settles into, and how it wanders before it does
+  { r: 0.8, rest: [0, -0.25, 0], amp: 1.4, f: 0.55, ph: 0 },
+  { r: 0.66, rest: [Math.PI / 2, 0, 0.25], amp: 1.8, f: 0.8, ph: 1.7 },
+  { r: 0.52, rest: [0.3, Math.PI / 2, 0], amp: 2.2, f: 1.1, ph: 3.1 },
+] as const
+
 /**
- * The beacon. Everything else on this page is a claim being checked; this
- * is the payoff the hero copy opened with — "Noise goes in. Signal comes
- * out." — read literally, as the one thing here that emits rather than
- * measures. A genuinely different silhouette from the housing this all
- * started in, not a second telling of the same shape: the housing is a
- * sealed case; this tapers to an open aperture. Closing the loop and
- * repeating the opening beat are two different endings, and this is the one
- * that actually means something for a page about signal recovered from noise.
+ * The gyroscope. "Let's build something that holds up" — the one mechanism
+ * whose whole job is to hold its orientation. Three nested gimbals and a
+ * flywheel: while the section is being read the rings tumble loosely; as the
+ * end of the page is reached they settle into orthogonal rest, the flywheel
+ * spins up and the core lights. Stability earned, not asserted.
  *
- * Handover in: the rack's dozen modules already converge onto this same
- * vertical axis as they leave (its `gone`, above) — the beacon is simply
- * what that gathered line becomes. Nothing departs from here; there is
- * nothing after it, the same as the very first housing had nothing before.
+ * Handover in: the rack gathers its modules onto the vertical axis as one
+ * line. Every ring here starts as exactly that line — a hoop seen edge-on,
+ * scaled to zero width — and unfolds outward, outermost first. Nothing
+ * departs; there is nothing after it.
  */
-function Beacon({ index }: { index: number }) {
+function Gyroscope({ index }: { index: number }) {
   const g = useRef<THREE.Group>(null!)
-  const lens = useRef<THREE.Mesh>(null!)
+  const rings = useRef<(THREE.Group | null)[]>([])
+  const rotor = useRef<THREE.Group>(null!)
+  const core = useRef<THREE.Mesh>(null!)
+  const halo = useRef<THREE.Mesh>(null!)
   const alloy = useAlloy()
   const w = useWeight(index)
-  const geo = useMemo(beaconGeometry, [])
+  const spin = useRef(0)
 
   useFrame((state, dt) => {
     const d = Math.min(dt, 0.05)
-    stage(g.current, w.current, 1.3)
+    stage(g.current, w.current, VIEW.mobile ? 0.85 : 1.15)
     const t = STILL ? 1 : (S.i === index ? S.t : 0)
     const born = arrive(index)
+    const time = STILL ? 0 : state.clock.elapsedTime
+    // S.t is measured at the viewport's middle, so the last section tops out
+    // near 0.5 at the page bottom — every range here has to finish by then
+    const settle = STILL ? 1 : THREE.MathUtils.smoothstep(t, 0.02, 0.4)
 
-    // The signal steadies only once the very end of the page is actually
-    // reached — not before, the same "nothing lit before it's earned" rule
-    // the vessel's seal and the core sample's sonde both already keep.
-    const lit = THREE.MathUtils.smoothstep(t, 0.15, 0.85) * born
-    const mat = lens.current.material as THREE.MeshBasicMaterial
-    mat.opacity = damp(mat.opacity, 0.08 + lit * 0.92, 7, d)
-    lens.current.scale.setScalar(1 + lit * 0.05)
+    GIMBALS.forEach((gm, i) => {
+      const ring = rings.current[i]
+      if (!ring) return
+      // staggered unfold: a vertical line (the rack's gathered axis) opening
+      // into a hoop, outermost first
+      const open = smoothstep(THREE.MathUtils.clamp((born - i * 0.14) / 0.72, 0, 1))
+      ring.scale.set(Math.max(open, 0.001), 1, Math.max(open, 0.001))
+      const loose = (1 - settle) * gm.amp
+      const wob = (k: number) => Math.sin(time * gm.f + gm.ph + k) * loose
+      ring.rotation.set(
+        gm.rest[0] * open + wob(0),
+        gm.rest[1] * open + wob(2.1) + (1 - settle) * time * gm.f * 0.6,
+        gm.rest[2] * open + wob(4.2) * 0.5,
+      )
+    })
 
-    g.current.rotation.y = STILL ? 0.15 : 0.15 + Math.sin(state.clock.elapsedTime * 0.14) * 0.045
-    g.current.rotation.x = -0.05
+    // flywheel: idles, then spins up as the rings settle
+    spin.current += d * (1.5 + settle * 9)
+    rotor.current.rotation.z = STILL ? 0.4 : spin.current
+    const r = smoothstep(THREE.MathUtils.clamp((born - 0.4) / 0.6, 0, 1))
+    rotor.current.scale.setScalar(Math.max(r, 0.001))
+
+    // the core lights only once the end of the page is genuinely reached
+    const lit = THREE.MathUtils.smoothstep(t, 0.2, 0.45) * born
+    const cm = core.current.material as THREE.MeshBasicMaterial
+    cm.opacity = damp(cm.opacity, 0.15 + lit * 0.85, 7, d)
+    const hm = halo.current.material as THREE.MeshBasicMaterial
+    const pulse = STILL ? 1 : 1 + Math.sin(time * 2.2) * 0.08
+    hm.opacity = damp(hm.opacity, lit * 0.35, 5, d)
+    halo.current.scale.setScalar((0.6 + lit * 0.6) * pulse)
+
+    g.current.rotation.y = STILL ? 0.3 : 0.3 + Math.sin(time * 0.14) * 0.08
+    g.current.rotation.x = -0.12
   })
 
   return (
     <group ref={g}>
-      <mesh geometry={geo} material={alloy} castShadow receiveShadow />
-      {/* the lens: dark until the signal is genuinely reached, then holds.
-          DoubleSide because a flat disc, unlike the vessel's seal torus,
-          has only one face -- and the rig's own ambient sway means no
-          single winding direction stays pointed at the camera. */}
-      <mesh ref={lens} position={[0, 0.79, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[0.052, 32]} />
-        <meshBasicMaterial
-          color={BEAM} transparent opacity={0.08} toneMapped={false}
-          side={THREE.DoubleSide}
-        />
+      {GIMBALS.map((gm, i) => (
+        <group key={i} ref={(el) => { rings.current[i] = el }}>
+          <mesh material={alloy} castShadow receiveShadow>
+            <torusGeometry args={[gm.r, 0.026, 18, 128]} />
+          </mesh>
+          {/* the pivot pins the next ring hangs from */}
+          {[-1, 1].map((sgn) => (
+            <mesh key={sgn} material={alloy} position={[gm.r * sgn, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+              <cylinderGeometry args={[0.032, 0.032, 0.09, 16]} />
+            </mesh>
+          ))}
+        </group>
+      ))}
+      {/* flywheel on its axle: rim and open spokes so the spin actually reads */}
+      <group ref={rotor}>
+        <mesh material={alloy} castShadow>
+          <torusGeometry args={[0.3, 0.045, 18, 96]} />
+        </mesh>
+        {[0, 1, 2].map((k) => (
+          <mesh key={k} material={alloy} rotation={[0, 0, (k * Math.PI) / 3]} position={[0, 0, 0.02]}>
+            <boxGeometry args={[0.56, 0.035, 0.03]} />
+          </mesh>
+        ))}
+        <mesh material={alloy} rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[0.022, 0.022, 1.04, 12]} />
+        </mesh>
+      </group>
+      <mesh ref={core}>
+        <sphereGeometry args={[0.09, 32, 16]} />
+        <meshBasicMaterial color={BEAM} transparent opacity={0.15} toneMapped={false} />
       </mesh>
-      {/* the collar the gathered line of modules arrives into */}
-      <mesh position={[0, -0.56, 0]} castShadow receiveShadow>
-        <cylinderGeometry args={[0.3, 0.36, 0.14, 40]} />
-        <primitive object={alloy} attach="material" />
+      <mesh ref={halo}>
+        <sphereGeometry args={[0.2, 32, 16]} />
+        <meshBasicMaterial
+          color={BEAM} transparent opacity={0} toneMapped={false}
+          blending={THREE.AdditiveBlending} depthWrite={false}
+        />
       </mesh>
     </group>
   )
@@ -1202,8 +1257,8 @@ export default function Instrument() {
                        //    of flat leaves is a fan from
     [0, 0.35, 4.7],    // 09 rack — a shade back and raised, so the grid
                        //    reads as a shelf, not a wall
-    [0, 0.2, 3.9],     // 10 beacon — close again, slightly raised so the
-                       //    tip and its lens both clear the frame
+    [0, 0.25, 4.1],    // 10 gyroscope — close again, slightly raised so
+                       //    the nested rings read as nested
   ]
 
   useFrame((state, dt) => {
@@ -1260,7 +1315,7 @@ export default function Instrument() {
       <CoreSample index={7} />
       <FeelerGauge index={8} />
       <Rack index={9} />
-      <Beacon index={10} />
+      <Gyroscope index={10} />
     </group>
   )
 }
