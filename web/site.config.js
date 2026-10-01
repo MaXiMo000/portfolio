@@ -3,8 +3,8 @@
  * og:url, og:image, twitter:image, robots.txt, sitemap.xml — is rewritten from
  * here at build time by prerender.js.
  *
- * To move to a custom domain: change the fallback below, or set SITE_URL in
- * Netlify (Site configuration -> Environment variables). Nothing else changes.
+ * SITE_URL in Netlify (Site configuration -> Environment variables) wins;
+ * the fallback below is the same origin. Nothing else changes.
  */
-export const SITE = (process.env.SITE_URL || 'https://ritishsaini.netlify.app')
+export const SITE = (process.env.SITE_URL || 'https://ritishsaini.tech')
   .replace(/\/+$/, '')

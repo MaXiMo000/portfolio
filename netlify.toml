@@ -7,6 +7,13 @@
 [build.environment]
   NODE_VERSION = "22"
 
+# One canonical origin: the netlify.app address 301s to the custom domain.
+[[redirects]]
+  from   = "https://ritishsaini.netlify.app/*"
+  to     = "https://ritishsaini.tech/:splat"
+  status = 301
+  force  = true
+
 # Umami, proxied so analytics stay same-origin (see web/prerender.js).
 [[redirects]]
   from   = "/u/script.js"

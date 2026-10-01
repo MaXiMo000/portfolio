@@ -1,7 +1,7 @@
 # portfolio
 
 An interactive WebGL portfolio for **Ritish Saini** — backend engineer,
-Postgres, security. Live at **[ritishsaini.netlify.app](https://ritishsaini.netlify.app)**.
+Postgres, security. Live at **[ritishsaini.tech](https://ritishsaini.tech)**.
 
 > **Instruments of resolution.** Every project here takes something messy and
 > untrusted and returns something you can rely on. So the site is *one* machined
@@ -271,8 +271,10 @@ and the build adds the tracker. Both the script and its beacon are proxied
 through `/u/` (`netlify.toml`), so the browser still only talks to this
 origin and the same-origin CSP is unchanged: no cookies, no third party.
 
-## Not done yet
+## Domain
 
-- no custom domain yet — `web/site.config.js` is the single switch; set
-  `SITE_URL` in Netlify and og:url, og:image, robots.txt and sitemap.xml all
-  follow
+`ritishsaini.tech` (DNS at Hostinger: `A @ 75.2.60.5`, `CNAME www ->
+ritishsaini.netlify.app`). `SITE_URL` in Netlify sets og:url, og:image,
+robots.txt and sitemap.xml; `web/site.config.js` falls back to the same
+origin. `www` and the old `netlify.app` address both 301 to it, the latter
+via `netlify.toml`, so old links (the CV included) keep working.
