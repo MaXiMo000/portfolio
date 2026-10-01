@@ -1,7 +1,7 @@
 import { Canvas } from '@react-three/fiber'
 import { Environment, Lightformer, ContactShadows, AdaptiveDpr } from '@react-three/drei'
 import {
-  EffectComposer, Bloom, DepthOfField, Noise, Vignette, ChromaticAberration,
+  EffectComposer, Bloom, Noise, Vignette, ChromaticAberration,
 } from '@react-three/postprocessing'
 import { BlendFunction } from 'postprocessing'
 import * as THREE from 'three'
@@ -140,7 +140,9 @@ export default function Scene({ onReady }: { onReady: () => void }) {
       // screen reader needs (see "Content is readable with the canvas dead"),
       // so the canvas itself must not be announced as an unlabelled graphic.
       aria-hidden="true"
-      dpr={[1, 1.5]}
+      // full device resolution up to 2x: machined edges are the whole look,
+      // and 1.5x left them visibly soft on retina screens
+      dpr={[1, 2]}
       frameloop={STILL ? 'demand' : 'always'}
       resize={{ polyfill: ViewportObserver as never }}
       gl={{ antialias: true, powerPreference: 'high-performance' }}
@@ -162,10 +164,12 @@ export default function Scene({ onReady }: { onReady: () => void }) {
 
       <ContactShadows position={[0, -1.55, 0]} opacity={0.5} scale={14} blur={3} far={5} />
 
-      <EffectComposer multisampling={0}>
-        <DepthOfField focusDistance={0.02} focalLength={0.16} bokehScale={2.2} />
+      {/* MSAA lives here: with a composer in the chain the canvas's own
+          antialias does nothing. No depth of field: its focus plane sat at the
+          camera, so it blurred the one thing on screen worth looking at. */}
+      <EffectComposer multisampling={4}>
         <Bloom intensity={0.55} luminanceThreshold={0.7} luminanceSmoothing={0.35} mipmapBlur />
-        <ChromaticAberration offset={new THREE.Vector2(0.0007, 0.0007)} />
+        <ChromaticAberration offset={new THREE.Vector2(0.00025, 0.00025)} />
         <Noise opacity={0.035} blendFunction={BlendFunction.OVERLAY} />
         <Vignette offset={0.24} darkness={0.82} />
       </EffectComposer>
