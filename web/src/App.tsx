@@ -1,5 +1,6 @@
 import { useEffect, useState, lazy, Suspense } from 'react'
-import { initScroll } from './lib/scroll'
+import { initScroll, replay } from './lib/scroll'
+import { knock } from './lib/pointer'
 import ExperienceBoundary from './lib/ExperienceBoundary'
 import { nudge } from './lib/nudge'
 import { MODE, STILL } from './lib/mode'
@@ -22,6 +23,22 @@ function useExperienceAllowed() {
   return ok
 }
 
+const EMAIL = 'ritishsaini1995@gmail.com'
+
+// Every boundary on the page, in order: what the shape before becomes.
+const HANDOVERS = [
+  ['housing', 'ratchet', 'eight lathe wedges hinge open around it'],
+  ['ratchet', 'vessel', 'the struck teeth fly inward and become rivets'],
+  ['vessel', 'rotor', 'the rivets let go, back onto the ring they came from'],
+  ['rotor', 'spectrometer', 'the cloud collapses onto one axis: the beam'],
+  ['spectrometer', 'tumbler', 'the spectral rows curl into rings'],
+  ['tumbler', 'manifold', 'the rings extrude into piston barrels'],
+  ['manifold', 'core', 'the barrels converge and lie down as bands'],
+  ['core', 'gauge', 'the bands swing out around one rivet'],
+  ['gauge', 'rack', 'the leaves fold shut; modules fan into a shelf'],
+  ['rack', 'gyroscope', 'the shelf gathers into a line; rings unfold from it'],
+] as const
+
 const RAIL = ['Resolve', 'carabiner', 'firedrill', 'recur', 'LabLedger', 'QuizNest',
               'Recipe', 'Experience', 'Skills', 'More', 'Contact']
 
@@ -29,6 +46,12 @@ export default function App() {
   const allowed = useExperienceAllowed()
   const [ready, setReady] = useState(false)
   const [dive, setDive] = useState<string | null>(null)
+  const [copied, setCopied] = useState(false)
+  const copy = () =>
+    navigator.clipboard?.writeText(EMAIL).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1800)
+    })
 
   // The drawing must never outlive its purpose. If the scene errors out or the
   // context is lost, onReady never fires — so retire it on a timer regardless.
@@ -337,18 +360,43 @@ export default function App() {
           </div>
         </section>
 
-        <section id="s10" data-sec="contact" className="sec hero">
+        {/* A tap anywhere that isn't a control knocks the gyroscope. */}
+        <section id="s10" data-sec="contact" className="sec hero"
+          onPointerDown={(e) => {
+            if (!(e.target as Element).closest('a, button, summary')) knock(0.9)
+          }}>
           <h1 className="close">
             <span>Let's build</span>
             <span className="serif">something</span>
             <span>that holds up.</span>
           </h1>
-          <a className="go big" href="mailto:ritishsaini1995@gmail.com">ritishsaini1995@gmail.com</a>
+          <p className="mailrow">
+            <a className="go big" href={`mailto:${EMAIL}`}>{EMAIL}</a>
+            <button type="button" className="copy" onClick={copy}>
+              <span aria-live="polite">{copied ? 'Copied ✓' : 'Copy'}</span>
+            </button>
+          </p>
           <p className="ends">
             <a href="/ritish-saini-cv.pdf" download>CV (PDF)</a>
             <a href="https://github.com/MaXiMo000">GitHub</a>
             <a href="https://www.linkedin.com/in/ritish-saini-2540a5253">LinkedIn</a>
           </p>
+          <details className="how">
+            <summary>How this page works</summary>
+            <p>
+              One object, never cut. Every boundary is the shape before it
+              turning into the shape after. Pick one to watch it happen again.
+            </p>
+            <ol>
+              {HANDOVERS.map(([a, b, how], i) => (
+                <li key={b}>
+                  <button type="button" onClick={() => replay(i)}>
+                    <b>{a} &rarr; {b}</b> {how}
+                  </button>
+                </li>
+              ))}
+            </ol>
+          </details>
         </section>
       </main>
 

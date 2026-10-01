@@ -46,6 +46,8 @@ read-only default token. See [`SECURITY.md`](SECURITY.md).
 `shots` exists because dev preview surfaces blank out on scroll, and headless
 Chrome without a GL backend silently falls back to the no-WebGL path — so you
 end up auditing the wrong page. Pass a viewport: `npm run shots -- 1440 900`.
+`shots` and `og` find Chrome per platform (`web/scripts/chrome.mjs`);
+`CHROME_PATH` overrides.
 
 ## Design
 
@@ -254,6 +256,20 @@ rings tumble loosely while the section is read, then settle into orthogonal
 rest as the page bottom is reached, the flywheel spins up and the core
 lights: "something that holds up", shown as the one mechanism whose whole
 job is holding its orientation.
+
+Knock it — a fast flick across its side of the screen, or a tap anywhere on
+the contact section that isn't a control — and it wobbles off true, the core
+dims, and it comes back to rest on its own.
+
+Under it, "How this page works" lists every handover above; each one replays
+by jumping to just before that boundary and travelling through it slowly.
+
+## Visit counts
+
+Off by default. Set `UMAMI_WEBSITE_ID` in Netlify (a free Umami Cloud site)
+and the build adds the tracker. Both the script and its beacon are proxied
+through `/u/` (`netlify.toml`), so the browser still only talks to this
+origin and the same-origin CSP is unchanged: no cookies, no third party.
 
 ## Not done yet
 

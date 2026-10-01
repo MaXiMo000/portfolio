@@ -2,7 +2,7 @@ import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { S, VIEW, damp } from '../lib/scroll'
-import { P, I } from '../lib/pointer'
+import { P, I, KICK } from '../lib/pointer'
 import { NUDGE } from '../lib/nudge'
 import { STILL } from '../lib/mode'
 import { ratchetGeometry, housingGeometry, pawlGeometry, tumblerGeometry } from './geometry'
@@ -1137,6 +1137,9 @@ const GIMBALS = [
  * line. Every ring here starts as exactly that line — a hoop seen edge-on,
  * scaled to zero width — and unfolds outward, outermost first. Nothing
  * departs; there is nothing after it.
+ *
+ * Knock it (flick across it, or tap) and it wobbles off true, the core
+ * flickers, and it finds its rest again — the claim, demonstrated.
  */
 function Gyroscope({ index }: { index: number }) {
   const g = useRef<THREE.Group>(null!)
@@ -1147,16 +1150,22 @@ function Gyroscope({ index }: { index: number }) {
   const alloy = useAlloy()
   const w = useWeight(index)
   const spin = useRef(0)
+  const shake = useRef(0)
 
   useFrame((state, dt) => {
     const d = Math.min(dt, 0.05)
-    stage(g.current, w.current, VIEW.mobile ? 0.85 : 1.15)
+    stage(g.current, w.current, VIEW.mobile ? 1 : 1.15)
     const t = STILL ? 1 : (S.i === index ? S.t : 0)
     const born = arrive(index)
     const time = STILL ? 0 : state.clock.elapsedTime
     // S.t is measured at the viewport's middle, so the last section tops out
     // near 0.5 at the page bottom — every range here has to finish by then
     const settle = STILL ? 1 : THREE.MathUtils.smoothstep(t, 0.02, 0.4)
+    // a knock decays on its own, so it always comes back to rest
+    KICK.v = STILL ? 0 : KICK.v * Math.exp(-1.4 * d)
+    // eased toward, so a tap swings it rather than snapping it
+    shake.current = damp(shake.current, Math.min(KICK.v, 1), 6, d)
+    const knock = shake.current
 
     GIMBALS.forEach((gm, i) => {
       const ring = rings.current[i]
@@ -1165,7 +1174,7 @@ function Gyroscope({ index }: { index: number }) {
       // into a hoop, outermost first
       const open = smoothstep(THREE.MathUtils.clamp((born - i * 0.14) / 0.72, 0, 1))
       ring.scale.set(Math.max(open, 0.001), 1, Math.max(open, 0.001))
-      const loose = (1 - settle) * gm.amp
+      const loose = ((1 - settle) + knock * 0.45) * gm.amp
       const wob = (k: number) => Math.sin(time * gm.f + gm.ph + k) * loose
       ring.rotation.set(
         gm.rest[0] * open + wob(0),
@@ -1181,7 +1190,7 @@ function Gyroscope({ index }: { index: number }) {
     rotor.current.scale.setScalar(Math.max(r, 0.001))
 
     // the core lights only once the end of the page is genuinely reached
-    const lit = THREE.MathUtils.smoothstep(t, 0.2, 0.45) * born
+    const lit = THREE.MathUtils.smoothstep(t, 0.2, 0.45) * born * (1 - knock * 0.6)
     const cm = core.current.material as THREE.MeshBasicMaterial
     cm.opacity = damp(cm.opacity, 0.15 + lit * 0.85, 7, d)
     const hm = halo.current.material as THREE.MeshBasicMaterial

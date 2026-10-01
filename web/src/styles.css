@@ -123,6 +123,10 @@ dd b{font-family:var(--mono);color:var(--beam);font-weight:400}
 
 .footnote{margin-top:30px;max-width:34rem;font-size:12.5px;line-height:1.65;color:#6E7885}
 .footnote b{font-family:var(--mono);font-weight:400;color:var(--alloy)}
+.footnote a{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--chalk);text-decoration:none;border-bottom:1px solid var(--hair);padding-bottom:5px;
+  transition:color .2s,border-color .2s}
+.footnote a:hover{color:var(--beam);border-color:rgba(134,233,222,.5)}
 
 /* ---- 09 the rack: a real .sec like every other section now (see the
    comment above it in App.tsx) -- only the link styling here is bespoke. */
@@ -216,6 +220,29 @@ dd b{font-family:var(--mono);color:var(--beam);font-weight:400}
   color:#6E7885;text-decoration:none;border-bottom:1px solid var(--hair);padding-bottom:6px}
 .ends a:hover{color:var(--chalk);border-color:var(--beam)}
 
+/* ---- contact: copy the address, and the page explaining itself ---------- */
+.mailrow{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 22px;margin-top:44px}
+.mailrow .go.big{margin-top:0}
+.copy{background:none;border:1px solid var(--hair);border-radius:2px;cursor:pointer;
+  font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;
+  color:#8791A0;padding:7px 12px;transition:color .2s,border-color .2s}
+.copy:hover,.copy:focus-visible{color:var(--beam);border-color:rgba(134,233,222,.5)}
+.how{margin-top:40px;max-width:30rem}
+.how summary{cursor:pointer;list-style:none;font-family:var(--mono);font-size:10px;
+  letter-spacing:.22em;text-transform:uppercase;color:#6E7885;display:flex;align-items:center;gap:10px}
+.how summary::-webkit-details-marker{display:none}
+.how summary::before{content:"+";color:var(--beam);transition:transform .25s}
+.how[open] summary::before{transform:rotate(45deg)}
+.how summary:hover{color:var(--chalk)}
+.how > p{margin-top:16px;font-size:12.5px;line-height:1.65;color:#8791A0}
+.how ol{list-style:none;margin-top:12px;border-left:1px solid var(--hair)}
+.how button{all:unset;cursor:pointer;display:block;padding:7px 0 7px 16px;font-size:12.5px;
+  line-height:1.5;color:#6E7885;transition:color .2s}
+.how button b{font-family:var(--mono);font-weight:400;color:var(--alloy);margin-right:6px}
+.how button:hover,.how button:focus-visible{color:var(--chalk)}
+.how button:hover b,.how button:focus-visible b{color:var(--beam)}
+.how button:focus-visible{outline:1px solid var(--beam);outline-offset:2px}
+
 /* ---- the instrument, drawn, while the render is still downloading -------- */
 /* Registered to where the instrument actually lands. Frustum maths under-read
    it (the rig scale and intro dolly both bite), so these are measured off the
@@ -248,6 +275,13 @@ dd b{font-family:var(--mono);color:var(--beam);font-weight:400}
   .role{display:none}
   .go.big{padding:14px 0}
   .ends a{padding:12px 0}
+  .footnote a{display:inline-block;padding:14px 0}
+  .copy{padding:12px 14px}
+  .how summary{padding:12px 0}
+  .how button{padding:10px 0 10px 16px}
+  /* The instrument holds the top third here, as in every other section; the
+     copy sits below it on the dark ground instead of over the rings. */
+  #s10{justify-content:flex-end;padding-bottom:9vh}
   .more__list a{display:inline-block;padding:12px 0}
   /* Same 44px floor as .go: 4px of padding on a 15px icon is a 23px target,
      and this row has room role's hiding just freed up. */

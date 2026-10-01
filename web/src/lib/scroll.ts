@@ -34,13 +34,33 @@ export const SECTIONS = [
 
 const clamp = (n: number, a = 0, b = 1) => (n < a ? a : n > b ? b : n)
 
+let lenis: Lenis | null = null
+
+/**
+ * Replay one handover, i -> i+1: jump to just before the boundary, then
+ * travel through it slowly enough to actually watch the shape change.
+ * Under `still` there is no motion to watch, so it lands on the result.
+ */
+export function replay(i: number) {
+  const els = SECTIONS.map((n) => document.querySelector<HTMLElement>(`[data-sec="${n}"]`)!)
+  const at = (f: number) => {
+    const el = els[Math.min(Math.floor(f), els.length - 1)]
+    return el.offsetTop + (f % 1) * el.offsetHeight - window.innerHeight / 2
+  }
+  const to = Math.min(at(i + 1.55), document.body.scrollHeight - window.innerHeight)
+  if (!lenis) return window.scrollTo(0, to)
+  lenis.scrollTo(at(i + 0.4), { immediate: true })
+  lenis.scrollTo(to, { duration: 2.8, easing: (t: number) => t * t * (3 - 2 * t) })
+}
+
 export function initScroll() {
   // Smooth scrolling is itself motion. Under reduce, hand scrolling back to
   // the OS entirelyrather than damping it.
-  const lenis = STILL ? null : new Lenis({ lerp: 0.09, wheelMultiplier: 0.9 })
-  if (lenis) {
-    lenis.on('scroll', ScrollTrigger.update)
-    gsap.ticker.add((time) => lenis.raf(time * 1000))
+  lenis = STILL ? null : new Lenis({ lerp: 0.09, wheelMultiplier: 0.9 })
+  const ln = lenis
+  if (ln) {
+    ln.on('scroll', ScrollTrigger.update)
+    gsap.ticker.add((time) => ln.raf(time * 1000))
     gsap.ticker.lagSmoothing(0)
   }
 
@@ -96,7 +116,7 @@ export function initScroll() {
     mark(best)
   }
 
-  if (lenis) lenis.on('scroll', update)
+  if (ln) ln.on('scroll', update)
   else window.addEventListener('scroll', update, { passive: true })
   window.addEventListener('resize', update)
   update()
@@ -128,7 +148,7 @@ export function initScroll() {
     // and five should still be over inside a couple of seconds. Continuity is
     // the point, not holding somebody hostage to their own navigation.
     const steps = Math.abs(el.offsetTop - window.scrollY) / window.innerHeight
-    lenis!.scrollTo(el, {
+    ln!.scrollTo(el, {
       duration: Math.min(1.6, 0.5 + steps * 0.16),
       easing: (t: number) => 1 - Math.pow(1 - t, 3),   // power3.out, as everywhere else
     })
@@ -143,7 +163,7 @@ export function initScroll() {
     el.setAttribute('tabindex', '-1')
     el.focus({ preventScroll: true })
   }
-  if (lenis) document.addEventListener('click', onNavClick)
+  if (ln) document.addEventListener('click', onNavClick)
 
   const stopPointer = STILL ? () => {} : initPointer()
   if (STILL) I.v = 1  // no entrance ramp; the image is simply there
@@ -168,13 +188,21 @@ export function initScroll() {
       { y: 26, autoAlpha: 0 },
       {
         y: 0, autoAlpha: 1, duration: 0.9, ease: 'power3.out',
-        scrollTrigger: { trigger: el, start: 'top 85%', once: true },
+        scrollTrigger: {
+          trigger: el, once: true,
+          // 'top 85%', but kept short of the page end: an element in the
+          // last 15% could otherwise never reach it and would stay hidden
+          start: () => Math.min(
+            el.getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.85,
+            ScrollTrigger.maxScroll(window) - 4,
+          ),
+        },
       },
     )
   })
 
   return () => {
-    lenis?.destroy()
+    ln?.destroy(); lenis = null
     window.removeEventListener('scroll', update)
     document.removeEventListener('click', onNavClick)
     stopPointer()

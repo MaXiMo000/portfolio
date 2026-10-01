@@ -7,6 +7,17 @@
 [build.environment]
   NODE_VERSION = "22"
 
+# Umami, proxied so analytics stay same-origin (see web/prerender.js).
+[[redirects]]
+  from   = "/u/script.js"
+  to     = "https://cloud.umami.is/script.js"
+  status = 200
+
+[[redirects]]
+  from   = "/u/api/send"
+  to     = "https://cloud.umami.is/api/send"
+  status = 200
+
 # Hashed assets are immutable; the HTML never is.
 [[headers]]
   for = "/assets/*"

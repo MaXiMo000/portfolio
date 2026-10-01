@@ -8,9 +8,7 @@
  *   npm run shots -- 1440 900
  */
 import puppeteer from 'puppeteer-core'
-
-const CHROME = process.env.CHROME_PATH
-  || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+import { CHROME } from './scripts/chrome.mjs'
 const [w = 375, h = 812] = process.argv.slice(2).map(Number)
 const URL = process.env.URL || 'http://localhost:5180/'
 
