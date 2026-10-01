@@ -85,7 +85,7 @@ export default function App() {
           Ritish Saini
         </span>
         <span className="hud-right">
-          <span className="role">Python · FastAPI · PostgreSQL · Elasticsearch · Celery</span>
+          <span className="role">Python · FastAPI · GenAI/LLM · PostgreSQL · Elasticsearch</span>
           {/* The fast path section 09 already offers, reachable without
               scrolling past eight instruments first. Same four destinations,
               same order, so a visitor who lands here first isn't shown a
@@ -198,7 +198,7 @@ export default function App() {
             <dl>
               <dt>Problem</dt><dd>A bank export is a wall of rows. The subscriptions are in there somewhere.</dd>
               <dt>Hard</dt><dd>Postgres row-level security, so a query that forgets its tenant filter returns zero rows instead of someone else's money.</dd>
-              <dt>Cost</dt><dd>FastAPI · SQLAlchemy · argon2id · OAuth 2.1 + PKCE · remote MCP server · <b>0</b> bank credentials stored, ever</dd>
+              <dt>Cost</dt><dd>FastAPI · SQLAlchemy · argon2id · OAuth 2.1 + PKCE · remote MCP server · pgvector matching, measured and cut · <b>0</b> bank credentials stored, ever</dd>
             </dl>
             <a
               className="go" href="https://github.com/MaXiMo000/recur"
@@ -218,8 +218,8 @@ export default function App() {
             <p className="claim">A lab PDF, resolved to <span className="serif">codes.</span></p>
             <dl>
               <dt>Problem</dt><dd>Every lab formats results differently. The numbers stop meaning anything.</dd>
-              <dt>Hard</dt><dd>Resolving each test to a LOINC code, converting units, and picking the right reference interval.</dd>
-              <dt>Cost</dt><dd>Multi-page PDFs · trend charts · <span className="esc">anything uncertain goes to a human</span></dd>
+              <dt>Hard</dt><dd>Resolving each test to a LOINC code, converting units, and picking the right reference interval &mdash; an LLM only for the ambiguous ones.</dd>
+              <dt>Cost</dt><dd>FastAPI · MongoDB · role-based access, 2FA, audit log · <span className="esc">anything uncertain goes to a human</span></dd>
             </dl>
             <a
               className="go" href="https://labledger-web.onrender.com/"
@@ -240,7 +240,7 @@ export default function App() {
             <dl>
               <dt>Problem</dt><dd>Reading something is not knowing it, and a score out of ten doesn't tell you which part you missed.</dd>
               <dt>Hard</dt><dd>Generating questions that actually discriminate, then turning a stream of answers into analytics a learner can act on.</dd>
-              <dt>Cost</dt><dd>MERN · AI-generated question sets · per-topic analytics · gamification</dd>
+              <dt>Cost</dt><dd>MERN · Gemini-generated questions and graded written answers · Google sign-in · per-topic analytics</dd>
             </dl>
             <a
               className="go" href="https://quiz-app-cp2h.onrender.com/"
@@ -289,19 +289,18 @@ export default function App() {
                 not as ownership of the platform they went into. Six lines,
                 because the core reads six bands. */}
             <ul className="strata">
-              <li>Search features on Elasticsearch &mdash; the indexes, the queries and the
-                  endpoints over them. Query latency down <b>~40%</b></li>
-              <li>A server-side row model over SQL, so grids too large to load at once
-                  page, sort and filter the way the Elasticsearch path already did</li>
-              <li>A payment gateway integration, taken end to end</li>
-              <li>Address validation before send, through Mailgun &mdash; a bad address
-                  fails on our side instead of against the sending domain</li>
+              <li><b>30+</b> REST APIs on FastAPI &mdash; <b>30%</b> faster data retrieval</li>
+              <li>A multi-tenant backend: each client's data private and isolated,
+                  and the system still easy to scale</li>
+              <li>Search on Elasticsearch &mdash; response time down <b>~40%</b></li>
+              <li>Long-running work moved onto Celery, so the API stays fast and
+                  responsive for users</li>
               {/* The space before the number is explicit: JSX trims the end of a
                   text line, so a dash at a line break runs straight into it. */}
-              <li>Query and index work across PostgreSQL and SQLAlchemy &mdash;{' '}
+              <li>PostgreSQL queries and SQLAlchemy code reworked &mdash;{' '}
                   <b>25%</b> less database load</li>
-              <li><b>30+</b> REST APIs on FastAPI, a good number of them small projects
-                  in their own right &mdash; <b>30%</b> off data retrieval</li>
+              <li>Centralized logging and Sentry alerts, so issues are caught and
+                  fixed faster</li>
             </ul>
           </div>
         </section>
@@ -313,16 +312,17 @@ export default function App() {
             <h2>What I reach for</h2>
             <p className="claim">Seven leaves, each ground to <span className="serif">one thickness.</span></p>
             <dl className="gauge">
-              <dt>Language</dt><dd>Python &middot; SQL &middot; Java</dd>
-              <dt>Backend</dt><dd>FastAPI &middot; REST &middot; JWT auth</dd>
+              <dt>Language</dt><dd>Python &middot; SQL &middot; Java &middot; JavaScript</dd>
+              <dt>Backend</dt><dd>FastAPI &middot; REST &middot; JWT &middot; OAuth2</dd>
+              <dt>GenAI</dt><dd>RAG &middot; OpenAI, Gemini &amp; Claude APIs &middot; prompt engineering &middot; MCP &middot; Claude Code, Cursor, Copilot</dd>
               <dt>Data</dt><dd>PostgreSQL &middot; MongoDB &middot; SQLAlchemy</dd>
               <dt>Search</dt><dd>Elasticsearch &middot; Redis</dd>
-              <dt>Async</dt><dd>Celery &middot; background jobs</dd>
-              <dt>Ship</dt><dd>Docker &middot; Git &middot; CI/CD &middot; Sentry</dd>
+              <dt>Ship</dt><dd>Celery &middot; Docker &middot; Git &middot; CI/CD &middot; Sentry</dd>
               <dt>Judgement</dt><dd>System design &middot; API design &middot; performance tuning &middot; debugging</dd>
             </dl>
             <p className="footnote">
-              B.Tech Computer Science, Chitkara University &mdash; CGPA <b>9.02</b>.
+              B.Tech Computer Science Engineering, Chitkara University, 2022&ndash;2026
+              &mdash; CGPA <b>9.02</b>.
               Certificates in deep learning, data science and product management.
             </p>
           </div>
@@ -381,6 +381,7 @@ export default function App() {
             <a href="https://github.com/MaXiMo000">GitHub</a>
             <a href="https://www.linkedin.com/in/ritish-saini-2540a5253">LinkedIn</a>
           </p>
+          <p className="where">Fremont, California &middot; Green Card holder, authorized to work in the U.S.</p>
           <details className="how">
             <summary>How this page works</summary>
             <p>
