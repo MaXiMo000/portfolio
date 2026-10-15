@@ -157,6 +157,7 @@ export default function App() {
               <dt>Problem</dt><dd>Repository posture rots silently between audits.</dd>
               <dt>Hard</dt><dd>A ratchet that never loosens — not by accident, not by a well-meaning PR.</dd>
               <dt>Cost</dt><dd><b>60</b> repos calibrated · <b>79</b> tests · <b>18</b> drills against live GitHub settings · SARIF · PyPI, GHCR, Marketplace</dd>
+              <dt>Found</dt><dd>Run on <b>40</b> popular repos, its build-failing findings went from <b>5</b> to <b>2</b> &mdash; <span className="serif">both real.</span> <code>carabiner fix</code> pins every action to its commit: <b>226</b> in grafana alone.</dd>
             </dl>
             <a
               className="go" href="https://github.com/MaXiMo000/carabiner"
@@ -176,8 +177,9 @@ export default function App() {
             <p className="claim">A backup is not proven until <span className="serif">something restores it.</span></p>
             <dl>
               <dt>Problem</dt><dd>A <code>pg_dump</code> that exits 0 can still be a truncated file nobody has ever tried to read back &mdash; and <code>psql</code> restores a truncated plain dump with exit 0, rows silently missing.</dd>
-              <dt>Hard</dt><dd>Matching the archive's own Postgres major and restoring inside a disposable container with no path to production, ever.</dd>
-              <dt>Cost</dt><dd><b>6</b> Postgres majors, both directions on the corpus · field-tested against pagila, chinook and northwind — <span className="serif">and found a real gap</span> in a published sample database nobody had caught · PyPI, GHCR, GitHub Action</dd>
+              <dt>Hard</dt><dd>Matching the archive's own database version and restoring inside a disposable container with no path to production, ever &mdash; including point-in-time recovery from pgBackRest and WAL-G, to the second.</dd>
+              <dt>Cost</dt><dd><b>6</b> Postgres majors, both directions on the corpus · MySQL and MariaDB · Slack and Discord alerts · PyPI, GHCR, GitHub Action</dd>
+              <dt>Found</dt><dd>pagila's published dump says Postgres 12 and needs 18: restored as labelled, <b>140</b> statements fail and <code>psql</code> <span className="serif">still exits 0.</span> <b>64</b> bytes zeroed in one pgBackRest file: caught.</dd>
             </dl>
             <a
               className="go" href="https://maximo000.github.io/firedrill/"
@@ -219,7 +221,8 @@ export default function App() {
             <dl>
               <dt>Problem</dt><dd>Every lab formats results differently. The numbers stop meaning anything.</dd>
               <dt>Hard</dt><dd>Resolving each test to a LOINC code, converting units, and picking the right reference interval &mdash; an LLM only for the ambiguous ones.</dd>
-              <dt>Cost</dt><dd>FastAPI · MongoDB · role-based access, 2FA, audit log · <span className="esc">anything uncertain goes to a human</span></dd>
+              <dt>Cost</dt><dd>FastAPI · MongoDB · role-based access, 2FA, audit log · FHIR R4 export · one-command demo · <span className="esc">anything uncertain goes to a human</span></dd>
+              <dt>Found</dt><dd>Checking <b>88</b> real report rows by hand found a positive COVID result <span className="serif">read as negative</span>. Now every row is a test: <b>0</b> values wrong, <b>0</b> tests matched wrong, <b>7</b> left for a person.</dd>
             </dl>
             <a
               className="go" href="https://labledger-web.onrender.com/"
@@ -344,13 +347,13 @@ export default function App() {
               own CI, read at a glance rather than one at a time.
             </p>
             <ul className="strata more__list">
-              <li><a href="https://github.com/MaXiMo000/receipt" aria-label="Open the receipt repository on GitHub">receipt</a> &mdash; verified receipts for what a shell command, an AI agent's tool call or a browser click actually did, in one tamper-evident format</li>
+              <li><a href="https://github.com/MaXiMo000/receipt" aria-label="Open the receipt repository on GitHub">receipt</a> &mdash; verified receipts for what a shell command, an AI agent's tool call or a browser click actually did, hash-chained and signed with an SSH key like a git commit</li>
               <li><a href="https://github.com/MaXiMo000/invariant" aria-label="Open the invariant repository on GitHub">invariant</a> &mdash; declare what must stay true, check it in CI with its own GitHub Action, keep a proof bundle of every run</li>
               <li><a href="https://github.com/MaXiMo000/playhead" aria-label="Open the playhead repository on GitHub">playhead</a> &mdash; replay an AI coding session like a video timeline, imported straight from its transcript</li>
               <li><a href="https://github.com/MaXiMo000/satchel" aria-label="Open the satchel repository on GitHub">satchel</a> &mdash; a local-first reading archive that imports Pocket and Omnivore and rescues dead links from the Wayback Machine</li>
-              <li><a href="https://github.com/MaXiMo000/sourced" aria-label="Open the sourced repository on GitHub">sourced</a> &mdash; checks each claim of LLM output against its source; an optional Claude judge must quote its evidence verbatim</li>
-              <li><a href="https://github.com/MaXiMo000/lockstep" aria-label="Open the lockstep repository on GitHub">lockstep</a> &mdash; catches installed code edited after install, which a version number never shows</li>
-              <li><a href="https://github.com/MaXiMo000/escrow" aria-label="Open the escrow repository on GitHub">escrow</a> &mdash; a self-hosted dead man's switch for cron and CI jobs, alerting when one goes quiet or fails</li>
+              <li><a href="https://github.com/MaXiMo000/sourced" aria-label="Open the sourced repository on GitHub">sourced</a> &mdash; checks each claim of LLM output against its source, measured on 20,261 real LLM sentences from RAGTruth; an optional Claude judge must quote its evidence verbatim</li>
+              <li><a href="https://github.com/MaXiMo000/lockstep" aria-label="Open the lockstep repository on GitHub">lockstep</a> &mdash; checks what is really installed &mdash; on a machine, in a container image or an SBOM &mdash; against the lockfile, uv.lock included, and catches code edited after install</li>
+              <li><a href="https://github.com/MaXiMo000/escrow" aria-label="Open the escrow repository on GitHub">escrow</a> &mdash; finds scheduled jobs that quietly stopped, across a whole GitHub org or Kubernetes cluster with no setup; one pydantic workflow had failed all 118 scheduled runs on record</li>
               <li><a href="https://github.com/MaXiMo000/drift" aria-label="Open the drift repository on GitHub">drift</a> &mdash; checks a device's real traffic, HTTPS included, against its maker's own RFC 8520 MUD file</li>
               <li><a href="https://github.com/MaXiMo000/witness" aria-label="Open the witness repository on GitHub">witness</a> &mdash; a browser extension that holds a site to the claims it publishes about itself</li>
             </ul>
