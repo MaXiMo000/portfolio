@@ -283,7 +283,7 @@ dd b{font-family:var(--mono);color:var(--beam);font-weight:400}
   .how button{padding:10px 0 10px 16px}
   /* The instrument holds the top third here, as in every other section; the
      copy sits below it on the dark ground instead of over the rings. */
-  #s10{justify-content:flex-end;padding-bottom:9vh}
+  #s13{justify-content:flex-end;padding-bottom:9vh}
   .more__list a{display:inline-block;padding:12px 0}
   /* Same 44px floor as .go: 4px of padding on a 15px icon is a 23px target,
      and this row has room role's hiding just freed up. */

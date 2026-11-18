@@ -5,7 +5,7 @@ import { Fragment, useEffect, useRef } from 'react'
  * the pitch alone asks to be taken on faith. Every excerpt below is verbatim
  * from the actual repository, not written for this panel; the schematic is
  * the one new drawing, built from the same primitive every time (a labelled
- * box, a line, the last box in --beam) so six different systems still read
+ * box, a line, the last box in --beam) so nine different systems still read
  * as one visual grammar rather than six one-off diagrams.
  */
 
@@ -106,6 +106,51 @@ $fn$;`,
 }`,
     caption: 'Three separate inputs — a duration, a diet, a goal — become one prompt, never three calls a client has to reconcile itself.',
     boxes: ['days + preferences + goals', 'one prompt', 'parsed plan'],
+  },
+  snazzlebop: {
+    lang: 'python', file: 'backend/tests/test_dice.py',
+    code: `def test_dice_are_secret(self):
+    g = make(3)
+    for viewer in ("p0", "p1", *SPECTATORS):
+        view = g.view_for(viewer)
+        self.assertNotIn("last", view)
+        self.assertEqual(view["you"]["dice"], g.dice.get(viewer, []))
+    self.assertEqual(g.view_for("tv:x")["you"]["dice"], [])
+    self.assertEqual(g.view_for("p1")["counts"], {"p0": 5, "p1": 5, "p2": 5})`,
+    caption: 'Liar’s Dice. Every player, every spectator and the TV is asked what it can see: your own dice, and only how many everyone else holds. Every game has a test like this one.',
+    boxes: ['a phone sends an intent', 'the game, on the server', 'view_for(player)', 'only what they may see'],
+  },
+  aninest: {
+    lang: 'javascript', file: 'backend/src/lib/animeSource.js',
+    code: `async function withFallback(key, ttl, primaryName, primary, fallbackName, fallback, persistMs) {
+  const compute = async () => {
+    try {
+      return await primary();
+    } catch (err) {
+      logger.warn({ err, key, primaryName, fallbackName }, \`\${primaryName} failed, falling back to \${fallbackName}\`);
+      return fallback();
+    }
+  };
+  return cached(key, ttl, persistMs ? () => persistentCached(\`anime:\${key}\`, persistMs, compute) : compute);
+}`,
+    caption: 'Every list on the site goes through this: AniList, then Jikan when AniList fails, and under both the last good copy kept in its own database.',
+    boxes: ['AniList', 'Jikan', 'stored copy', 'the page'],
+  },
+  afterglow: {
+    lang: 'python', file: 'backend/worker/git.py',
+    code: `def clone(self, url: str, dest: str, *extra: str) -> Path:
+    """Bare clone with no working tree, watched for time and size."""
+    self._remaining()
+    target = self.scratch / dest
+    self._watch(
+        self._spawn(
+            ["clone", "--bare", "--quiet", "--no-tags", "--single-branch", "--no-recurse-submodules",
+             *extra, "--", url, str(target)]
+        )
+    )  # fmt: skip
+    return target`,
+    caption: 'A stranger’s repository is read without ever checking a file out: a bare clone (blobless for the history pass), under a time and size budget, from a sandbox that can only reach github.com.',
+    boxes: ['public repo', 'bare, blobless clone', 'git log metadata', 'the city'],
   },
 }
 

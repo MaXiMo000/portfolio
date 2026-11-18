@@ -768,16 +768,438 @@ function Manifold({ index }: { index: number }) {
   )
 }
 
-/* ---------------------------------------------------------------------- 07 */
-const STRATA = 6
 const BEAM_C = new THREE.Color(BEAM)
+
+/* ---------------------------------------------------------------------- 07 */
+const SEGS = 8
+const PEGS = 16
+const WHEEL_R = 1.0
+const WIN = 5          // the segment the wheel lands on
+const TURNS = 3
+
+/** Past its section a mechanism holds its finished state rather than
+ *  snapping back to the start while it is still half on screen. */
+const held = (index: number, still: number) =>
+  STILL ? still : S.i === index ? S.t : S.i > index ? 1 : 0
+
+/**
+ * The prize wheel. Snazzlebop — a party game show.
+ *
+ * Handover in: the manifold's five barrels lie down and fan out as the
+ * wheel's segments, and its collector becomes the hub.
+ *
+ * Scroll spins it. A clicker rides the pegs on the rim, so the wheel is heard
+ * slowing down before it is seen to; the marquee bulbs chase while it turns
+ * and hold steady when it stops, and only the segment under the pointer
+ * lights. Scrolling back spins it back — a wheel, not a slot machine.
+ */
+function PrizeWheel({ index }: { index: number }) {
+  const g = useRef<THREE.Group>(null!)
+  const wheel = useRef<THREE.Group>(null!)
+  const wedges = useRef<THREE.Group>(null!)
+  const clicker = useRef<THREE.Mesh>(null!)
+  const alloy = useAlloy()
+  const w = useWeight(index)
+
+  const segs = useMemo(
+    () =>
+      Array.from({ length: SEGS }, (_, i) => {
+        const span = (Math.PI * 2) / SEGS
+        return {
+          geo: new THREE.CylinderGeometry(WHEEL_R, WHEEL_R, 0.07, 12, 1, false, i * span + 0.02, span - 0.04),
+          mat: new THREE.MeshStandardMaterial({
+            color: '#AEB8C6', metalness: 0.92, roughness: i % 2 ? 0.34 : 0.22, envMapIntensity: 2.1,
+          }),
+          center: i * span + span / 2,
+          glow: 0,
+          // the barrel (or, for the last three, the collector) it was
+          fromX: i < DOSES ? (i - (DOSES - 1) / 2) * 0.46 : 0,
+          fromY: i < DOSES ? 0.72 : -0.58,
+        }
+      }),
+    [],
+  )
+  const bulbs = useMemo(
+    () => Array.from({ length: PEGS }, () => new THREE.MeshBasicMaterial({ color: BEAM, transparent: true })),
+    [],
+  )
+  // A wedge's centre angle c points at (sin c, -cos c) once the cylinder is
+  // turned to face the camera; the pointer is at the top, so the wheel has to
+  // turn by (pi - c) to put segment WIN under it.
+  const final = TURNS * Math.PI * 2 + Math.PI - segs[WIN].center
+
+  useFrame((state, dt) => {
+    const d = Math.min(dt, 0.05)
+    const m = VIEW.mobile
+    stage(g.current, w.current, m ? 0.56 : 0.74)
+    // Clear of the copy column on desktop; centred and lifted on a phone,
+    // where the copy is below it. A wheel is as tall as it is wide.
+    g.current.position.x = m ? 0 : 0.4
+    g.current.position.y = m ? 0.32 : 0
+    const t = held(index, 1)
+    const born = arrive(index)
+
+    wedges.current.children.forEach((m, i) => {
+      const sp = segs[i]
+      m.position.x = THREE.MathUtils.lerp(sp.fromX, 0, born)
+      m.position.y = THREE.MathUtils.lerp(sp.fromY, 0, born)
+      m.scale.setScalar(0.25 + born * 0.75)
+    })
+
+    const spin = THREE.MathUtils.clamp((t - 0.08) / 0.62, 0, 1)
+    const e = 1 - Math.pow(1 - spin, 3)               // fast off the mark, long coast
+    const angle = final * e
+    wheel.current.rotation.z = STILL ? final : damp(wheel.current.rotation.z, angle, 10, d)
+    const moving = spin > 0 && spin < 1
+
+    // the clicker deflects as each peg passes the top, harder while fast
+    const pitch = (Math.PI * 2) / PEGS
+    const f = (((wheel.current.rotation.z / pitch) % 1) + 1) % 1
+    const tooth = f < 0.3 ? f / 0.3 : (1 - f) / 0.7
+    clicker.current.rotation.z = moving ? -0.5 * tooth * (1 - e * 0.6) : 0
+
+    const won = spin >= 1
+    segs.forEach((sp, i) => {
+      const on = won && i === WIN ? 0.85 : 0
+      sp.glow = STILL ? on : damp(sp.glow, on, 6, d)
+      sp.mat.emissive.copy(BEAM_C).multiplyScalar(sp.glow)
+    })
+    const now = state.clock.elapsedTime
+    bulbs.forEach((b, i) => {
+      // chase while it turns, all steady once it has landed
+      const chase = (Math.floor(now * 14) + i) % 4 === 0 ? 1 : 0.18
+      b.opacity = STILL || won ? 0.9 : moving ? chase : 0.35
+    })
+
+    g.current.rotation.y = STILL ? -0.18 : -0.18 + Math.sin(now * 0.14) * 0.05
+    g.current.rotation.x = -0.08
+  })
+
+  return (
+    <group ref={g}>
+      <group ref={wheel}>
+        <group ref={wedges}>
+          {segs.map((sp, i) => (
+            <mesh key={i} geometry={sp.geo} material={sp.mat} rotation={[Math.PI / 2, 0, 0]}
+                  position={[sp.fromX, sp.fromY, 0]} castShadow />
+          ))}
+        </group>
+        {Array.from({ length: PEGS }, (_, i) => {
+          const a = (i / PEGS) * Math.PI * 2
+          return (
+            <group key={i}>
+              <mesh position={[Math.cos(a) * 1.02, Math.sin(a) * 1.02, 0.07]} rotation={[Math.PI / 2, 0, 0]}>
+                <cylinderGeometry args={[0.026, 0.026, 0.12, 10]} />
+                <primitive object={alloy} attach="material" />
+              </mesh>
+              <mesh position={[Math.cos(a + Math.PI / PEGS) * 1.12, Math.sin(a + Math.PI / PEGS) * 1.12, 0.02]}
+                    material={bulbs[i]}>
+                <sphereGeometry args={[0.03, 10, 10]} />
+              </mesh>
+            </group>
+          )
+        })}
+        <mesh rotation={[Math.PI / 2, 0, 0]} castShadow>
+          <cylinderGeometry args={[0.17, 0.17, 0.16, 32]} />
+          <primitive object={alloy} attach="material" />
+        </mesh>
+      </group>
+
+      {/* the clicker: pivots at the top, rides the pegs */}
+      <group position={[0, 1.2, 0.1]}>
+        <mesh ref={clicker}>
+          <boxGeometry args={[0.05, 0.26, 0.04]} />
+          <meshBasicMaterial color={BEAM} />
+        </mesh>
+      </group>
+      <mesh position={[0, 1.36, 0.1]}>
+        <cylinderGeometry args={[0.05, 0.05, 0.1, 16]} />
+        <primitive object={alloy} attach="material" />
+      </mesh>
+    </group>
+  )
+}
+
+/* ---------------------------------------------------------------------- 08 */
+const RAILS = 3
+const RAIL_LEN = 1.55
+const HUB = new THREE.Vector3(-0.75, 0, 0)
+
+/**
+ * The selector. AniNest — every page answered, even when a source is down.
+ *
+ * Three rails into one hub: the primary source, the fallback, and the copy
+ * kept in its own database. Data runs down the first; its gate drops (the
+ * source is down) and the arm swings to the second; that gate drops too and
+ * the arm swings to the stored copy. The flow into the hub never stops,
+ * which is the whole point: a page degrades, it does not fail.
+ *
+ * Handover in: the wheel draws in to the hub, and three of its wedges
+ * straighten into the rails.
+ */
+function Selector({ index }: { index: number }) {
+  const g = useRef<THREE.Group>(null!)
+  const rails = useRef<THREE.Group>(null!)
+  const arm = useRef<THREE.Group>(null!)
+  const beads = useRef<THREE.Group>(null!)
+  const alloy = useAlloy()
+  const w = useWeight(index)
+
+  const spec = useMemo(
+    () =>
+      Array.from({ length: RAILS }, (_, j) => ({
+        angle: (1 - j) * 0.42,                    // fanned to the right of the hub
+        wheel: j * ((Math.PI * 2) / SEGS) + 0.4,  // the wedge it was
+        gate: new THREE.MeshStandardMaterial({
+          color: '#AEB8C6', metalness: 0.92, roughness: 0.26, envMapIntensity: 2.1,
+        }),
+      })),
+    [],
+  )
+  const ESC_C = useMemo(() => new THREE.Color(ESCALATE), [])
+
+  useFrame((state, dt) => {
+    const d = Math.min(dt, 0.05)
+    stage(g.current, w.current, 0.86)
+    g.current.position.x = VIEW.mobile ? 0 : 0.3
+    const t = held(index, 0.9)
+    const born = arrive(index)
+
+    // which rail is live: 0 until its gate drops, then 1, then the stored copy
+    const fail0 = THREE.MathUtils.clamp((t - 0.3) / 0.08, 0, 1)
+    const fail1 = THREE.MathUtils.clamp((t - 0.6) / 0.08, 0, 1)
+    const live = fail1 >= 1 ? 2 : fail0 >= 1 ? 1 : 0
+
+    rails.current.children.forEach((r, j) => {
+      const sp = spec[j]
+      const a = THREE.MathUtils.lerp(sp.wheel, sp.angle, born)
+      r.rotation.z = a
+      r.position.copy(HUB)
+      r.scale.x = 0.2 + born * 0.8
+      const gate = r.children[1]
+      const down = j === 0 ? fail0 : j === 1 ? fail1 : 0
+      gate.rotation.x = down * (Math.PI / 2)
+      sp.gate.emissive.copy(ESC_C).multiplyScalar(down * 0.9)
+    })
+
+    const target = spec[live].angle
+    arm.current.rotation.z = STILL ? target : damp(arm.current.rotation.z, target, 7, d)
+
+    // data flowing in from the far end of whichever rail is live
+    const now = STILL ? 0 : state.clock.elapsedTime
+    const a = arm.current.rotation.z
+    beads.current.children.forEach((b, k) => {
+      const along = 1 - ((now * 0.45 + k / 4) % 1)
+      const r = 0.2 + along * (RAIL_LEN - 0.25)
+      b.position.set(HUB.x + Math.cos(a) * r, HUB.y + Math.sin(a) * r, 0.08)
+      b.visible = born > 0.85 && t > 0.05
+    })
+
+    g.current.rotation.y = STILL ? 0.2 : 0.2 + Math.sin(state.clock.elapsedTime * 0.15) * 0.05
+    g.current.rotation.x = -0.12
+  })
+
+  return (
+    <group ref={g}>
+      <group ref={rails}>
+        {spec.map((sp, j) => (
+          <group key={j}>
+            <mesh position={[RAIL_LEN / 2, 0, 0]} castShadow receiveShadow>
+              <boxGeometry args={[RAIL_LEN, 0.06, 0.16]} />
+              <primitive object={alloy} attach="material" />
+            </mesh>
+            {/* the gate: stands across the rail, folds flat when its source fails */}
+            <group position={[RAIL_LEN * 0.62, 0, 0]}>
+              <mesh position={[0, 0.13, 0]} material={sp.gate}>
+                <boxGeometry args={[0.05, 0.26, 0.2]} />
+              </mesh>
+            </group>
+          </group>
+        ))}
+      </group>
+
+      <group ref={arm} position={HUB}>
+        <mesh position={[0.32, 0, 0.09]}>
+          <boxGeometry args={[0.64, 0.07, 0.05]} />
+          <meshBasicMaterial color={BEAM} />
+        </mesh>
+      </group>
+      <mesh position={HUB} rotation={[Math.PI / 2, 0, 0]} castShadow>
+        <cylinderGeometry args={[0.26, 0.26, 0.2, 40]} />
+        <primitive object={alloy} attach="material" />
+      </mesh>
+
+      <group ref={beads}>
+        {Array.from({ length: 4 }, (_, k) => (
+          <mesh key={k}>
+            <sphereGeometry args={[0.05, 14, 14]} />
+            <meshBasicMaterial color={BEAM} />
+          </mesh>
+        ))}
+      </group>
+    </group>
+  )
+}
+
+/* ---------------------------------------------------------------------- 09 */
+const GLASS = 5          // the round glass towers on the main street
+const GROUND = -0.6
+const BLOCK = 0.26
+
+/** Deterministic, so the city is the same on every load. */
+const hash = (n: number) => {
+  const x = Math.sin(n * 127.1 + 311.7) * 43758.5453
+  return x - Math.floor(x)
+}
+
+/** Where a glass tower stands, and how tall: the core sample reads these. */
+const TOWERS = Array.from({ length: GLASS }, (_, i) => ({
+  x: (i - (GLASS - 1) / 2) * 0.46,
+  h: 0.7 + hash(i + 40) * 0.6,
+}))
+
+/**
+ * The city. afterglow — a repository's history, grown into a night city.
+ *
+ * Handover in: the selector's rails lie down as streets, and the city grows
+ * up out of them in the order its files were written. Lit windows are recent
+ * work; one building takes a red beam, the hotspot; lanterns roam the
+ * streets, which are the people. The main street is five round glass towers,
+ * the largest files, and they are what lie down into the next section.
+ */
+function City({ index }: { index: number }) {
+  const g = useRef<THREE.Group>(null!)
+  const towers = useRef<THREE.Group>(null!)
+  const glass = useRef<THREE.Group>(null!)
+  const beacon = useRef<THREE.Mesh>(null!)
+  const lanterns = useRef<THREE.Group>(null!)
+  const alloy = useAlloy()
+  const w = useWeight(index)
+
+  const lit = useMemo(
+    () => new THREE.MeshStandardMaterial({
+      color: '#AEB8C6', metalness: 0.85, roughness: 0.3, envMapIntensity: 2.1,
+    }),
+    [],
+  )
+  const hot = useMemo(
+    () => new THREE.MeshStandardMaterial({
+      color: '#AEB8C6', metalness: 0.85, roughness: 0.3, envMapIntensity: 2.1,
+    }),
+    [],
+  )
+  const ESC_C = useMemo(() => new THREE.Color(ESCALATE), [])
+
+  // a 6 x 4 grid of blocks, two rows each side of the main street
+  const blocks = useMemo(
+    () =>
+      Array.from({ length: 24 }, (_, i) => {
+        const col = i % 6
+        const row = Math.floor(i / 6)
+        return {
+          x: (col - 2.5) * 0.42,
+          z: [-0.82, -0.46, 0.46, 0.82][row],
+          h: 0.18 + hash(i) * 0.62,
+          born: hash(i + 100),                     // when in the history it was written
+          kind: i === 9 ? 'hot' : hash(i + 7) > 0.74 ? 'lit' : 'dark',
+        }
+      }),
+    [],
+  )
+  const hotBlock = blocks[9]
+
+  useFrame((state) => {
+    const m = VIEW.mobile
+    stage(g.current, w.current, m ? 0.56 : 0.72)
+    // The raised camera that shows the roofs also pushes the city down the
+    // frame; on a phone that is where the copy is, so it is lifted back up.
+    g.current.position.y = m ? 0.85 : 0
+    const t = held(index, 0.9)
+    const born = arrive(index)
+    // the history replays over the first two thirds of the section
+    const grown = THREE.MathUtils.clamp((t - 0.05) / 0.6, 0, 1)
+
+    towers.current.children.forEach((m, i) => {
+      const b = blocks[i]
+      const s = THREE.MathUtils.clamp((grown - b.born * 0.75) / 0.25, 0, 1) * born
+      const k = 0.02 + s * 0.98
+      m.scale.y = k
+      m.position.y = GROUND + (b.h * k) / 2
+    })
+    glass.current.children.forEach((m, i) => {
+      const s = THREE.MathUtils.clamp((grown - i * 0.08) / 0.4, 0, 1)
+      // the selector's rails were lying where this street now runs
+      const k = (0.06 + s * 0.94) * Math.max(born, 0.06)
+      m.scale.y = k
+      m.position.y = GROUND + (TOWERS[i].h * k) / 2
+    })
+
+    lit.emissive.copy(BEAM_C).multiplyScalar(grown * 0.32)
+    const flare = THREE.MathUtils.clamp((t - 0.62) / 0.12, 0, 1)
+    hot.emissive.copy(ESC_C).multiplyScalar(flare * 0.95)
+    beacon.current.scale.y = 0.02 + flare * 0.98
+    beacon.current.position.y = GROUND + hotBlock.h + (1.1 * beacon.current.scale.y) / 2
+    beacon.current.visible = flare > 0.01
+
+    const now = STILL ? 0 : state.clock.elapsedTime
+    lanterns.current.children.forEach((l, k) => {
+      const lane = [-0.64, 0, 0.64][k % 3]
+      const x = (((now * 0.18 + k * 0.37) % 1) * 2.6) - 1.3
+      l.position.set(k % 2 ? -x : x, GROUND + 0.06, lane)
+      l.visible = grown > 0.4
+    })
+
+    g.current.rotation.y = STILL ? -0.42 : -0.42 + Math.sin(state.clock.elapsedTime * 0.12) * 0.07
+    g.current.rotation.x = 0.12
+  })
+
+  return (
+    <group ref={g}>
+      {/* the ground, with the main street and the two side streets in it */}
+      <mesh position={[0, GROUND - 0.04, 0]} receiveShadow>
+        <boxGeometry args={[2.7, 0.06, 2.1]} />
+        <primitive object={alloy} attach="material" />
+      </mesh>
+      <group ref={towers}>
+        {blocks.map((b, i) => (
+          <mesh key={i} position={[b.x, GROUND, b.z]} castShadow receiveShadow
+                material={b.kind === 'hot' ? hot : b.kind === 'lit' ? lit : alloy}>
+            <boxGeometry args={[BLOCK, b.h, BLOCK]} />
+          </mesh>
+        ))}
+      </group>
+      <group ref={glass}>
+        {TOWERS.map((tw, i) => (
+          <mesh key={i} position={[tw.x, GROUND, 0]} castShadow material={alloy}>
+            <cylinderGeometry args={[0.145, 0.145, tw.h, 40]} />
+          </mesh>
+        ))}
+      </group>
+      <mesh ref={beacon} position={[hotBlock.x, GROUND + hotBlock.h, hotBlock.z]}>
+        <cylinderGeometry args={[0.022, 0.022, 1.1, 10]} />
+        <meshBasicMaterial color={ESCALATE} transparent opacity={0.85} />
+      </mesh>
+      <group ref={lanterns}>
+        {Array.from({ length: 4 }, (_, k) => (
+          <mesh key={k}>
+            <sphereGeometry args={[0.035, 12, 12]} />
+            <meshBasicMaterial color={BEAM} />
+          </mesh>
+        ))}
+      </group>
+    </group>
+  )
+}
+
+/* ---------------------------------------------------------------------- 10 */
+const STRATA = 6
 
 /**
  * The core sample. Wizcommerce — one job, read as strata.
  *
- * Handover in: the manifold's five barrels converge on the axis and lie down,
- * and its single output nozzle becomes the sixth band. Same cylinder
- * throughout, only ever rescaled — a barrel is tall and narrow, a band is
+ * Handover in: the city's five glass towers converge on the axis and lie
+ * down, and the ground they stood on becomes the sixth band. Same cylinder
+ * throughout, only ever rescaled — a tower is tall and narrow, a band is
  * short and wide. Nothing is swapped for anything.
  *
  * A logging sonde then runs the length of it once, and each band takes the
@@ -810,11 +1232,11 @@ function CoreSample({ index }: { index: number }) {
     () =>
       Array.from({ length: STRATA }, (_, i) => ({
         y: 0.66 - i * 0.26,
-        // The barrel this band was a moment ago. The sixth has no barrel: it
-        // comes from the collector's output, which is where the other five
-        // were pouring anyway.
-        fromX: i < DOSES ? (i - (DOSES - 1) / 2) * 0.46 : 0,
-        fromY: i < DOSES ? 0.72 : -0.92,
+        // The glass tower this band was a moment ago. The sixth has no tower:
+        // it comes up out of the ground the other five stood on.
+        fromX: i < GLASS ? TOWERS[i].x : 0,
+        fromY: i < GLASS ? GROUND + TOWERS[i].h / 2 : GROUND,
+        fromH: i < GLASS ? TOWERS[i].h / 0.62 : 0.1,
       })),
     [],
   )
@@ -837,7 +1259,7 @@ function CoreSample({ index }: { index: number }) {
       b.position.x = THREE.MathUtils.lerp(sp.fromX, 0, born)
       b.position.y = THREE.MathUtils.lerp(sp.fromY, sp.y, born)
       b.scale.x = b.scale.z = THREE.MathUtils.lerp(1, 2.35, born)
-      b.scale.y = THREE.MathUtils.lerp(1, 0.34, born)
+      b.scale.y = THREE.MathUtils.lerp(sp.fromH, 0.34, born)
     })
 
     // One pass, top to bottom, over the middle of the section. It starts after
@@ -891,7 +1313,7 @@ function CoreSample({ index }: { index: number }) {
   )
 }
 
-/* ---------------------------------------------------------------------- 08 */
+/* ---------------------------------------------------------------------- 11 */
 const LEAVES = 7
 
 /**
@@ -1020,7 +1442,7 @@ function FeelerGauge({ index }: { index: number }) {
   )
 }
 
-/* ---------------------------------------------------------------------- 09 */
+/* ---------------------------------------------------------------------- 12 */
 const MODULES = 12
 const RACK_COLS = 4
 
@@ -1118,7 +1540,7 @@ function Rack({ index }: { index: number }) {
   )
 }
 
-/* ---------------------------------------------------------------------- 10 */
+/* ---------------------------------------------------------------------- 13 */
 const GIMBALS = [
   // radius, the pose it settles into, and how it wanders before it does
   { r: 0.8, rest: [0, -0.25, 0], amp: 1.4, f: 0.55, ph: 0 },
@@ -1260,13 +1682,16 @@ export default function Instrument() {
     [0.2, 0, 4.8],     // 04 spectrometer, side on
     [0, 0.15, 4.3],    // 05 tumbler, down the barrel
     [0, 0.35, 4.6],    // 06 manifold
-    [0.3, 0.1, 4.9],   // 07 core — side on and slightly raked, so the column
+    [0.05, 0.1, 4.5],  // 07 wheel — face on, so the segments and the pointer read
+    [0.15, 0.45, 4.6], // 08 selector — a shade above, so the three rails fan
+    [0.35, 1.25, 5.0], // 09 city — raised, so the streets and roofs read
+    [0.3, 0.1, 4.9],   // 10 core — side on and slightly raked, so the column
                        //    reads as a column and the sonde's travel is visible
-    [0, 0.75, 4.5],    // 08 gauge — from above, which is the only angle a fan
+    [0, 0.75, 4.5],    // 11 gauge — from above, which is the only angle a fan
                        //    of flat leaves is a fan from
-    [0, 0.35, 4.7],    // 09 rack — a shade back and raised, so the grid
+    [0, 0.35, 4.7],    // 12 rack — a shade back and raised, so the grid
                        //    reads as a shelf, not a wall
-    [0, 0.25, 4.1],    // 10 gyroscope — close again, slightly raised so
+    [0, 0.25, 4.1],    // 13 gyroscope — close again, slightly raised so
                        //    the nested rings read as nested
   ]
 
@@ -1321,10 +1746,13 @@ export default function Instrument() {
       <Spectrometer index={4} />
       <Tumbler index={5} />
       <Manifold index={6} />
-      <CoreSample index={7} />
-      <FeelerGauge index={8} />
-      <Rack index={9} />
-      <Gyroscope index={10} />
+      <PrizeWheel index={7} />
+      <Selector index={8} />
+      <City index={9} />
+      <CoreSample index={10} />
+      <FeelerGauge index={11} />
+      <Rack index={12} />
+      <Gyroscope index={13} />
     </group>
   )
 }

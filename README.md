@@ -20,9 +20,13 @@ cuts between sections; it transforms.
 | 04 | [LabLedger](https://labledger-web.onrender.com/) | spectrometer — bands snap to LOINC rows; one holds amber and escalates |
 | 05 | [QuizNest](https://quiz-app-cp2h.onrender.com/) | tumbler — five notched rings; the beam passes only when all align |
 | 06 | AI-Recipe-Maker | dosing manifold — five pistons fire in sequence into one output |
-| 07 | Wizcommerce | **core sample** — five barrels converge and lie down into one column; a sonde runs its length and each band takes the beam as it is read |
-| 08 | what I reach for | **feeler gauge** — the bands come off the column and swing out around one rivet. Seven leaves: one shape, ground seven ways |
-| 09 | — | the housing seals; ends where it started |
+| 07 | [Snazzlebop](https://snazzlebop.onrender.com) | **prize wheel** — the barrels lie down and fan into segments; it spins, a clicker rides the pegs, the marquee chases, and only the segment it lands on lights |
+| 08 | [AniNest](https://aninest-frontend.onrender.com) | **selector** — three rails into one hub: the primary source, the fallback, the stored copy. Each gate drops in turn and the arm swings on; the flow never stops |
+| 09 | [afterglow](https://afterglow.name) | **city** — the rails lie down as streets and the city grows in history order; lit windows, one red hotspot beam, lanterns in the streets |
+| 10 | Wizcommerce | **core sample** — the city's five glass towers converge and lie down into one column; a sonde runs its length and each band takes the beam as it is read |
+| 11 | what I reach for | **feeler gauge** — the bands come off the column and swing out around one rivet. Seven leaves: one shape, ground seven ways |
+| 12 | more | **rack** — the leaves fold shut; the smaller tools share one shelf |
+| 13 | — | the housing seals; ends where it started |
 
 ## Running it
 
