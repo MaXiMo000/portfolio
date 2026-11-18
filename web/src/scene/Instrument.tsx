@@ -960,7 +960,8 @@ function Selector({ index }: { index: number }) {
 
   useFrame((state, dt) => {
     const d = Math.min(dt, 0.05)
-    stage(g.current, w.current, 0.86)
+    const tablet = VIEW.mobile && VIEW.aspect >= 0.66
+    stage(g.current, w.current, tablet ? 1 : 0.86)
     g.current.position.x = VIEW.mobile ? 0 : 0.3
     const t = held(index, 0.9)
     const born = arrive(index)
@@ -1110,10 +1111,12 @@ function City({ index }: { index: number }) {
 
   useFrame((state) => {
     const m = VIEW.mobile
-    stage(g.current, w.current, m ? 0.56 : 0.72)
+    const phone = m && VIEW.aspect < 0.66
+    stage(g.current, w.current, phone ? 0.56 : m ? 0.68 : 0.72)
     // The raised camera that shows the roofs also pushes the city down the
     // frame; on a phone that is where the copy is, so it is lifted back up.
-    g.current.position.y = m ? 0.85 : 0
+    // A portrait tablet has the width to show it larger and lower.
+    g.current.position.y = phone ? 0.85 : m ? 0.5 : 0
     const t = held(index, 0.9)
     const born = arrive(index)
     // the history replays over the first two thirds of the section
@@ -1727,9 +1730,13 @@ export default function Instrument() {
     // At fov 38 and z~3.3 the half-height is ~1.14 world units, so y 0.78 with
     // scale 0.52 lands the instrument in the top quarter — clear of the copy,
     // and clear of the vignette at the frame edge.
-    rig.current.position.x = damp(rig.current.position.x, m ? 0.14 : 1.15, 4, d)
+    // A narrow desktop (1024x768, a small laptop) keeps the same copy column
+    // as a wide one, so the instrument gets less room beside it: a little
+    // smaller and further right, rather than under the paragraphs.
+    const narrow = !m && VIEW.aspect < 1.5
+    rig.current.position.x = damp(rig.current.position.x, m ? 0.14 : narrow ? 1.32 : 1.15, 4, d)
     rig.current.position.y = damp(rig.current.position.y, m ? 0.78 : 0.05, 4, d)
-    const s = damp(rig.current.scale.x, m ? 0.52 : 0.78, 4, d)
+    const s = damp(rig.current.scale.x, m ? 0.52 : narrow ? 0.66 : 0.78, 4, d)
     rig.current.scale.setScalar(s)
     state.camera.lookAt(m ? 0.1 : 0.55, m ? 0.05 : 0, 0)
   })
