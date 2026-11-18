@@ -33,14 +33,18 @@ const HANDOVERS = [
   ['rotor', 'spectrometer', 'the cloud collapses onto one axis: the beam'],
   ['spectrometer', 'tumbler', 'the spectral rows curl into rings'],
   ['tumbler', 'manifold', 'the rings extrude into piston barrels'],
-  ['manifold', 'core', 'the barrels converge and lie down as bands'],
+  ['manifold', 'wheel', 'the barrels lie down and fan out into segments'],
+  ['wheel', 'selector', 'the wheel draws in to a hub; three wedges straighten into rails'],
+  ['selector', 'city', 'the rails lie down as streets and the city grows up out of them'],
+  ['city', 'core', 'the glass towers converge and lie down as bands'],
   ['core', 'gauge', 'the bands swing out around one rivet'],
   ['gauge', 'rack', 'the leaves fold shut; modules fan into a shelf'],
   ['rack', 'gyroscope', 'the shelf gathers into a line; rings unfold from it'],
 ] as const
 
 const RAIL = ['Resolve', 'carabiner', 'firedrill', 'recur', 'LabLedger', 'QuizNest',
-              'Recipe', 'Experience', 'Skills', 'More', 'Contact']
+              'Recipe', 'Snazzlebop', 'AniNest', 'afterglow', 'Experience', 'Skills', 'More',
+              'Contact']
 
 export default function App() {
   const allowed = useExperienceAllowed()
@@ -85,7 +89,7 @@ export default function App() {
           Ritish Saini
         </span>
         <span className="hud-right">
-          <span className="role">Python · FastAPI · GenAI/LLM · PostgreSQL · Elasticsearch</span>
+          <span className="role">Python · FastAPI · LLM applications &amp; agent tooling</span>
           {/* The fast path section 09 already offers, reachable without
               scrolling past eight instruments first. Same four destinations,
               same order, so a visitor who lands here first isn't shown a
@@ -142,9 +146,9 @@ export default function App() {
             <span>comes out.</span>
           </h1>
           <p className="lede">
-            A repository. A Postgres backup. A bank export. A lab PDF. Six
-            systems that take input nobody vetted — and <b>refuse to guess</b>{' '}
-            about the parts they can't resolve.
+            A repository. A Postgres backup. A bank export. A lab PDF. A git
+            history. Nine systems that take input nobody vetted — and{' '}
+            <b>refuse to guess</b> about the parts they can't resolve.
           </p>
         </section>
 
@@ -156,7 +160,7 @@ export default function App() {
             <dl>
               <dt>Problem</dt><dd>Repository posture rots silently between audits.</dd>
               <dt>Hard</dt><dd>A ratchet that never loosens — not by accident, not by a well-meaning PR.</dd>
-              <dt>Cost</dt><dd><b>60</b> repos calibrated · <b>79</b> tests · <b>18</b> drills against live GitHub settings · SARIF · PyPI, GHCR, Marketplace</dd>
+              <dt>Cost</dt><dd><b>60</b> repos calibrated · <b>83</b> tests · <b>18</b> drills against live GitHub settings · SARIF · a pre-commit hook · PyPI, GHCR, Marketplace</dd>
               <dt>Found</dt><dd>Run on <b>40</b> popular repos, its build-failing findings went from <b>5</b> to <b>2</b> &mdash; <span className="serif">both real.</span> <code>carabiner fix</code> pins every action to its commit: <b>226</b> in grafana alone.</dd>
             </dl>
             <a
@@ -178,7 +182,7 @@ export default function App() {
             <dl>
               <dt>Problem</dt><dd>A <code>pg_dump</code> that exits 0 can still be a truncated file nobody has ever tried to read back &mdash; and <code>psql</code> restores a truncated plain dump with exit 0, rows silently missing.</dd>
               <dt>Hard</dt><dd>Matching the archive's own database version and restoring inside a disposable container with no path to production, ever &mdash; including point-in-time recovery from pgBackRest and WAL-G, to the second.</dd>
-              <dt>Cost</dt><dd><b>6</b> Postgres majors, both directions on the corpus · MySQL and MariaDB · Slack and Discord alerts · PyPI, GHCR, GitHub Action</dd>
+              <dt>Cost</dt><dd><b>6</b> Postgres majors, both directions on the corpus · MySQL and MariaDB · SQLite with no container at all · Slack and Discord alerts · PyPI, GHCR, GitHub Action</dd>
               <dt>Found</dt><dd>pagila's published dump says Postgres 12 and needs 18: restored as labelled, <b>140</b> statements fail and <code>psql</code> <span className="serif">still exits 0.</span> <b>64</b> bytes zeroed in one pgBackRest file: caught.</dd>
             </dl>
             <a
@@ -277,11 +281,74 @@ export default function App() {
           </div>
         </section>
 
-        {/* 07 — the core sample. One band per line below, which is not a
-            coincidence: the instrument reads this list. */}
-        <section id="s7" data-sec="experience" className="sec">
+        <section id="s7" data-sec="snazzlebop" className="sec">
           <div className="col">
-            <p className="num">07 <em>/ the core sample</em></p>
+            <p className="num">07 <em>/ the prize wheel</em></p>
+            <h2>Snazzlebop</h2>
+            <p className="claim">A game show where your friends are <span className="serif">the contestants.</span></p>
+            <dl>
+              <dt>Problem</dt><dd>Party games online mean an install, an account each, or one person sharing a screen while everyone else watches.</dd>
+              <dt>Hard</dt><dd>Server-authoritative engines: each phone only ever receives what its player may see. Your dice, the bomb's fuse, who is secretly the House &mdash; none of it reaches another device before the reveal, and a deploy doesn't end a game in progress.</dd>
+              <dt>Cost</dt><dd><b>37</b> games &middot; FastAPI + WebSockets &middot; React + TypeScript &middot; show nights, an audience of up to <b>30</b>, a Discord Activity &middot; <b>1,046</b> backend tests</dd>
+            </dl>
+            <a
+              className="go" href="https://snazzlebop.onrender.com"
+              aria-label="Play Snazzlebop live"
+              onPointerEnter={() => nudge(7)} onFocus={() => nudge(7)}
+            >
+              Play it live →
+            </a>
+            <DiveTrigger project="snazzlebop" onOpen={setDive} />
+          </div>
+        </section>
+
+        <section id="s8" data-sec="aninest" className="sec">
+          <div className="col">
+            <p className="num">08 <em>/ the selector</em></p>
+            <h2>AniNest</h2>
+            <p className="claim">Every page answers, <span className="serif">even with a source down.</span></p>
+            <dl>
+              <dt>Problem</dt><dd>An anime and manga hub built on free public APIs &mdash; which rate-limit, and go down.</dd>
+              <dt>Hard</dt><dd>AniList first, Jikan when it fails, and the last good copy from its own database when both are down. One dead upstream greys out one panel, never the page.</dd>
+              <dt>Cost</dt><dd>Vanilla JS &middot; Express &middot; SQLite on Turso &middot; anime, manga and novels &middot; official free episodes &middot; games, XP and alerts &middot; CSRF, 2FA, strict CSP &middot; Playwright plays every game</dd>
+            </dl>
+            <a
+              className="go" href="https://aninest-frontend.onrender.com"
+              aria-label="See AniNest running live"
+              onPointerEnter={() => nudge(8)} onFocus={() => nudge(8)}
+            >
+              See it live →
+            </a>
+            <DiveTrigger project="aninest" onOpen={setDive} />
+          </div>
+        </section>
+
+        <section id="s9" data-sec="afterglow" className="sec">
+          <div className="col">
+            <p className="num">09 <em>/ the city</em></p>
+            <h2>afterglow</h2>
+            <p className="claim">A repository's history, grown into a <span className="serif">night city.</span></p>
+            <dl>
+              <dt>Problem</dt><dd>The parts of a codebase that matter &mdash; hotspots, the bus factor, code nobody has touched in years &mdash; are invisible in a file tree.</dd>
+              <dt>Hard</dt><dd>Reading any public repository's history safely: a sandboxed worker, a bare blobless clone that never checks out a file, network egress to github.com only, and no email address ever kept.</dd>
+              <dt>Cost</dt><dd>FastAPI &middot; a Postgres job queue &middot; a WebGL2 city that also works as a plain table &middot; CodeQL, Semgrep, Trivy and gitleaks on every PR &middot; GHCR images with build provenance</dd>
+            </dl>
+            <a
+              className="go" href="https://afterglow.name"
+              aria-label="Open afterglow and grow a city from a repository"
+              onPointerEnter={() => nudge(9)} onFocus={() => nudge(9)}
+            >
+              Grow a city →
+            </a>
+            <DiveTrigger project="afterglow" onOpen={setDive} />
+          </div>
+        </section>
+
+        {/* 10 — the core sample. One band per line below, which is not a
+            coincidence: the instrument reads this list. */}
+        <section id="s10" data-sec="experience" className="sec">
+          <div className="col">
+            <p className="num">10 <em>/ the core sample</em></p>
             <h2>Wizcommerce</h2>
             <p className="claim">Backend in production, on a <span className="serif">multi-tenant</span> platform.</p>
             <p className="post">
@@ -308,20 +375,20 @@ export default function App() {
           </div>
         </section>
 
-        {/* 08 — the feeler gauge. Seven groups, seven leaves. */}
-        <section id="s8" data-sec="skills" className="sec">
+        {/* 11 — the feeler gauge. Seven groups, seven leaves. */}
+        <section id="s11" data-sec="skills" className="sec">
           <div className="col">
-            <p className="num">08 <em>/ the feeler gauge</em></p>
+            <p className="num">11 <em>/ the feeler gauge</em></p>
             <h2>What I reach for</h2>
             <p className="claim">Seven leaves, each ground to <span className="serif">one thickness.</span></p>
             <dl className="gauge">
-              <dt>Language</dt><dd>Python &middot; SQL &middot; Java &middot; JavaScript</dd>
+              <dt>Language</dt><dd>Python &middot; SQL &middot; TypeScript &middot; JavaScript (React, Node.js) &middot; Java</dd>
               <dt>Backend</dt><dd>FastAPI &middot; REST &middot; JWT &middot; OAuth2</dd>
-              <dt>GenAI</dt><dd>RAG &middot; OpenAI, Gemini &amp; Claude APIs &middot; prompt engineering &middot; MCP &middot; Claude Code, Cursor, Copilot</dd>
+              <dt>GenAI</dt><dd>RAG &middot; embeddings (pgvector) &middot; LLM evaluation &middot; prompt engineering &middot; OpenAI, Gemini &amp; Claude APIs &middot; MCP &middot; Claude Code hooks, Cursor, Copilot</dd>
               <dt>Data</dt><dd>PostgreSQL &middot; MongoDB &middot; SQLAlchemy</dd>
               <dt>Search</dt><dd>Elasticsearch &middot; Redis</dd>
-              <dt>Ship</dt><dd>Celery &middot; Docker &middot; Git &middot; CI/CD &middot; Sentry</dd>
-              <dt>Judgement</dt><dd>System design &middot; API design &middot; performance tuning &middot; debugging</dd>
+              <dt>Ship</dt><dd>Celery &middot; Docker &middot; Kubernetes &middot; Git &middot; CI/CD &middot; Sentry</dd>
+              <dt>Judgement</dt><dd>Data structures &amp; algorithms &middot; system design &middot; API design &middot; performance tuning &middot; debugging</dd>
             </dl>
             <p className="footnote">
               B.Tech Computer Science Engineering, Chitkara University, 2022&ndash;2026
@@ -331,40 +398,41 @@ export default function App() {
           </div>
         </section>
 
-        {/* 09 — the rack. Six above each get a bespoke instrument because
+        {/* 12 — the rack. Nine above each get a bespoke instrument because
             each is one system, read closely. These twelve share one rack
             instead — a real 3D instrument in its own right, not a plain
             content aside, but honestly one shelf of smaller modules rather
             than six more invented mechanisms. */}
-        <section id="s9" data-sec="more" className="sec">
+        <section id="s12" data-sec="more" className="sec">
           <div className="col">
-            <p className="num">09 <em>/ the rack</em></p>
+            <p className="num">12 <em>/ the rack</em></p>
             <h2>More, on GitHub</h2>
             <p className="claim">
-              Six above are one system each, worth their own
+              Nine above are one system each, worth their own
               <span className="serif"> mechanism.</span> These share a
               rack instead &mdash; real, tested, published, each with its
               own CI, read at a glance rather than one at a time.
             </p>
             <ul className="strata more__list">
-              <li><a href="https://github.com/MaXiMo000/receipt" aria-label="Open the receipt repository on GitHub">receipt</a> &mdash; verified receipts for what a shell command, an AI agent's tool call or a browser click actually did, hash-chained and signed with an SSH key like a git commit</li>
+              <li><a href="https://github.com/MaXiMo000/receipt" aria-label="Open the receipt repository on GitHub">receipt</a> &mdash; verified receipts for what a shell command, a browser click or an AI coding agent actually did &mdash; one hook for Claude Code, Codex and Cursor &mdash; hash-chained and signed with an SSH key like a git commit</li>
               <li><a href="https://github.com/MaXiMo000/invariant" aria-label="Open the invariant repository on GitHub">invariant</a> &mdash; declare what must stay true, check it in CI with its own GitHub Action, keep a proof bundle of every run</li>
               <li><a href="https://github.com/MaXiMo000/playhead" aria-label="Open the playhead repository on GitHub">playhead</a> &mdash; replay an AI coding session like a video timeline, imported straight from its transcript</li>
-              <li><a href="https://github.com/MaXiMo000/satchel" aria-label="Open the satchel repository on GitHub">satchel</a> &mdash; a local-first reading archive that imports Pocket and Omnivore and rescues dead links from the Wayback Machine</li>
+              <li><a href="https://github.com/MaXiMo000/satchel" aria-label="Open the satchel repository on GitHub">satchel</a> &mdash; a local-first reading archive with a one-click browser extension; imports Pocket and Omnivore, tags included, and rescues dead links from the Wayback Machine</li>
               <li><a href="https://github.com/MaXiMo000/sourced" aria-label="Open the sourced repository on GitHub">sourced</a> &mdash; checks each claim of LLM output against its source, measured on 20,261 real LLM sentences from RAGTruth; an optional Claude judge must quote its evidence verbatim</li>
-              <li><a href="https://github.com/MaXiMo000/lockstep" aria-label="Open the lockstep repository on GitHub">lockstep</a> &mdash; checks what is really installed &mdash; on a machine, in a container image or an SBOM &mdash; against the lockfile, uv.lock included, and catches code edited after install</li>
-              <li><a href="https://github.com/MaXiMo000/escrow" aria-label="Open the escrow repository on GitHub">escrow</a> &mdash; finds scheduled jobs that quietly stopped, across a whole GitHub org or Kubernetes cluster with no setup; one pydantic workflow had failed all 118 scheduled runs on record</li>
-              <li><a href="https://github.com/MaXiMo000/drift" aria-label="Open the drift repository on GitHub">drift</a> &mdash; checks a device's real traffic, HTTPS included, against its maker's own RFC 8520 MUD file</li>
+              <li><a href="https://github.com/MaXiMo000/lockstep" aria-label="Open the lockstep repository on GitHub">lockstep</a> &mdash; checks what is really installed &mdash; on a machine, in a container image or an SBOM &mdash; against the lockfile, uv.lock and npm's package-lock.json included, and catches code edited after install</li>
+              <li><a href="https://github.com/MaXiMo000/escrow" aria-label="Open the escrow repository on GitHub">escrow</a> &mdash; finds scheduled jobs that quietly stopped, by cron schedule or across a whole GitHub org or Kubernetes cluster with no setup, with a self-hosted status page; one pydantic workflow had failed all 118 scheduled runs on record</li>
+              <li><a href="https://github.com/MaXiMo000/drift" aria-label="Open the drift repository on GitHub">drift</a> &mdash; checks a device's real traffic, HTTPS included, against its maker's own RFC 8520 MUD file, from a capture or live on the network</li>
               <li><a href="https://github.com/MaXiMo000/witness" aria-label="Open the witness repository on GitHub">witness</a> &mdash; a browser extension that holds a site to the claims it publishes about itself</li>
             </ul>
             <p className="footnote">
+              <a href="https://maximo000.github.io/tools/" aria-label="See the tools on one page">The tools on one page &rarr;</a>{' '}
               <a href="https://github.com/MaXiMo000?tab=repositories" aria-label="See every public repository on GitHub">Every public repo &rarr;</a>
             </p>
           </div>
         </section>
 
         {/* A tap anywhere that isn't a control knocks the gyroscope. */}
-        <section id="s10" data-sec="contact" className="sec hero"
+        <section id="s13" data-sec="contact" className="sec hero"
           onPointerDown={(e) => {
             if (!(e.target as Element).closest('a, button, summary')) knock(0.9)
           }}>

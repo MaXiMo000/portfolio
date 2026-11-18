@@ -12,7 +12,7 @@ gsap.registerPlugin(ScrollTrigger)
  *  i = active section index, t = 0..1 progress *through* that section.
  */
 export const S = { i: 0, t: 0, p: 0 }
-export const VIEW = { mobile: false }
+export const VIEW = { mobile: false, aspect: 1 }
 
 // dev only: lets the scene be driven without scrolling, so a transition can be
 // parked at any point and inspected
@@ -26,6 +26,9 @@ export const SECTIONS = [
   'labledger',
   'quiznest',
   'recipe',
+  'snazzlebop',
+  'aninest',
+  'afterglow',
   'experience',
   'skills',
   'more',
@@ -80,6 +83,29 @@ export function initScroll() {
    * "01 carabiner … 09 Contact" are, to a screen reader, ten identical
    * destinations with nothing saying which one you are standing in.
    */
+  /**
+   * On a phone the instrument holds the top of the screen and the copy is
+   * read below it -- until a long section scrolls its copy up into that band,
+   * where text over lit metal is the one contrast failure no palette fixes.
+   * So the scene dims as the copy rises into it (--veil, 0..1, read by the
+   * scrim in styles.css) and clears when the next heading arrives below it.
+   * Written only when it changes by a visible amount, like the rail.
+   */
+  let veiled = -1
+  const root = document.documentElement
+  const veil = (el: HTMLElement) => {
+    let v = 0
+    if (VIEW.mobile) {
+      const copy = el.querySelector<HTMLElement>('.col') ?? el
+      const top = copy.getBoundingClientRect().top
+      const h = window.innerHeight
+      v = clamp((h * 0.3 - top) / (h * 0.18))
+    }
+    if (Math.abs(v - veiled) < 0.02 && !(v === 0 && veiled > 0) && !(v === 1 && veiled < 1)) return
+    veiled = v
+    root.style.setProperty('--veil', v.toFixed(3))
+  }
+
   let marked = -1
   const mark = (i: number) => {
     if (i === marked) return
@@ -99,6 +125,7 @@ export function initScroll() {
    */
   const update = () => {
     VIEW.mobile = window.innerWidth <= 820
+    VIEW.aspect = window.innerWidth / window.innerHeight
     const mid = window.scrollY + window.innerHeight / 2
     let best = 0
     let bestDist = Infinity
@@ -114,6 +141,7 @@ export function initScroll() {
     const max = document.body.scrollHeight - window.innerHeight
     S.p = max > 0 ? window.scrollY / max : 0
     mark(best)
+    veil(el)
   }
 
   if (ln) ln.on('scroll', update)

@@ -32,7 +32,8 @@ ok('the lede is in the markup', html.includes('refuse to guess'))
 
 // Every section the rail links to must exist, or the nav points at nothing.
 const RAIL = ['Resolve', 'carabiner', 'firedrill', 'recur', 'LabLedger', 'QuizNest',
-              'Recipe', 'Experience', 'Skills', 'More', 'Contact']
+              'Recipe', 'Snazzlebop', 'AniNest', 'afterglow', 'Experience', 'Skills', 'More',
+              'Contact']
 RAIL.forEach((name, i) => {
   ok(`section #s${i} (${name}) exists`, html.includes(`id="s${i}"`))
   ok(`rail links to #s${i}`, html.includes(`href="#s${i}"`))
@@ -47,6 +48,9 @@ const DESTINATIONS = [
   'github.com/MaXiMo000/AI-Recipe-Maker',
   'labledger-web.onrender.com',
   'quiz-app-cp2h.onrender.com',
+  'snazzlebop.onrender.com',
+  'aninest-frontend.onrender.com',
+  'afterglow.name',
 ]
 for (const url of DESTINATIONS) ok(`reachable: ${url}`, html.includes(url))
 
@@ -54,7 +58,8 @@ for (const url of DESTINATIONS) ok(`reachable: ${url}`, html.includes(url))
 // across the whole page would let one section hold two while another holds
 // none, which is precisely the shape of the bug this is here to prevent -- so
 // each section is inspected on its own.
-const PROJECTS = ['carabiner', 'firedrill', 'recur', 'labledger', 'quiznest', 'recipe']
+const PROJECTS = ['carabiner', 'firedrill', 'recur', 'labledger', 'quiznest', 'recipe',
+                  'snazzlebop', 'aninest', 'afterglow']
 for (const sec of PROJECTS) {
   const start = html.indexOf(`data-sec="${sec}"`)
   const rest = start === -1 ? '' : html.slice(start)
