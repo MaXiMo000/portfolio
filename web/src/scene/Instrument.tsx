@@ -834,7 +834,8 @@ function PrizeWheel({ index }: { index: number }) {
     stage(g.current, w.current, m ? 0.56 : 0.74)
     // Clear of the copy column on desktop; centred and lifted on a phone,
     // where the copy is below it. A wheel is as tall as it is wide.
-    g.current.position.x = m ? 0 : 0.4
+    // On a narrow desktop the rig has already moved right (see Instrument).
+    g.current.position.x = m ? 0 : VIEW.aspect < 1.5 ? 0.12 : 0.4
     g.current.position.y = m ? 0.32 : 0
     const t = held(index, 1)
     const born = arrive(index)
@@ -962,7 +963,7 @@ function Selector({ index }: { index: number }) {
     const d = Math.min(dt, 0.05)
     const tablet = VIEW.mobile && VIEW.aspect >= 0.66
     stage(g.current, w.current, tablet ? 1 : 0.86)
-    g.current.position.x = VIEW.mobile ? 0 : 0.3
+    g.current.position.x = VIEW.mobile ? 0 : VIEW.aspect < 1.5 ? 0.1 : 0.3
     const t = held(index, 0.9)
     const born = arrive(index)
 
@@ -1734,9 +1735,12 @@ export default function Instrument() {
     // as a wide one, so the instrument gets less room beside it: a little
     // smaller and further right, rather than under the paragraphs.
     const narrow = !m && VIEW.aspect < 1.5
-    rig.current.position.x = damp(rig.current.position.x, m ? 0.14 : narrow ? 1.32 : 1.15, 4, d)
+    // A phone held sideways: the copy takes the left 60% (styles.css), so
+    // the instrument sits smaller in the right of a very wide frame.
+    const short = VIEW.short
+    rig.current.position.x = damp(rig.current.position.x, m ? 0.14 : short ? 1.85 : narrow ? 1.32 : 1.15, 4, d)
     rig.current.position.y = damp(rig.current.position.y, m ? 0.78 : 0.05, 4, d)
-    const s = damp(rig.current.scale.x, m ? 0.52 : narrow ? 0.66 : 0.78, 4, d)
+    const s = damp(rig.current.scale.x, m ? 0.52 : short ? 0.6 : narrow ? 0.66 : 0.78, 4, d)
     rig.current.scale.setScalar(s)
     state.camera.lookAt(m ? 0.1 : 0.55, m ? 0.05 : 0, 0)
   })

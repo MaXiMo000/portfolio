@@ -12,7 +12,12 @@ gsap.registerPlugin(ScrollTrigger)
  *  i = active section index, t = 0..1 progress *through* that section.
  */
 export const S = { i: 0, t: 0, p: 0 }
-export const VIEW = { mobile: false, aspect: 1 }
+export const VIEW = { mobile: false, aspect: 1, short: false }
+
+/** The stacked layout's query, the same one styles.css uses. */
+const STACKED = typeof window === 'undefined'
+  ? ({ matches: false } as MediaQueryList)
+  : window.matchMedia('(max-width:820px),(max-width:1100px) and (max-aspect-ratio:9/10)')
 
 // dev only: lets the scene be driven without scrolling, so a transition can be
 // parked at any point and inspected
@@ -96,7 +101,8 @@ export function initScroll() {
   const veil = (el: HTMLElement) => {
     let v = 0
     if (VIEW.mobile) {
-      const copy = el.querySelector<HTMLElement>('.col') ?? el
+      // The hero and the close have no column: their first line is the copy.
+      const copy = el.querySelector<HTMLElement>('.col') ?? (el.firstElementChild as HTMLElement) ?? el
       const top = copy.getBoundingClientRect().top
       const h = window.innerHeight
       v = clamp((h * 0.3 - top) / (h * 0.18))
@@ -124,8 +130,9 @@ export function initScroll() {
    * still on screen, and S.t jumped instead of sweeping.
    */
   const update = () => {
-    VIEW.mobile = window.innerWidth <= 820
+    VIEW.mobile = STACKED.matches
     VIEW.aspect = window.innerWidth / window.innerHeight
+    VIEW.short = !VIEW.mobile && window.innerHeight <= 560   // a phone held sideways
     const mid = window.scrollY + window.innerHeight / 2
     let best = 0
     let bestDist = Infinity

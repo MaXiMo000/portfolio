@@ -66,7 +66,10 @@ a:focus-visible,[href]:focus-visible,button:focus-visible{outline:2px solid var(
 
 /* ---------------- sections: 150vh each. Pacing is the design. ------------ */
 .sec{min-height:150vh;display:flex;flex-direction:column;justify-content:center;
-  align-items:flex-start;padding:0 44px;position:relative}
+  /* Vertical padding only matters when a section's copy is taller than the
+     section (a short phone, a phone held sideways): without it the copy
+     runs straight into the next section's. Centred copy is unaffected. */
+  align-items:flex-start;padding:14vh 44px;position:relative}
 .hero{min-height:100vh}
 .col{max-width:36rem}
 
@@ -148,7 +151,7 @@ dd b{font-family:var(--mono);color:var(--beam);font-weight:400}
 /* ---------------- deep dive: one real excerpt per project ---------------- */
 .dive-trigger{display:block;margin-top:18px;background:none;border:none;cursor:pointer;
   font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;
-  color:#6E7885;padding:4px 0}
+  color:#6E7885;padding:8px 0}
 .dive-trigger:hover{color:var(--beam)}
 
 .dive-backdrop{position:fixed;inset:0;z-index:40;display:flex;align-items:center;
@@ -196,7 +199,7 @@ dd b{font-family:var(--mono);color:var(--beam);font-weight:400}
 /* Narrow screens have no room beside the instrument, so the copy sits over it.
    Even white is only 2.39:1 against bright metal — no palette fixes that, so
    the ground is reasserted underneath the text instead. */
-@media (max-width:820px){
+@media (max-width:820px),(max-width:1100px) and (max-aspect-ratio:9/10){
   body::after{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;
     /* The top band clears for the instrument, unless a section's copy has
        scrolled up into it: --veil (scroll.ts) dims it then. */
@@ -206,7 +209,7 @@ dd b{font-family:var(--mono);color:var(--beam);font-weight:400}
       rgba(8,9,12,.55) 34%,
       rgba(8,9,12,.9) 44%, var(--void) 58%)}
   .rail{display:none}
-  .sec{padding:0 22px;min-height:130vh}
+  .sec{padding:16vh 22px;min-height:130vh}
   .dive-backdrop{padding:0}
   .dive{max-width:none;max-height:none;height:100%;padding:64px 22px 40px}
   .dive__close{top:16px;right:14px}
@@ -278,11 +281,17 @@ dd b{font-family:var(--mono);color:var(--beam);font-weight:400}
 .d7{animation-delay:.66s}.d8{animation-delay:.78s}
 @keyframes draw{to{stroke-dashoffset:0}}
 
-@media (max-width:820px){
+/* The stacked layout: phones, and any screen up to 1100px held in portrait
+   (an iPad Pro upright), where two columns leave no room for the instrument.
+   scroll.ts reads the same query. */
+@media (max-width:820px),(max-width:1100px) and (max-aspect-ratio:9/10){
   /* narrow: object is ~37vh tall, centred at 19% down */
   .resolving{left:52%;top:18%;height:62vh}
   /* touch targets were 20px tall; 44 is the floor */
-  .go{padding:12px 0}
+  .go{display:inline-flex;align-items:center;min-height:44px;padding:12px 0}
+  .dive-trigger{min-height:44px;margin-top:6px;padding:12px 0}
+  .top{padding:8px 22px 20px}
+  .ends a,.copy,.how summary{display:inline-flex;align-items:center;min-height:44px}
   .role{display:none}
   .go.big{padding:14px 0}
   .ends a{padding:12px 0}
@@ -298,6 +307,15 @@ dd b{font-family:var(--mono);color:var(--beam);font-weight:400}
      and this row has room role's hiding just freed up. */
   .links{gap:2px}
   .links a{padding:14.5px}
+}
+@media (min-width:821px) and (max-height:560px){
+  /* A phone held sideways: the rail is taller than the screen, so it goes;
+     the header links stay as the fast path. */
+  .rail{display:none}
+  .top{padding:14px 28px 18px}
+  /* Wide but short: the copy keeps the left of the screen and the
+     instrument (Instrument.tsx, VIEW.short) moves into the right. */
+  .col{max-width:min(36rem,60vw)}
 }
 @media (prefers-reduced-motion:reduce){
   .resolving .d{animation:none;stroke-dashoffset:0}
