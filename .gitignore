@@ -1,3 +1,12 @@
 
 # macOS writes these into every directory it opens.
 .DS_Store
+
+# Local-only material: notes, plans, dev tools, assistant config, secrets
+.dev/
+CLAUDE.md
+CLAUDE.local.md
+.claude/
+.env
+.env.*
+!.env.example
